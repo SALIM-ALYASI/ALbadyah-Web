@@ -39,15 +39,10 @@ Route::get('/admin/login', [AdminController::class, 'showLogin'])->name('admin.l
 Route::post('/admin/login', [AdminController::class, 'login']);
 Route::post('/admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
 
-// حماية لوحة التحكم
+// حماية لوحة التحكم باستخدام middleware متقدم
 Route::group([
     'prefix' => 'dashboard',
-    'middleware' => function ($request, $next) {
-        if (!session('admin_access')) {
-            return redirect()->route('admin.login');
-        }
-        return $next($request);
-    }
+    'middleware' => 'admin.auth'
     ], function () {
         Route::resource('governorates', GovernorateController::class);
         Route::resource('wilayats', WilayatController::class);

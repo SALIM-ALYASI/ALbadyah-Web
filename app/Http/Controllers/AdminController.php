@@ -12,7 +12,7 @@ class AdminController extends Controller
     public function showLogin()
     {
         // إذا كان مسجل دخول بالفعل، إعادة توجيه للوحة التحكم
-        if (session('admin_access')) {
+        if (session('admin_access') && session('admin_secret') === env('ADMIN_SECRET')) {
             return redirect()->route('governorates.index');
         }
         
@@ -20,33 +20,71 @@ class AdminController extends Controller
     }
 
     /**
-     * تسجيل دخول الإدمن
+     * تسجيل دخول الإدمن - متغير واحد فقط مع حماية إضافية
      */
     public function login(Request $request)
     {
-        $request->validate([
-            'username' => 'required|string',
-            'password' => 'required|string',
+        // حماية ضد محاولات التلاعب - Rate Limiting
+        $ip = $request->ip();
+        $attempts = session("login_attempts_{$ip}", 0);
+        $lastAttempt = session("last_attempt_{$ip}", 0);
+        
+        // منع محاولات متتالية سريعة (أقل من 3 ثواني)
+        if (time() - $lastAttempt < 3) {
+            return back()->withErrors([
+                'credentials' => 'محاولة دخول سريعة جداً، انتظر قليلاً'
+            ]);
+        }
+        
+        // منع أكثر من 5 محاولات في 10 دقائق
+        if ($attempts >= 5 && (time() - session("first_attempt_{$ip}", time())) < 600) {
+            return back()->withErrors([
+                'credentials' => 'تم تجاوز عدد المحاولات المسموح، حاول مرة أخرى بعد 10 دقائق'
+            ]);
+        }
+        
+        // تحديث عداد المحاولات
+        if ($attempts == 0) {
+            session(["first_attempt_{$ip}" => time()]);
+        }
+        session([
+            "login_attempts_{$ip}" => $attempts + 1,
+            "last_attempt_{$ip}" => time()
         ]);
 
-        // بيانات الإدمن - كلمة المرور من متغير البيئة
-        $adminCredentials = [
-            'username' => 'admin',
-            'password' => env('ADMIN_SECRET', 'admin123'), // كلمة المرور من متغير البيئة
-        ];
+        $request->validate([
+            'admin_key' => 'required|string|min:6',
+        ]);
 
-        if ($request->username === $adminCredentials['username'] && 
-            $request->password === $adminCredentials['password']) {
+        // متغير واحد فقط للدخول - ADMIN_SECRET
+        $adminSecret = env('ADMIN_SECRET', 'admin123');
+        
+        // التحقق من صحة المفتاح مع تشفير إضافي
+        $inputKey = $request->admin_key;
+        
+        if (hash('sha256', $inputKey) === hash('sha256', $adminSecret)) {
+            // مسح عداد المحاولات عند نجاح الدخول
+            session()->forget([
+                "login_attempts_{$ip}",
+                "last_attempt_{$ip}",
+                "first_attempt_{$ip}"
+            ]);
             
-            // تعيين جلسة الإدمن
-            session(['admin_access' => true]);
+            // تعيين جلسة الإدمن مع ADMIN_SECRET
+            session([
+                'admin_access' => true,
+                'admin_secret' => env('ADMIN_SECRET'),
+                'admin_login_time' => time(),
+                'admin_ip' => $ip,
+                'admin_session_id' => uniqid('admin_', true)
+            ]);
             
             return redirect()->route('governorates.index')
                 ->with('success', 'مرحباً بك في لوحة التحكم');
         }
 
         return back()->withErrors([
-            'credentials' => 'اسم المستخدم أو كلمة المرور غير صحيحة'
+            'credentials' => 'مفتاح الدخول غير صحيح'
         ]);
     }
 
@@ -55,7 +93,15 @@ class AdminController extends Controller
      */
     public function logout()
     {
-        session()->forget('admin_access');
+        // حذف جميع بيانات الجلسة الإدارية
+        session()->forget([
+            'admin_access', 
+            'admin_secret', 
+            'admin_login_time', 
+            'admin_username',
+            'admin_ip',
+            'admin_session_id'
+        ]);
         
         return redirect()->route('admin.login')
             ->with('success', 'تم تسجيل الخروج بنجاح');

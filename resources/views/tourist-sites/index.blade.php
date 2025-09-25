@@ -39,7 +39,7 @@
         </div>
         <div class="col-md-3">
             <div class="stats-card">
-                <h3>{{ $touristSites->filter(function($item) { return $item->created_at->isToday(); })->count() }}</h3>
+                <h3>{{ $touristSites->filter(function($item) { return $item->created_at && $item->created_at->isToday(); })->count() }}</h3>
                 <p>مواقع أضيفت اليوم</p>
             </div>
         </div>

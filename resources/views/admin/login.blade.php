@@ -83,13 +83,6 @@
         .form-control:focus + .input-group-text {
             border-color: #614c39;
         }
-        .credentials-info {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 14px;
-        }
     </style>
 </head>
 <body>
@@ -119,42 +112,30 @@
         <form method="POST" action="{{ route('admin.login') }}">
             @csrf
             
-            <div class="mb-3">
-                <label for="username" class="form-label">
-                    <i class="fas fa-user me-1"></i>
-                    اسم المستخدم
-                </label>
-                <div class="input-group">
-                    <input type="text" 
-                           class="form-control @error('username') is-invalid @enderror" 
-                           id="username" 
-                           name="username" 
-                           value="{{ old('username') }}" 
-                           placeholder="أدخل اسم المستخدم"
-                           required
-                           autofocus>
-                    <span class="input-group-text">
-                        <i class="fas fa-user"></i>
-                    </span>
-                </div>
-            </div>
-
             <div class="mb-4">
-                <label for="password" class="form-label">
-                    <i class="fas fa-lock me-1"></i>
-                    كلمة المرور
+                <label for="admin_key" class="form-label">
+                    <i class="fas fa-key me-1"></i>
+                    مفتاح الدخول الإداري
                 </label>
                 <div class="input-group">
                     <input type="password" 
-                           class="form-control @error('password') is-invalid @enderror" 
-                           id="password" 
-                           name="password" 
-                           placeholder="أدخل كلمة المرور"
-                           required>
+                           class="form-control @error('admin_key') is-invalid @enderror" 
+                           id="admin_key" 
+                           name="admin_key" 
+                           value="{{ old('admin_key') }}" 
+                           placeholder="أدخل مفتاح الدخول الإداري"
+                           required
+                           autofocus
+                           minlength="6">
                     <span class="input-group-text">
-                        <i class="fas fa-lock"></i>
+                        <i class="fas fa-key"></i>
                     </span>
                 </div>
+                @error('admin_key')
+                    <div class="invalid-feedback d-block">
+                        {{ $message }}
+                    </div>
+                @enderror
             </div>
 
             <button type="submit" class="btn btn-login">
@@ -162,6 +143,7 @@
                 تسجيل الدخول
             </button>
         </form>
+
 
     </div>
 
