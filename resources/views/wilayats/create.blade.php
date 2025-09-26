@@ -26,7 +26,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('wilayats.store') }}" method="POST" id="wilayatForm">
+                <form action="{{ route('wilayats.store') }}" method="POST" id="wilayatForm" enctype="multipart/form-data">
                     @csrf
                     
                     <div class="row">
@@ -267,11 +267,12 @@
         const imageFile = document.getElementById('image').files[0];
         const imageUrl = document.getElementById('image_url').value;
         
-        if (!imageFile && !imageUrl) {
-            e.preventDefault();
-            alert('يرجى إدخال رابط صورة أو رفع ملف صورة');
-            return false;
-        }
+        // إزالة التحقق الإجباري للصورة - الصورة اختيارية
+        // if (!imageFile && !imageUrl) {
+        //     e.preventDefault();
+        //     alert('يرجى إدخال رابط صورة أو رفع ملف صورة');
+        //     return false;
+        // }
         
         if (imageFile && imageFile.size > 2 * 1024 * 1024) {
             e.preventDefault();

@@ -48,6 +48,9 @@ class WilayatController extends Controller
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             $imagePath = $image->storeAs('images/wilayats', $imageName, 'public');
             $data['image_path'] = $imagePath;
+            
+            // إزالة image_url إذا تم رفع صورة محلية
+            unset($data['image_url']);
         }
 
         Wilayat::create($data);
@@ -107,6 +110,9 @@ class WilayatController extends Controller
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             $imagePath = $image->storeAs('images/wilayats', $imageName, 'public');
             $data['image_path'] = $imagePath;
+            
+            // إزالة image_url إذا تم رفع صورة محلية
+            unset($data['image_url']);
         }
 
         $wilayat->update($data);

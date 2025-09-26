@@ -33,7 +33,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('wilayats.update', $wilayat->id) }}" method="POST" id="editForm">
+                <form action="{{ route('wilayats.update', $wilayat->id) }}" method="POST" id="editForm" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     
