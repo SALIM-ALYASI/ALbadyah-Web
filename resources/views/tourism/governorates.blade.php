@@ -49,7 +49,7 @@
                         <div class="col-md-4">
                             <div class="governorate-image">
                                 @if($governorate->image_path)
-                                    <img src="{{ asset('storage/' . $governorate->image_path) }}" alt="{{ $governorate->name_ar }}" class="img-fluid">
+                                    <img src="{{ asset($governorate->image_path) }}" alt="{{ $governorate->name_ar }}" class="img-fluid">
                                 @elseif($governorate->image_url)
                                     <img src="{{ $governorate->image_url }}" alt="{{ $governorate->name_ar }}" class="img-fluid">
                                 @else
@@ -165,6 +165,13 @@
 
 @push('styles')
 <style>
+    .hero-section {
+        background: linear-gradient(rgba(97, 76, 57, 0.7), rgba(161, 129, 90, 0.6), rgba(222, 180, 122, 0.5)),
+        url('{{ asset("images/albadyah.jpg") }}');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
     /* Hero Section */
     .hero-title {
         font-size: 3rem;

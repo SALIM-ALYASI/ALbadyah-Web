@@ -151,7 +151,7 @@
                         @if($site->images->count() > 0)
                             @php $firstImage = $site->images->first(); @endphp
                             @if($firstImage->image_path)
-                                <img src="{{ asset('storage/' . $firstImage->image_path) }}" class="card-img-top" alt="{{ $site->name_ar }}" style="height: 250px; object-fit: cover;">
+                                <img src="{{ asset($firstImage->image_path) }}" class="card-img-top" alt="{{ $site->name_ar }}" style="height: 250px; object-fit: cover;">
                             @elseif($firstImage->image_url)
                                 <img src="{{ $firstImage->image_url }}" class="card-img-top" alt="{{ $site->name_ar }}" style="height: 250px; object-fit: cover;">
                             @else
@@ -275,6 +275,14 @@
 
 @push('styles')
 <style>
+    .hero-section {
+        background: linear-gradient(rgba(97, 76, 57, 0.7), rgba(161, 129, 90, 0.6), rgba(222, 180, 122, 0.5)),
+        url('{{ asset("images/albadyah.jpg") }}');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    
     .card {
         transition: all 0.3s ease;
         border: none;

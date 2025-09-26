@@ -218,70 +218,53 @@
         </div>
     </div>
     
-    <!-- Current Images Management -->
+    <!-- Images Management -->
     <div class="col-lg-4">
-        @if($touristSite->images->count() > 0)
-        <div class="card mb-4">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-images me-2"></i>
-                    الصور الحالية ({{ $touristSite->images->count() }})
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    @foreach($touristSite->images as $image)
-                    <div class="col-6 mb-3">
-                        <div class="position-relative">
-                            <img src="{{ $image->image_url }}" 
-                                 alt="{{ $touristSite->name_ar }}" 
-                                 class="img-fluid rounded shadow" 
-                                 style="width: 100%; height: 100px; object-fit: cover;">
-                            <div class="position-absolute top-0 end-0 m-1">
-                                <button type="button" 
-                                        class="btn btn-sm btn-danger rounded-circle" 
-                                        onclick="deleteImage('{{ $image->id }}')"
-                                        title="حذف الصورة">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-        @endif
-        
-        <!-- Add New Images -->
         <div class="card">
             <div class="card-header">
                 <h6 class="mb-0">
-                    <i class="fas fa-plus me-2"></i>
-                    إضافة صور جديدة
+                    <i class="fas fa-images me-2"></i>
+                    إدارة الصور
                 </h6>
             </div>
             <div class="card-body">
-                <div class="mb-3">
-                    <label for="new_image_url" class="form-label">رابط صورة جديد</label>
-                    <div class="input-group">
-                        <input type="url" 
-                               class="form-control" 
-                               id="new_image_url" 
-                               placeholder="https://example.com/image.jpg">
-                        <button class="btn btn-outline-primary" type="button" onclick="addNewImage()">
-                            <i class="fas fa-plus"></i>
-                        </button>
+                @if($touristSite->images->count() > 0)
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">الصور الحالية ({{ $touristSite->images->count() }})</span>
+                            <a href="{{ route('tourist-sites.show', $touristSite->id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-cog"></i>
+                                إدارة الصور
+                            </a>
+                        </div>
+                        <div class="row">
+                            @foreach($touristSite->images->take(4) as $image)
+                            <div class="col-6 mb-2">
+                                <img src="{{ $image->image_url }}" 
+                                     alt="{{ $touristSite->name_ar }}" 
+                                     class="img-fluid rounded shadow" 
+                                     style="width: 100%; height: 60px; object-fit: cover;">
+                            </div>
+                            @endforeach
+                        </div>
+                        @if($touristSite->images->count() > 4)
+                            <small class="text-muted">و {{ $touristSite->images->count() - 4 }} صورة أخرى...</small>
+                        @endif
                     </div>
-                </div>
+                @else
+                    <div class="text-center py-3">
+                        <i class="fas fa-image fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-3">لا توجد صور للموقع السياحي</p>
+                        <a href="{{ route('tourist-sites.show', $touristSite->id) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i>
+                            إضافة صور
+                        </a>
+                    </div>
+                @endif
                 
-                <div id="new_images_list" class="mb-3">
-                    <!-- New images will be added here dynamically -->
-                </div>
-                
-                <div class="form-text">
-                    <i class="fas fa-info-circle me-1"></i>
-                    يمكنك إضافة صور جديدة للموقع السياحي
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <small>يمكنك إدارة الصور من صفحة عرض الموقع السياحي</small>
                 </div>
             </div>
         </div>
@@ -290,65 +273,6 @@
 
 @push('scripts')
 <script>
-    let newImageCount = 0;
-    
-    function addNewImage() {
-        const input = document.getElementById('new_image_url');
-        const url = input.value.trim();
-        
-        if (!url || !isValidUrl(url)) {
-            alert('يرجى إدخال رابط صورة صحيح');
-            return;
-        }
-        
-        const imagesList = document.getElementById('new_images_list');
-        const imageDiv = document.createElement('div');
-        imageDiv.className = 'mb-2 p-2 border rounded d-flex align-items-center';
-        imageDiv.innerHTML = `
-            <img src="${url}" alt="معاينة" class="me-2" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
-            <div class="flex-grow-1">
-                <small class="text-muted d-block">${url}</small>
-            </div>
-            <button type="button" class="btn btn-sm btn-danger" onclick="removeNewImage(this)">
-                <i class="fas fa-times"></i>
-            </button>
-            <input type="hidden" name="add_images[]" value="${url}">
-        `;
-        
-        imagesList.appendChild(imageDiv);
-        input.value = '';
-        newImageCount++;
-    }
-    
-    function removeNewImage(button) {
-        button.closest('.mb-2').remove();
-        newImageCount--;
-    }
-    
-    function deleteImage(imageId) {
-        if (confirm('هل أنت متأكد من حذف هذه الصورة؟')) {
-            // Add hidden input for deletion
-            const form = document.getElementById('editForm');
-            const deleteInput = document.createElement('input');
-            deleteInput.type = 'hidden';
-            deleteInput.name = 'delete_image_ids[]';
-            deleteInput.value = imageId;
-            form.appendChild(deleteInput);
-            
-            // Remove the image from display
-            event.target.closest('.col-6').remove();
-        }
-    }
-    
-    function isValidUrl(string) {
-        try {
-            new URL(string);
-            return true;
-        } catch (_) {
-            return false;
-        }
-    }
-    
     // Form validation
     document.getElementById('editForm').addEventListener('submit', function(e) {
         const submitBtn = document.getElementById('submitBtn');

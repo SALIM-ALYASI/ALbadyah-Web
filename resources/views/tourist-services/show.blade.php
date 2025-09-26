@@ -11,6 +11,10 @@
         <p class="text-muted mb-0">عرض جميع معلومات الخدمة السياحية</p>
     </div>
     <div class="d-flex gap-2">
+        <a href="{{ route('tourist-services.add-services', $touristService->id) }}" class="btn btn-success">
+            <i class="fas fa-plus"></i>
+            إضافة خدمات
+        </a>
         <a href="{{ route('tourist-services.edit', $touristService->id) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i>
             تعديل
@@ -138,7 +142,7 @@
                     </div>
                 </div>
 
-                @if($touristService->image_url)
+                @if($touristService->has_image)
                 <div class="info-item mb-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="info-icon me-3">

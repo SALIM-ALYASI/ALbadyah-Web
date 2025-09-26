@@ -61,13 +61,91 @@
             <!-- Wilayat Header -->
             <div class="wilayat-header">
                 <div class="row align-items-center">
-                    <div class="col-lg-8">
+                    <!-- صورة الولاية -->
+                    <div class="col-lg-3 col-md-4">
+                        <div class="wilayat-image-container" style="
+                            background: linear-gradient(135deg, #f5f1eb 0%, #e8ddd4 50%, #d4c4b0 100%);
+                            border-radius: 20px;
+                            padding: 20px;
+                            box-shadow: 0 8px 25px rgba(97, 76, 57, 0.15);
+                            position: relative;
+                            overflow: hidden;
+                        ">
+                            <!-- تأثير زخرفي في الخلفية -->
+                            <div style="
+                                position: absolute;
+                                top: -40px;
+                                right: -40px;
+                                width: 80px;
+                                height: 80px;
+                                background: rgba(97, 76, 57, 0.1);
+                                border-radius: 50%;
+                                z-index: 1;
+                            "></div>
+                            <div style="
+                                position: absolute;
+                                bottom: -25px;
+                                left: -25px;
+                                width: 50px;
+                                height: 50px;
+                                background: rgba(97, 76, 57, 0.08);
+                                border-radius: 50%;
+                                z-index: 1;
+                            "></div>
+                            
+                            @if($wilayat->has_image)
+                                <img src="{{ $wilayat->image_url }}" 
+                                     alt="{{ $wilayat->name_ar }}" 
+                                     class="img-fluid rounded shadow-lg"
+                                     style="
+                                        width: 100%;
+                                        height: 200px;
+                                        object-fit: cover;
+                                        border-radius: 15px;
+                                        position: relative;
+                                        z-index: 2;
+                                        transition: transform 0.3s ease;
+                                     "
+                                     onmouseover="this.style.transform='scale(1.02)'"
+                                     onmouseout="this.style.transform='scale(1)'">
+                            @else
+                                <div class="d-flex align-items-center justify-content-center" style="
+                                    height: 200px;
+                                    background: rgba(255,255,255,0.8);
+                                    border-radius: 15px;
+                                    position: relative;
+                                    z-index: 2;
+                                ">
+                                    <div class="text-center">
+                                        <i class="fas fa-image fa-3x text-muted mb-2" style="opacity: 0.6;"></i>
+                                        <p class="text-muted mb-0">لا توجد صورة</p>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    <!-- معلومات الولاية -->
+                    <div class="col-lg-5 col-md-8">
                         <h3 class="wilayat-title">
                             <i class="fas fa-map-pin me-2"></i>{{ $wilayat->name_ar }}
                             <span class="wilayat-name-en">{{ $wilayat->name_en }}</span>
                         </h3>
                         <p class="wilayat-description">{{ $wilayat->description ?? 'ولاية جميلة في ' . $governorate->name_ar }}</p>
+                        
+                        @if($wilayat->website_url)
+                        <div class="mt-3">
+                            <a href="{{ $wilayat->website_url }}" 
+                               target="_blank" 
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-external-link-alt me-1"></i>
+                                زيارة الموقع 
+                            </a>
+                        </div>
+                        @endif
                     </div>
+                    
+                    <!-- إحصائيات الولاية -->
                     <div class="col-lg-4 text-end">
                         <div class="wilayat-stats">
                             <span class="stat-badge">
@@ -79,7 +157,7 @@
                                 {{ $wilayat->touristServices->count() }} خدمة سياحية
                             </span>
                             <a href="{{ route('tourism.wilayat', $wilayat->id) }}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-eye me-1"></i>عرض الولاية
+                                <i class="fas fa-eye me-1"></i>عرض التفاصيل
                             </a>
                         </div>
                     </div>
@@ -212,6 +290,14 @@
 
 @push('styles')
 <style>
+    .hero-section {
+        background: linear-gradient(rgba(97, 76, 57, 0.7), rgba(161, 129, 90, 0.6), rgba(222, 180, 122, 0.5)),
+        url('{{ asset("images/albadyah.jpg") }}');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    
     /* Hero Section */
     .hero-title {
         font-size: 3rem;
@@ -523,6 +609,14 @@
             padding: 0.4rem 0.8rem;
         }
 
+        .wilayat-image-container {
+            padding: 15px;
+        }
+
+        .wilayat-image-container img {
+            height: 150px;
+        }
+
         .section-subtitle {
             font-size: 1.2rem;
         }
@@ -570,6 +664,15 @@
         .wilayat-name-en {
             margin-right: 0;
             margin-top: 0.25rem;
+        }
+
+        .wilayat-image-container {
+            padding: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .wilayat-image-container img {
+            height: 120px;
         }
 
         .site-image,

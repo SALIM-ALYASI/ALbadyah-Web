@@ -25,7 +25,7 @@
                         من الجبال الشامخة إلى السواحل الذهبية، من الصحراء الذهبية إلى الواحات الخضراء<br>
                         رحلة عبر تراث عُمان العريق وطبيعتها الساحرة
                     </p>
-                    
+
                     <!-- إحصائيات الزيارات -->
                     <div class="hero-stats">
                         <div class="stat-item">
@@ -100,26 +100,26 @@
                 <p class="section-subtitle">اكتشف أجمل الأماكن في سلطنة عُمان</p>
             </div>
         </div>
-        
+
         <div class="row">
             @forelse($featuredSites as $site)
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card h-100 mountain-shadow">
                     @if($site->images->count() > 0)
-                        <img src="{{ $site->images->first()->image_url }}" class="card-img-top" alt="{{ $site->name_ar }}">
+                    <img src="{{ $site->images->first()->image_url }}" class="card-img-top" alt="{{ $site->name_ar }}">
                     @else
-                        @php
-                            $omaniImages = [
-                                'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // صحراء
-                                'https://images.unsplash.com/photo-1544735716-392fe2489ffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // جبال
-                                'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // سواحل
-                                'https://images.unsplash.com/photo-1583417319070-4a69db38a482?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // واحات
-                                'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // قلعة
-                                'https://images.unsplash.com/photo-1544735716-392fe2489ffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'  // تراث
-                            ];
-                            $randomImage = $omaniImages[array_rand($omaniImages)];
-                        @endphp
-                        <img src="{{ $randomImage }}" class="card-img-top" alt="{{ $site->name_ar }}">
+                    @php
+                    $omaniImages = [
+                    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // صحراء
+                    'https://images.unsplash.com/photo-1544735716-392fe2489ffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // جبال
+                    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // سواحل
+                    'https://images.unsplash.com/photo-1583417319070-4a69db38a482?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // واحات
+                    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // قلعة
+                    'https://images.unsplash.com/photo-1544735716-392fe2489ffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' // تراث
+                    ];
+                    $randomImage = $omaniImages[array_rand($omaniImages)];
+                    @endphp
+                    <img src="{{ $randomImage }}" class="card-img-top" alt="{{ $site->name_ar }}">
                     @endif
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">{{ $site->name_ar }}</h5>
@@ -145,7 +145,7 @@
             </div>
             @endforelse
         </div>
-        
+
         <div class="row mt-4">
             <div class="col-12 text-center">
                 <a href="{{ route('tourism.tourist-sites') }}" class="btn btn-outline-primary btn-lg">
@@ -165,7 +165,7 @@
                 <p class="section-subtitle">اكتشف التنوع الجغرافي والثقافي في سلطنة عُمان</p>
             </div>
         </div>
-        
+
         <div class="row">
             @forelse($governorates->take(6) as $governorate)
             <div class="col-lg-4 col-md-6 mb-4">
@@ -202,7 +202,7 @@
             </div>
             @endforelse
         </div>
-        
+
         <div class="row mt-4">
             <div class="col-12 text-center">
                 <a href="{{ route('tourism.governorates') }}" class="btn btn-outline-primary btn-lg">
@@ -220,7 +220,7 @@
             <div class="col-lg-8">
                 <h2 class="mb-4">ابدأ رحلتك في البادية</h2>
                 <p class="mb-4">من الجبال الشامخة إلى السواحل الذهبية، من الصحراء الذهبية إلى الواحات الخضراء<br>
-                اكتشف خدماتنا السياحية المتميزة واحجز رحلتك المثالية عبر تراث عُمان العريق</p>
+                    اكتشف خدماتنا السياحية المتميزة واحجز رحلتك المثالية عبر تراث عُمان العريق</p>
                 <div class="cta-buttons">
                     <a href="{{ route('tourism.tourist-services') }}" class="btn btn-light btn-lg me-3">
                         <i class="fas fa-concierge-bell me-2"></i>خدماتنا السياحية
@@ -235,94 +235,94 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    loadHeroStats();
-});
+    document.addEventListener('DOMContentLoaded', function() {
+        loadHeroStats();
+    });
 
-function loadHeroStats() {
-    // جلب إجمالي الزيارات
-    fetch('/total-visits')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById('hero-total-visits').textContent = formatNumber(data.total_visits);
-            }
-        })
-        .catch(error => {
-            console.error('Error loading total visits:', error);
-        });
+    function loadHeroStats() {
+        // جلب إجمالي الزيارات
+        fetch('/total-visits')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('hero-total-visits').textContent = formatNumber(data.total_visits);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading total visits:', error);
+            });
 
-    // جلب إحصائيات مفصلة لعدد المدن
-    fetch('/visit-stats')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success && data.data.visits_by_city) {
-                const uniqueCities = data.data.visits_by_city.length;
-                document.getElementById('hero-total-cities').textContent = formatNumber(uniqueCities);
-            }
-        })
-        .catch(error => {
-            console.error('Error loading city stats:', error);
-        });
-}
-
-function formatNumber(num) {
-    if (num >= 1000000) {
-        return (num / 1000000).toFixed(1) + 'M';
-    } else if (num >= 1000) {
-        return (num / 1000).toFixed(1) + 'K';
+        // جلب إحصائيات مفصلة لعدد المدن
+        fetch('/visit-stats')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data.visits_by_city) {
+                    const uniqueCities = data.data.visits_by_city.length;
+                    document.getElementById('hero-total-cities').textContent = formatNumber(uniqueCities);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading city stats:', error);
+            });
     }
-    return num.toString();
-}
+
+    function formatNumber(num) {
+        if (num >= 1000000) {
+            return (num / 1000000).toFixed(1) + 'M';
+        } else if (num >= 1000) {
+            return (num / 1000).toFixed(1) + 'K';
+        }
+        return num.toString();
+    }
 </script>
 @endpush
 
 @push('styles')
 <style>
     .hero-section {
-        background: linear-gradient(rgba(97, 76, 57, 0.7), rgba(161, 129, 90, 0.6), rgba(222, 180, 122, 0.5)), 
-                    url('{{ asset("images/AL-badyah.jpg") }}');
+        background: linear-gradient(rgba(97, 76, 57, 0.7), rgba(161, 129, 90, 0.6), rgba(222, 180, 122, 0.5)),
+        url('{{ asset("images/albadyah.jpg") }}');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
     }
-    
+
     .hero-logo-container {
         display: flex;
         justify-content: center;
         align-items: center;
     }
-    
+
     .hero-logo-img {
         height: 140px;
         width: auto;
         object-fit: contain;
-        filter: brightness(1.1) contrast(1.1) drop-shadow(0 6px 12px rgba(0,0,0,0.4));
+        filter: brightness(1.1) contrast(1.1) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
         transition: all 0.3s ease;
         border-radius: 15px;
         background: rgba(255, 255, 255, 0.1);
         padding: 10px;
         backdrop-filter: blur(5px);
     }
-    
+
     .hero-logo-img:hover {
         transform: scale(1.1);
-        filter: brightness(1.3) contrast(1.2) drop-shadow(0 8px 16px rgba(0,0,0,0.5));
+        filter: brightness(1.3) contrast(1.2) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
         background: rgba(255, 255, 255, 0.2);
     }
-    
+
     .hero-buttons {
         margin-top: 2rem;
     }
-    
+
     .governorate-stats .badge {
         font-size: 0.8rem;
     }
-    
+
     .cta-buttons {
         margin-top: 2rem;
     }
-    
+
     /* Custom Badge Colors */
     .custom-badge-1 {
         background: linear-gradient(135deg, #614c39 0%, #a1815a 100%) !important;
@@ -330,57 +330,57 @@ function formatNumber(num) {
         border: none;
         font-weight: 500;
     }
-    
+
     .custom-badge-2 {
         background: linear-gradient(135deg, #a1815a 0%, #deb47a 100%) !important;
         color: white !important;
         border: none;
         font-weight: 500;
     }
-    
+
     .custom-badge-3 {
         background: linear-gradient(135deg, #deb47a 0%, #c19b6c 100%) !important;
         color: white !important;
         border: none;
         font-weight: 500;
     }
-    
+
     .custom-badge-1:hover {
         background: linear-gradient(135deg, #4a3a2a 0%, #8a6f4a 100%) !important;
         transform: translateY(-1px);
         box-shadow: 0 2px 8px rgba(97, 76, 57, 0.3);
     }
-    
+
     .custom-badge-2:hover {
         background: linear-gradient(135deg, #8a6f4a 0%, #c9a06a 100%) !important;
         transform: translateY(-1px);
         box-shadow: 0 2px 8px rgba(161, 129, 90, 0.3);
     }
-    
+
     .custom-badge-3:hover {
         background: linear-gradient(135deg, #c9a06a 0%, #a8855c 100%) !important;
         transform: translateY(-1px);
         box-shadow: 0 2px 8px rgba(222, 180, 122, 0.3);
     }
-    
+
     @media (max-width: 768px) {
         .hero-logo-img {
             height: 100px;
         }
-        
+
         .hero-buttons .btn {
             display: block;
             width: 100%;
             margin-bottom: 1rem;
         }
-        
+
         .cta-buttons .btn {
             display: block;
             width: 100%;
             margin-bottom: 1rem;
         }
     }
-    
+
     /* إحصائيات الصفحة الرئيسية */
     .hero-stats {
         display: flex;
@@ -420,11 +420,11 @@ function formatNumber(num) {
             gap: 1.5rem;
             padding: 1rem;
         }
-        
+
         .hero-stats .stat-number {
             font-size: 2rem;
         }
-        
+
         .hero-stats .stat-label {
             font-size: 0.9rem;
         }
@@ -435,11 +435,11 @@ function formatNumber(num) {
             flex-wrap: wrap;
             gap: 1rem;
         }
-        
+
         .hero-stats .stat-item {
             flex: 1 1 calc(50% - 0.5rem);
         }
-        
+
         .hero-stats .stat-number {
             font-size: 1.8rem;
         }

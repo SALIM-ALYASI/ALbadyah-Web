@@ -1,19 +1,25 @@
 @extends('layouts.app')
 
-@section('title', 'إضافة خدمة سياحية جديدة')
-@section('page-title', 'إضافة خدمة سياحية جديدة')
+@section('title', 'إضافة خدمة سياحية سريعة')
+@section('page-title', 'إضافة خدمة سياحية سريعة')
 
 @section('content')
 <!-- Header Section -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h1 class="h3 mb-2">إضافة خدمة سياحية جديدة</h1>
-        <p class="text-muted mb-0">أدخل بيانات الخدمة السياحية الجديدة في النموذج أدناه</p>
+        <h1 class="h3 mb-2">إضافة خدمة سياحية سريعة</h1>
+        <p class="text-muted mb-0">أدخل بيانات الخدمة السياحية في النموذج أدناه</p>
     </div>
-    <a href="{{ route('tourist-services.index') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-right"></i>
-        العودة للقائمة
-    </a>
+    <div class="d-flex gap-2">
+        <a href="{{ route('tourist-services.create-location') }}" class="btn btn-primary">
+            <i class="fas fa-map-marker-alt"></i>
+            إضافة موقع خدمة جديد
+        </a>
+        <a href="{{ route('tourist-services.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right"></i>
+            العودة للقائمة
+        </a>
+    </div>
 </div>
 
 <div class="row justify-content-center">
@@ -22,13 +28,14 @@
             <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-concierge-bell me-2"></i>
-                    بيانات الخدمة السياحية الجديدة
+                    بيانات الخدمة السياحية
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('tourist-services.store') }}" method="POST" id="serviceForm">
+                <form action="{{ route('tourist-services.store') }}" method="POST" id="serviceForm" enctype="multipart/form-data">
                     @csrf
                     
+                    <!-- Basic Information -->
                     <div class="row">
                         <div class="col-md-6 mb-4">
                             <label for="name_ar" class="form-label">
@@ -69,16 +76,17 @@
                         </div>
                     </div>
 
+                    <!-- Service Details -->
                     <div class="row">
                         <div class="col-md-4 mb-4">
                             <label for="service_type_id" class="form-label">
                                 <i class="fas fa-tags me-1 text-primary"></i>
-                                نوع الخدمة
+                                نوع الخدمة (اختياري)
                             </label>
                             <select class="form-control @error('service_type_id') is-invalid @enderror" 
                                     id="service_type_id" 
                                     name="service_type_id">
-                                <option value="">اختر نوع الخدمة</option>
+                                <option value="">اختر نوع الخدمة (اختياري)</option>
                                 @foreach($serviceTypes as $serviceType)
                                     <option value="{{ $serviceType->id }}" 
                                             {{ old('service_type_id') == $serviceType->id ? 'selected' : '' }}>
@@ -91,6 +99,10 @@
                                     {{ $message }}
                                 </div>
                             @enderror
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                نوع الخدمة اختياري - يمكنك تركه فارغاً
+                            </div>
                         </div>
                         
                         <div class="col-md-4 mb-4">
@@ -140,6 +152,7 @@
                         </div>
                     </div>
                     
+                    <!-- Website URL -->
                     <div class="mb-4">
                         <label for="website_url" class="form-label">
                             <i class="fas fa-globe me-1 text-primary"></i>
@@ -167,43 +180,71 @@
                         </div>
                     </div>
                     
+                    <!-- Service Image -->
                     <div class="mb-4">
-                        <label for="image_url" class="form-label">
-                            <i class="fas fa-image me-1 text-primary"></i>
-                            رابط صورة الخدمة
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text">
-                                <i class="fas fa-image"></i>
-                            </span>
-                            <input type="url" 
-                                   class="form-control @error('image_url') is-invalid @enderror" 
-                                   id="image_url" 
-                                   name="image_url" 
-                                   value="{{ old('image_url') }}" 
-                                   placeholder="https://example.com/image.jpg">
-                        </div>
-                        @error('image_url')
-                            <div class="invalid-feedback d-block">
-                                {{ $message }}
+                        <h6 class="mb-3">
+                            <i class="fas fa-image me-2"></i>
+                            صورة الخدمة
+                        </h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-upload me-1 text-primary"></i>
+                                    رفع صورة الخدمة
+                                </label>
+                                <input type="file" 
+                                       class="form-control @error('image_file') is-invalid @enderror" 
+                                       id="image_file" 
+                                       name="image_file" 
+                                       accept="image/*"
+                                       onchange="previewImage(this)">
+                                @error('image_file')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    يمكنك رفع صورة للخدمة (JPG, PNG, GIF - الحد الأقصى 2MB)
+                                </div>
                             </div>
-                        @enderror
-                        <div class="form-text">
-                            <i class="fas fa-info-circle me-1"></i>
-                            أدخل رابط الصورة التي تمثل الخدمة السياحية
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-link me-1 text-primary"></i>
+                                    أو رابط صورة الخدمة
+                                </label>
+                                <input type="url" 
+                                       class="form-control @error('image_url') is-invalid @enderror" 
+                                       id="image_url" 
+                                       name="image_url" 
+                                       value="{{ old('image_url') }}" 
+                                       placeholder="https://example.com/service-image.jpg"
+                                       onchange="previewImageUrl(this)">
+                                @error('image_url')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    أدخل رابط صورة الخدمة من الإنترنت
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <!-- Image Preview -->
-                    <div id="image_preview_container" class="mb-4" style="display: none;">
-                        <label class="form-label">
-                            <i class="fas fa-eye me-1 text-primary"></i>
-                            معاينة الصورة
-                        </label>
-                        <div class="text-center">
-                            <img id="image_preview" src="" alt="معاينة الصورة" 
-                                 class="img-fluid rounded shadow" 
-                                 style="max-width: 300px; max-height: 200px; object-fit: cover;">
+                        
+                        <!-- Image Preview -->
+                        <div id="image_preview_container" class="mb-3" style="display: none;">
+                            <label class="form-label">
+                                <i class="fas fa-eye me-1 text-primary"></i>
+                                معاينة صورة الخدمة
+                            </label>
+                            <div class="text-center">
+                                <img id="image_preview" src="" alt="معاينة صورة الخدمة" 
+                                     class="img-fluid rounded shadow" 
+                                     style="max-width: 300px; max-height: 200px; object-fit: cover;">
+                            </div>
                         </div>
                     </div>
                     
@@ -226,29 +267,45 @@
 
 @push('scripts')
 <script>
-    // Image preview functionality
-    document.getElementById('image_url').addEventListener('input', function() {
-        const url = this.value;
-        const previewContainer = document.getElementById('image_preview_container');
-        const previewImage = document.getElementById('image_preview');
+    // Preview image from file
+    function previewImage(input) {
+        const file = input.files[0];
+        const preview = document.getElementById('image_preview_container');
+        const img = document.getElementById('image_preview');
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+        }
+    }
+    
+    // Preview image from URL
+    function previewImageUrl(input) {
+        const url = input.value;
+        const preview = document.getElementById('image_preview_container');
+        const img = document.getElementById('image_preview');
         
         if (url && isValidUrl(url)) {
-            previewImage.src = url;
-            previewContainer.style.display = 'block';
+            img.src = url;
+            preview.style.display = 'block';
             
-            // Add loading state
-            previewImage.style.opacity = '0.5';
-            previewImage.onload = function() {
+            img.onload = function() {
                 this.style.opacity = '1';
             };
-            previewImage.onerror = function() {
-                previewContainer.style.display = 'none';
-                showAlert('خطأ في تحميل الصورة', 'danger');
+            img.onerror = function() {
+                preview.style.display = 'none';
+                showAlert('خطأ في تحميل صورة الخدمة', 'danger');
             };
         } else {
-            previewContainer.style.display = 'none';
+            preview.style.display = 'none';
         }
-    });
+    }
     
     function isValidUrl(string) {
         try {
@@ -257,6 +314,22 @@
         } catch (_) {
             return false;
         }
+    }
+    
+    function showAlert(message, type) {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alert.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        const container = document.querySelector('.card-body');
+        container.insertBefore(alert, container.firstChild);
+        
+        setTimeout(() => {
+            alert.remove();
+        }, 5000);
     }
     
     // Form validation

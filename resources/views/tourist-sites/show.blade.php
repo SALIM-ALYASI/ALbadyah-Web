@@ -229,45 +229,140 @@
     </div>
 </div>
 
-@if($touristSite->images->count() > 0)
-<!-- Images Gallery -->
+<!-- Images Management Section -->
 <div class="row mt-4">
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-images me-2"></i>
-                    معرض الصور ({{ $touristSite->images->count() }} صورة)
-                </h5>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-images me-2"></i>
+                        إدارة الصور ({{ $touristSite->images->count() }} صورة)
+                    </h5>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addImagesModal">
+                        <i class="fas fa-plus"></i>
+                        إضافة صور
+                    </button>
+                </div>
             </div>
             <div class="card-body">
-                <div class="row">
-                    @foreach($touristSite->images as $image)
-                    <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                        <div class="position-relative">
-                            <img src="{{ $image->image_url }}" 
-                                 alt="{{ $touristSite->name_ar }}" 
-                                 class="img-fluid rounded shadow" 
-                                 style="width: 100%; height: 200px; object-fit: cover; cursor: pointer;"
-                                 onclick="openImageModal('{{ $image->image_url }}', '{{ $touristSite->name_ar }}')">
-                            <div class="position-absolute top-0 end-0 m-2">
-                                <button class="btn btn-sm btn-danger rounded-circle" 
-                                        onclick="deleteImage('{{ $image->id }}')"
-                                        title="حذف الصورة">
-                                    <i class="fas fa-times"></i>
-                                </button>
+                @if($touristSite->images->count() > 0)
+                    <div class="row">
+                        @foreach($touristSite->images as $image)
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                            <div class="position-relative">
+                                <img src="{{ $image->image_url }}" 
+                                     alt="{{ $touristSite->name_ar }}" 
+                                     class="img-fluid rounded shadow" 
+                                     style="width: 100%; height: 200px; object-fit: cover; cursor: pointer;"
+                                     onclick="openImageModal('{{ $image->image_url }}', '{{ $touristSite->name_ar }}')">
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <form action="{{ route('tourist-sites.images.destroy', [$touristSite->id, $image->id]) }}" 
+                                          method="POST" 
+                                          style="display: inline;"
+                                          onsubmit="return confirm('هل أنت متأكد من حذف هذه الصورة؟')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger rounded-circle" 
+                                                title="حذف الصورة">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
+                        @endforeach
                     </div>
-                    @endforeach
-                </div>
+                @else
+                    <div class="text-center py-5">
+                        <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">لا توجد صور للموقع السياحي</h5>
+                        <p class="text-muted">يمكنك إضافة صور للموقع السياحي باستخدام الزر أعلاه</p>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
 </div>
-@endif
 
-<!-- Image Modal -->
+<!-- Add Images Modal -->
+<div class="modal fade" id="addImagesModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus me-2"></i>
+                    إضافة صور للموقع السياحي
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('tourist-sites.images.store', $touristSite->id) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <!-- File Upload Section -->
+                    <div class="mb-4">
+                        <label for="image_files" class="form-label">
+                            <i class="fas fa-upload me-1 text-primary"></i>
+                            رفع ملفات الصور
+                        </label>
+                        <input type="file" 
+                               class="form-control @error('image_files') is-invalid @enderror" 
+                               id="image_files" 
+                               name="image_files[]" 
+                               multiple 
+                               accept="image/*"
+                               onchange="previewFiles(this)">
+                        @error('image_files')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            يمكنك اختيار عدة ملفات صور (JPG, PNG, GIF)
+                        </div>
+                    </div>
+                    
+                    <!-- File Preview Section -->
+                    <div id="file_preview" class="mb-4" style="display: none;">
+                        <h6 class="text-muted mb-2">معاينة الملفات المرفوعة:</h6>
+                        <div id="preview_container" class="row"></div>
+                    </div>
+                    
+                    <!-- URL Input Section -->
+                    <div class="mb-3">
+                        <label for="image_url_input" class="form-label">
+                            <i class="fas fa-link me-1 text-primary"></i>
+                            أو رابط صورة
+                        </label>
+                        <div class="input-group">
+                            <input type="url" 
+                                   class="form-control" 
+                                   id="image_url_input" 
+                                   placeholder="https://example.com/image.jpg">
+                            <button class="btn btn-outline-primary" type="button" onclick="addImage()">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="images_list" class="mb-3">
+                        <!-- Images will be added here dynamically -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        حفظ الصور
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Image View Modal -->
 <div class="modal fade" id="imageModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -309,6 +404,8 @@
 
 @push('scripts')
 <script>
+    let imageCount = 0;
+    
     function openImageModal(imageUrl, siteName) {
         document.getElementById('modalImage').src = imageUrl;
         document.getElementById('modalImage').alt = siteName;
@@ -316,11 +413,86 @@
         new bootstrap.Modal(document.getElementById('imageModal')).show();
     }
     
-    function deleteImage(imageId) {
-        if (confirm('هل أنت متأكد من حذف هذه الصورة؟')) {
-            // You can implement AJAX delete here
-            alert('سيتم تنفيذ حذف الصورة في التحديث القادم');
+    // File preview function
+    function previewFiles(input) {
+        const previewContainer = document.getElementById('preview_container');
+        const filePreview = document.getElementById('file_preview');
+        
+        if (input.files && input.files.length > 0) {
+            filePreview.style.display = 'block';
+            previewContainer.innerHTML = '';
+            
+            Array.from(input.files).forEach((file, index) => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const col = document.createElement('div');
+                        col.className = 'col-6 mb-2';
+                        col.innerHTML = `
+                            <div class="position-relative">
+                                <img src="${e.target.result}" 
+                                     alt="معاينة ${index + 1}" 
+                                     class="img-fluid rounded shadow" 
+                                     style="width: 100%; height: 80px; object-fit: cover;">
+                                <div class="position-absolute top-0 end-0 m-1">
+                                    <span class="badge bg-primary">${index + 1}</span>
+                                </div>
+                            </div>
+                        `;
+                        previewContainer.appendChild(col);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        } else {
+            filePreview.style.display = 'none';
         }
+    }
+    
+    function addImage() {
+        const input = document.getElementById('image_url_input');
+        const url = input.value.trim();
+        
+        if (!url || !isValidUrl(url)) {
+            alert('يرجى إدخال رابط صورة صحيح');
+            return;
+        }
+        
+        const imagesList = document.getElementById('images_list');
+        const imageDiv = document.createElement('div');
+        imageDiv.className = 'mb-2 p-2 border rounded d-flex align-items-center';
+        imageDiv.innerHTML = `
+            <img src="${url}" alt="معاينة" class="me-2" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+            <div class="flex-grow-1">
+                <small class="text-muted d-block">${url}</small>
+            </div>
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeImage(this)">
+                <i class="fas fa-times"></i>
+            </button>
+            <input type="hidden" name="image_urls[]" value="${url}">
+        `;
+        
+        imagesList.appendChild(imageDiv);
+        input.value = '';
+        imageCount++;
+    }
+    
+    function removeImage(button) {
+        button.closest('.mb-2').remove();
+        imageCount--;
+    }
+    
+    function isValidUrl(string) {
+        try {
+            new URL(string);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+    
+    function confirmDelete() {
+        return confirm('هل أنت متأكد من حذف هذا الموقع السياحي؟ سيتم حذف جميع الصور المرتبطة به أيضاً.');
     }
 </script>
 @endpush

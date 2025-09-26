@@ -15,6 +15,8 @@ class TouristService extends Model
         'website_url',
         'image_url',
         'image_path',
+        'location_image_path',
+        'location_image_url',
         'governorate_id',
         'wilayat_id',
         'service_type_id',
@@ -36,6 +38,72 @@ class TouristService extends Model
     public function wilayat()
     {
         return $this->belongsTo(\App\Models\Wilayat::class, 'wilayat_id');
+    }
+
+    /**
+     * الحصول على رابط صورة الموقع
+     */
+    public function getLocationImageUrlAttribute()
+    {
+        return \App\Helpers\ImageHelper::getImageUrl(
+            $this->attributes['location_image_path'] ?? null,
+            $this->attributes['location_image_url'] ?? null
+        );
+    }
+
+    /**
+     * التحقق من وجود صورة الموقع
+     */
+    public function getHasLocationImageAttribute()
+    {
+        return \App\Helpers\ImageHelper::hasImage(
+            $this->attributes['location_image_path'] ?? null,
+            $this->attributes['location_image_url'] ?? null
+        );
+    }
+
+    /**
+     * الحصول على معلومات صورة الموقع
+     */
+    public function getLocationImageInfoAttribute()
+    {
+        return \App\Helpers\ImageHelper::getImageInfo(
+            $this->attributes['location_image_path'] ?? null,
+            $this->attributes['location_image_url'] ?? null
+        );
+    }
+
+    /**
+     * الحصول على رابط صورة الخدمة
+     */
+    public function getImageUrlAttribute()
+    {
+        return \App\Helpers\ImageHelper::getImageUrl(
+            $this->attributes['image_path'] ?? null,
+            $this->attributes['image_url'] ?? null
+        );
+    }
+
+    /**
+     * التحقق من وجود صورة الخدمة
+     */
+    public function getHasImageAttribute()
+    {
+        return \App\Helpers\ImageHelper::hasImage(
+            $this->attributes['image_path'] ?? null,
+            $this->attributes['image_url'] ?? null
+        );
+    }
+
+    /**
+     * الحصول على معلومات صورة الخدمة
+     */
+    public function getImageInfoAttribute()
+    {
+        return \App\Helpers\ImageHelper::getImageInfo(
+            $this->attributes['image_path'] ?? null,
+            $this->attributes['image_url'] ?? null
+        );
     }
 }
 

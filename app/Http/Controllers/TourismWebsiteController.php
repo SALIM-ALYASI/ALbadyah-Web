@@ -216,9 +216,9 @@ class TourismWebsiteController extends Controller
 
         $touristServices = $query->latest()->paginate(12);
 
-        // للحصول على قوائم الفلترة
-        $serviceTypes = ServiceType::orderBy('name_ar')->get();
-        $governorates = Governorate::orderBy('name_ar')->get();
+        // للحصول على قوائم الفلترة - فقط الأنواع التي تحتوي على خدمات
+        $serviceTypes = ServiceType::whereHas('touristServices')->orderBy('name_ar')->get();
+        $governorates = Governorate::whereHas('touristServices')->orderBy('name_ar')->get();
 
         return view('tourism.tourist-services', compact('touristServices', 'serviceTypes', 'governorates'));
     }

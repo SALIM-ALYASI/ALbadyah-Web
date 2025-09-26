@@ -46,8 +46,16 @@ class WilayatController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $imagePath = $image->storeAs('images/wilayats', $imageName, 'public');
-            $data['image_path'] = $imagePath;
+            
+            // إنشاء المجلد إذا لم يكن موجوداً
+            $uploadPath = public_path('images/wilayats');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+            
+            // حفظ الصورة في مجلد public
+            $image->move($uploadPath, $imageName);
+            $data['image_path'] = 'images/wilayats/' . $imageName;
             
             // إزالة image_url إذا تم رفع صورة محلية
             unset($data['image_url']);
@@ -100,7 +108,7 @@ class WilayatController extends Controller
         if ($request->hasFile('image')) {
             // حذف الصورة القديمة إذا كانت موجودة
             if ($wilayat->image_path) {
-                $oldImagePath = storage_path('app/public/' . $wilayat->image_path);
+                $oldImagePath = public_path($wilayat->image_path);
                 if (file_exists($oldImagePath)) {
                     unlink($oldImagePath);
                 }
@@ -108,8 +116,16 @@ class WilayatController extends Controller
 
             $image = $request->file('image');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $imagePath = $image->storeAs('images/wilayats', $imageName, 'public');
-            $data['image_path'] = $imagePath;
+            
+            // إنشاء المجلد إذا لم يكن موجوداً
+            $uploadPath = public_path('images/wilayats');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+            
+            // حفظ الصورة في مجلد public
+            $image->move($uploadPath, $imageName);
+            $data['image_path'] = 'images/wilayats/' . $imageName;
             
             // إزالة image_url إذا تم رفع صورة محلية
             unset($data['image_url']);

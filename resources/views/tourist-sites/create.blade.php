@@ -219,36 +219,33 @@
         </div>
     </div>
     
-    <!-- Images Section -->
+    <!-- Info Section -->
     <div class="col-lg-4">
         <div class="card">
             <div class="card-header">
                 <h6 class="mb-0">
-                    <i class="fas fa-images me-2"></i>
-                    إدارة الصور
+                    <i class="fas fa-info-circle me-2"></i>
+                    معلومات إضافية
                 </h6>
             </div>
             <div class="card-body">
-                <div class="mb-3">
-                    <label for="image_url_input" class="form-label">رابط صورة جديد</label>
-                    <div class="input-group">
-                        <input type="url" 
-                               class="form-control" 
-                               id="image_url_input" 
-                               placeholder="https://example.com/image.jpg">
-                        <button class="btn btn-outline-primary" type="button" onclick="addImage()">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
+                <div class="alert alert-info">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <strong>نصيحة:</strong> بعد حفظ الموقع السياحي، يمكنك إضافة الصور من صفحة عرض الموقع.
                 </div>
                 
-                <div id="images_list" class="mb-3">
-                    <!-- Images will be added here dynamically -->
+                <div class="mb-3">
+                    <h6 class="text-muted">الخطوات التالية:</h6>
+                    <ol class="small text-muted">
+                        <li>احفظ بيانات الموقع الأساسية</li>
+                        <li>انتقل لصفحة عرض الموقع</li>
+                        <li>أضف الصور من قسم إدارة الصور</li>
+                    </ol>
                 </div>
                 
                 <div class="form-text">
-                    <i class="fas fa-info-circle me-1"></i>
-                    يمكنك إضافة عدة صور للموقع السياحي
+                    <i class="fas fa-images me-1"></i>
+                    يمكنك إضافة صور متعددة للموقع السياحي بعد الحفظ
                 </div>
             </div>
         </div>
@@ -257,50 +254,6 @@
 
 @push('scripts')
 <script>
-    let imageCount = 0;
-    
-    function addImage() {
-        const input = document.getElementById('image_url_input');
-        const url = input.value.trim();
-        
-        if (!url || !isValidUrl(url)) {
-            alert('يرجى إدخال رابط صورة صحيح');
-            return;
-        }
-        
-        const imagesList = document.getElementById('images_list');
-        const imageDiv = document.createElement('div');
-        imageDiv.className = 'mb-2 p-2 border rounded d-flex align-items-center';
-        imageDiv.innerHTML = `
-            <img src="${url}" alt="معاينة" class="me-2" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
-            <div class="flex-grow-1">
-                <small class="text-muted d-block">${url}</small>
-            </div>
-            <button type="button" class="btn btn-sm btn-danger" onclick="removeImage(this)">
-                <i class="fas fa-times"></i>
-            </button>
-            <input type="hidden" name="images[]" value="${url}">
-        `;
-        
-        imagesList.appendChild(imageDiv);
-        input.value = '';
-        imageCount++;
-    }
-    
-    function removeImage(button) {
-        button.closest('.mb-2').remove();
-        imageCount--;
-    }
-    
-    function isValidUrl(string) {
-        try {
-            new URL(string);
-            return true;
-        } catch (_) {
-            return false;
-        }
-    }
-    
     // Form validation
     document.getElementById('touristSiteForm').addEventListener('submit', function(e) {
         const submitBtn = document.getElementById('submitBtn');

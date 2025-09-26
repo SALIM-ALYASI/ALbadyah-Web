@@ -7,6 +7,7 @@ use App\Models\Governorate;
 use App\Models\Wilayat;
 use App\Models\ServiceType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TouristServiceController extends Controller
 {
@@ -44,7 +45,7 @@ class TouristServiceController extends Controller
     }
 
     /**
-     * عرض نموذج إضافة خدمة سياحية جديدة
+     * عرض نموذج إضافة خدمة سياحية جديدة (الطريقة القديمة)
      */
     public function create()
     {
@@ -55,7 +56,28 @@ class TouristServiceController extends Controller
     }
 
     /**
-     * حفظ خدمة سياحية جديدة
+     * عرض نموذج إنشاء موقع خدمة سياحية جديد
+     */
+    public function createLocation()
+    {
+        $governorates = Governorate::all();
+        $wilayats = Wilayat::all();
+        $serviceTypes = ServiceType::all();
+        return view('tourist-services.create-location', compact('governorates', 'wilayats', 'serviceTypes'));
+    }
+
+    /**
+     * عرض نموذج إضافة خدمات لموقع محدد
+     */
+    public function addServices($id)
+    {
+        $location = TouristService::findOrFail($id);
+        $serviceTypes = ServiceType::all();
+        return view('tourist-services.add-services', compact('location', 'serviceTypes'));
+    }
+
+    /**
+     * حفظ خدمة سياحية سريعة
      */
     public function store(Request $request)
     {
@@ -63,25 +85,131 @@ class TouristServiceController extends Controller
             'name_ar'         => 'required|string|max:255',
             'name_en'         => 'required|string|max:255',
             'website_url'     => 'nullable|url|max:255',
-            'image_url'       => 'nullable|url|max:1024',
-            'image'           => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'governorate_id'  => 'nullable|integer|exists:governorates,id',
             'wilayat_id'      => 'nullable|integer|exists:wilayats,id',
             'service_type_id' => 'nullable|integer|exists:service_types,id',
+            'image_file'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image_url'       => 'nullable|url|max:1024',
         ]);
 
-        // رفع الصورة إذا تم اختيارها
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
+        // معالجة صورة الخدمة
+        if ($request->hasFile('image_file')) {
+            $image = $request->file('image_file');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $imagePath = $image->storeAs('images/tourist-services', $imageName, 'public');
-            $data['image_path'] = $imagePath;
+            
+            // إنشاء المجلد إذا لم يكن موجوداً
+            $uploadPath = public_path('images/tourist-services');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+            
+            // حفظ الصورة في مجلد public
+            $image->move($uploadPath, $imageName);
+            $data['image_path'] = 'images/tourist-services/' . $imageName;
         }
 
         TouristService::create($data);
 
         return redirect()->route('tourist-services.index')
             ->with('success', 'تمت إضافة الخدمة السياحية بنجاح');
+    }
+
+    /**
+     * حفظ موقع خدمة سياحية جديد
+     */
+    public function storeLocation(Request $request)
+    {
+        $data = $request->validate([
+            'name_ar'         => 'required|string|max:255',
+            'name_en'         => 'required|string|max:255',
+            'website_url'     => 'nullable|url|max:255',
+            'governorate_id'  => 'nullable|integer|exists:governorates,id',
+            'wilayat_id'      => 'nullable|integer|exists:wilayats,id',
+            'service_type_id' => 'nullable|integer|exists:service_types,id',
+            'location_image'  => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'location_image_url' => 'nullable|url|max:1024',
+        ]);
+
+        // معالجة صورة الموقع
+        if ($request->hasFile('location_image')) {
+            $image = $request->file('location_image');
+            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            
+            // إنشاء المجلد إذا لم يكن موجوداً
+            $uploadPath = public_path('images/tourist-services/locations');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+            
+            // حفظ الصورة في مجلد public
+            $image->move($uploadPath, $imageName);
+            $data['location_image_path'] = 'images/tourist-services/locations/' . $imageName;
+        }
+
+        $location = TouristService::create($data);
+
+        return redirect()->route('tourist-services.add-services', $location->id)
+            ->with('success', 'تم إنشاء الموقع بنجاح. يمكنك الآن إضافة الخدمات.');
+    }
+
+    /**
+     * حفظ خدمات متعددة لموقع محدد
+     */
+    public function storeServices(Request $request, $id)
+    {
+        $location = TouristService::findOrFail($id);
+
+        $data = $request->validate([
+            'services'        => 'required|array|min:1',
+            'services.*.name_ar'         => 'required|string|max:255',
+            'services.*.name_en'         => 'required|string|max:255',
+            'services.*.service_type_id' => 'nullable|integer|exists:service_types,id',
+            'services.*.website_url'     => 'nullable|url|max:255',
+            'services.*.image_file'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'services.*.image_url'       => 'nullable|url|max:1024',
+        ]);
+
+        DB::transaction(function () use ($location, $data, $request) {
+            $services = $data['services'];
+            
+            // حفظ كل خدمة كسجل منفصل
+            foreach ($services as $index => $serviceData) {
+                // رفع صورة الخدمة إذا تم اختيارها
+                if ($request->hasFile("services.{$index}.image_file")) {
+                    $image = $request->file("services.{$index}.image_file");
+                    $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    
+                    // إنشاء المجلد إذا لم يكن موجوداً
+                    $uploadPath = public_path('images/tourist-services');
+                    if (!file_exists($uploadPath)) {
+                        mkdir($uploadPath, 0755, true);
+                    }
+                    
+                    // حفظ الصورة في مجلد public
+                    $image->move($uploadPath, $imageName);
+                    $serviceData['image_path'] = 'images/tourist-services/' . $imageName;
+                }
+
+                // دمج بيانات الموقع مع بيانات الخدمة
+                $serviceData = array_merge([
+                    'name_ar' => $location->name_ar,
+                    'name_en' => $location->name_en,
+                    'website_url' => $location->website_url,
+                    'governorate_id' => $location->governorate_id,
+                    'wilayat_id' => $location->wilayat_id,
+                    'location_image_path' => $location->location_image_path,
+                    'location_image_url' => $location->location_image_url,
+                ], $serviceData);
+                
+                // إزالة image_file من البيانات قبل الحفظ
+                unset($serviceData['image_file']);
+                
+                TouristService::create($serviceData);
+            }
+        });
+
+        return redirect()->route('tourist-services.show', $location->id)
+            ->with('success', 'تمت إضافة الخدمات بنجاح');
     }
 
     /**
@@ -127,7 +255,7 @@ class TouristServiceController extends Controller
         if ($request->hasFile('image')) {
             // حذف الصورة القديمة إذا كانت موجودة
             if ($service->image_path) {
-                $oldImagePath = storage_path('app/public/' . $service->image_path);
+                $oldImagePath = public_path($service->image_path);
                 if (file_exists($oldImagePath)) {
                     unlink($oldImagePath);
                 }
@@ -135,8 +263,16 @@ class TouristServiceController extends Controller
 
             $image = $request->file('image');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $imagePath = $image->storeAs('images/tourist-services', $imageName, 'public');
-            $data['image_path'] = $imagePath;
+            
+            // إنشاء المجلد إذا لم يكن موجوداً
+            $uploadPath = public_path('images/tourist-services');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+            
+            // حفظ الصورة في مجلد public
+            $image->move($uploadPath, $imageName);
+            $data['image_path'] = 'images/tourist-services/' . $imageName;
         }
 
         $service->update($data);

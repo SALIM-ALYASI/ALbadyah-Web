@@ -198,7 +198,7 @@
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card h-100 modern-card">
                         @if($service->image_path)
-                            <img src="{{ asset('storage/' . $service->image_path) }}" class="card-img-top" alt="{{ $service->name_ar }}" style="height: 220px; object-fit: cover;">
+                            <img src="{{ asset($service->image_path) }}" class="card-img-top" alt="{{ $service->name_ar }}" style="height: 220px; object-fit: cover;">
                         @elseif($service->image_url)
                             <img src="{{ $service->image_url }}" class="card-img-top" alt="{{ $service->name_ar }}" style="height: 220px; object-fit: cover;">
                         @else
@@ -300,6 +300,14 @@
 
 @push('styles')
 <style>
+    .hero-section {
+        background: linear-gradient(rgba(97, 76, 57, 0.7), rgba(161, 129, 90, 0.6), rgba(222, 180, 122, 0.5)),
+        url('{{ asset("images/albadyah.jpg") }}');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    
     /* التصميم العصري الجديد */
     .section {
         padding: 80px 0;

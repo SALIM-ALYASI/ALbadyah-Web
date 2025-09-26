@@ -10,10 +10,16 @@
         <h1 class="h3 mb-2">الخدمات السياحية</h1>
         <p class="text-muted mb-0">إدارة وعرض جميع الخدمات السياحية في النظام</p>
     </div>
-    <a href="{{ route('tourist-services.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        إضافة خدمة سياحية جديدة
-    </a>
+    <div class="d-flex gap-2">
+        <a href="{{ route('tourist-services.create-location') }}" class="btn btn-primary">
+            <i class="fas fa-map-marker-alt"></i>
+            إضافة موقع خدمة جديد
+        </a>
+        <a href="{{ route('tourist-services.create') }}" class="btn btn-outline-primary">
+            <i class="fas fa-plus"></i>
+            إضافة خدمة سريعة
+        </a>
+    </div>
 </div>
 
 @if($touristServices->count() > 0)
@@ -122,7 +128,7 @@
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100">
                 <!-- Service Image -->
-                @if($service->image_url)
+                @if($service->has_image)
                     <div class="position-relative" style="height: 200px; overflow: hidden;">
                         <img src="{{ $service->image_url }}" 
                              alt="{{ $service->name_ar }}" 

@@ -14,4 +14,37 @@ class TouristImage extends Model
     {
         return $this->belongsTo(\App\Models\TouristSite::class, 'tourist_site_id');
     }
+
+    /**
+     * Get the image URL accessor
+     */
+    public function getImageUrlAttribute()
+    {
+        return \App\Helpers\ImageHelper::getImageUrl(
+            $this->attributes['image_path'] ?? null,
+            $this->attributes['image_url'] ?? null
+        );
+    }
+
+    /**
+     * Check if image exists
+     */
+    public function getHasImageAttribute()
+    {
+        return \App\Helpers\ImageHelper::hasImage(
+            $this->attributes['image_path'] ?? null,
+            $this->attributes['image_url'] ?? null
+        );
+    }
+
+    /**
+     * Get image info
+     */
+    public function getImageInfoAttribute()
+    {
+        return \App\Helpers\ImageHelper::getImageInfo(
+            $this->attributes['image_path'] ?? null,
+            $this->attributes['image_url'] ?? null
+        );
+    }
 }

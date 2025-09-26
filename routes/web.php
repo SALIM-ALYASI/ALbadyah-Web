@@ -49,6 +49,16 @@ Route::group([
         Route::resource('tourist-sites', TouristSiteController::class);
         Route::resource('tourist-services', TouristServiceController::class);
         
+        // روابط إضافية للخدمات السياحية
+        Route::get('tourist-services/create/location', [TouristServiceController::class, 'createLocation'])->name('tourist-services.create-location');
+        Route::post('tourist-services/store/location', [TouristServiceController::class, 'storeLocation'])->name('tourist-services.store-location');
+        Route::get('tourist-services/{id}/add-services', [TouristServiceController::class, 'addServices'])->name('tourist-services.add-services');
+        Route::post('tourist-services/{id}/store-services', [TouristServiceController::class, 'storeServices'])->name('tourist-services.store-services');
+        
+        // إدارة صور المواقع السياحية
+        Route::post('tourist-sites/{id}/images', [TouristSiteController::class, 'addImages'])->name('tourist-sites.images.store');
+        Route::delete('tourist-sites/{id}/images/{imageId}', [TouristSiteController::class, 'deleteImage'])->name('tourist-sites.images.destroy');
+        
         // صفحة عرض جميع البيانات
         Route::get('/data-viewer', [TouristServiceController::class, 'dataViewer'])->name('data-viewer.index');
         

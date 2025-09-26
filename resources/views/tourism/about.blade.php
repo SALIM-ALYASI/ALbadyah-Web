@@ -238,6 +238,14 @@
 
 @push('styles')
 <style>
+    .hero-section {
+        background: linear-gradient(rgba(97, 76, 57, 0.7), rgba(161, 129, 90, 0.6), rgba(222, 180, 122, 0.5)),
+        url('{{ asset("images/albadyah.jpg") }}');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    
     /* Hero Section */
     .hero-title {
         font-size: 3rem;

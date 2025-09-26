@@ -69,169 +69,112 @@
                     </div>
                     
                     <div class="hero-actions mt-4">
+                        <!-- Location Actions -->
+                        <div class="location-actions-row mb-3">
+                            @if($touristService->governorate)
+                                <a href="{{ route('tourism.governorate', $touristService->governorate->id) }}" 
+                                   class="btn btn-outline-primary modern-btn me-2 mb-2">
+                                    <i class="fas fa-building me-2"></i>{{ $touristService->governorate->name_ar }}
+                                </a>
+                            @endif
+                            
+                            @if($touristService->wilayat)
+                                <a href="{{ route('tourism.wilayat', $touristService->wilayat->id) }}" 
+                                   class="btn btn-outline-primary modern-btn me-2 mb-2">
+                                    <i class="fas fa-map-pin me-2"></i>{{ $touristService->wilayat->name_ar }}
+                                </a>
+                            @endif
+                        </div>
                         
-                        @if($touristService->contact_phone)
-                            <a href="tel:{{ $touristService->contact_phone }}" class="btn btn-outline-primary modern-btn">
-                                <i class="fas fa-phone me-2"></i>اتصل بنا
+                        <!-- Service Actions -->
+                        <div class="service-actions-row">
+                            @if($touristService->contact_phone)
+                                <a href="tel:{{ $touristService->contact_phone }}" class="btn btn-outline-primary modern-btn me-2 mb-2">
+                                    <i class="fas fa-phone me-2"></i>اتصل بنا
+                                </a>
+                            @endif
+                            
+                            
+                            
+                            @php
+                                $locationQuery = '';
+                                if($touristService->governorate && $touristService->wilayat) {
+                                    $locationQuery = $touristService->wilayat->name_ar . ' ' . $touristService->governorate->name_ar . ' سلطنة عمان';
+                                } elseif($touristService->governorate) {
+                                    $locationQuery = $touristService->governorate->name_ar . ' سلطنة عمان';
+                                } else {
+                                    $locationQuery = $touristService->name_ar . ' سلطنة عمان';
+                                }
+                            @endphp
+                            
+                            <a href="https://www.google.com/maps/search/{{ urlencode($locationQuery) }}" 
+                               target="_blank" 
+                               class="btn btn-primary modern-btn mb-2"
+                               onmouseover="this.style.transform='translateY(-3px) scale(1.02)'; this.style.boxShadow='0 8px 25px rgba(66, 133, 244, 0.5)'" 
+                               onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 6px 20px rgba(66, 133, 244, 0.4)'">
+                                <i class="fab fa-google me-2"></i>جوجل ماب
                             </a>
-                        @endif
+                        </div>
                     </div>
                 </div>
             </div>
             
             <div class="col-lg-4">
                 <div class="service-image-container">
-                    <div class="service-placeholder">
-                        <div class="service-icon">
-                            @if($touristService->serviceType)
-                                @switch($touristService->serviceType->name_en)
-                                    @case('Hotel')
-                                        <i class="fas fa-hotel"></i>
-                                        @break
-                                    @case('Restaurant')
-                                        <i class="fas fa-utensils"></i>
-                                        @break
-                                    @case('Transportation')
-                                        <i class="fas fa-car"></i>
-                                        @break
-                                    @case('Tour Guide')
-                                        <i class="fas fa-map-marked-alt"></i>
-                                        @break
-                                    @case('Shopping')
-                                        <i class="fas fa-shopping-bag"></i>
-                                        @break
-                                    @default
-                                        <i class="fas fa-concierge-bell"></i>
-                                @endswitch
-                            @else
-                                <i class="fas fa-concierge-bell"></i>
-                            @endif
-                        </div>
-                        <div class="service-overlay">
-                            <div class="service-badge">
-                                <i class="fas fa-star"></i>
-                                <span>{{ $touristService->name_ar }}</span>
+                    @if($touristService->has_image)
+                        <div class="service-image">
+                            <img src="{{ $touristService->image_url }}" 
+                                 alt="{{ $touristService->name_ar }}" 
+                                 class="img-fluid rounded shadow">
+                            <div class="service-overlay">
+                                <div class="service-badge">
+                                    <i class="fas fa-star"></i>
+                                    <span>{{ $touristService->name_ar }}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @else
+                        <div class="service-placeholder">
+                            <div class="service-icon">
+                                @if($touristService->serviceType)
+                                    @switch($touristService->serviceType->name_en)
+                                        @case('Hotel')
+                                            <i class="fas fa-hotel"></i>
+                                            @break
+                                        @case('Restaurant')
+                                            <i class="fas fa-utensils"></i>
+                                            @break
+                                        @case('Transportation')
+                                            <i class="fas fa-car"></i>
+                                            @break
+                                        @case('Tour Guide')
+                                            <i class="fas fa-map-marked-alt"></i>
+                                            @break
+                                        @case('Shopping')
+                                            <i class="fas fa-shopping-bag"></i>
+                                            @break
+                                        @default
+                                            <i class="fas fa-concierge-bell"></i>
+                                    @endswitch
+                                @else
+                                    <i class="fas fa-concierge-bell"></i>
+                                @endif
+                            </div>
+                            <div class="service-overlay">
+                                <div class="service-badge">
+                                    <i class="fas fa-star"></i>
+                                    <span>{{ $touristService->name_ar }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Service Description and Info -->
-<section class="section">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-info-circle me-2"></i>وصف الخدمة
-                        </h3>
-                    </div>
-                    
-                    <div class="card-body">
-                        @if($touristService->description_ar)
-                            <div class="description-section mb-4">
-                                <h5 class="description-title">الوصف بالعربية:</h5>
-                                <div class="description-content">
-                                    {{ $touristService->description_ar }}
-                                </div>
-                            </div>
-                        @endif
-                        
-                        @if($touristService->description_en)
-                            <div class="description-section">
-                                <h5 class="description-title">Description in English:</h5>
-                                <div class="description-content">
-                                    {{ $touristService->description_en }}
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-lg-4">
-                <div class="info-card">
-                    <div class="card-header">
-                        <h5 class="card-title">
-                            <i class="fas fa-info me-2"></i>معلومات الخدمة
-                        </h5>
-                    </div>
-                    
-                    <div class="card-body">
-                        <div class="info-item">
-                            <div class="info-icon">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                            <div class="info-text">
-                                <span class="info-label">تاريخ الإضافة</span>
-                                <span class="info-value">{{ $touristService->created_at->format('Y-m-d') }}</span>
-                            </div>
-                        </div>
-                        
-                        @if($touristService->serviceType)
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-tag"></i>
-                                </div>
-                                <div class="info-text">
-                                    <span class="info-label">نوع الخدمة</span>
-                                    <span class="info-value">{{ $touristService->serviceType->name_ar }}</span>
-                                </div>
-                            </div>
-                        @endif
-                        
-                    </div>
-                </div>
-                
-                <!-- Contact Card -->
-                @if($touristService->contact_phone || $touristService->contact_email)
-                <div class="contact-card mt-4">
-                    <div class="card-header">
-                        <h5 class="card-title">
-                            <i class="fas fa-phone me-2"></i>معلومات الاتصال
-                        </h5>
-                    </div>
-                    
-                    <div class="card-body">
-                        @if($touristService->contact_phone)
-                            <div class="contact-item">
-                                <div class="contact-icon">
-                                    <i class="fas fa-phone"></i>
-                                </div>
-                                <div class="contact-text">
-                                    <span class="contact-label">الهاتف</span>
-                                    <a href="tel:{{ $touristService->contact_phone }}" class="contact-link">
-                                        {{ $touristService->contact_phone }}
-                                    </a>
-                                </div>
-                            </div>
-                        @endif
-                        
-                        @if($touristService->contact_email)
-                            <div class="contact-item">
-                                <div class="contact-icon">
-                                    <i class="fas fa-envelope"></i>
-                                </div>
-                                <div class="contact-text">
-                                    <span class="contact-label">البريد الإلكتروني</span>
-                                    <a href="mailto:{{ $touristService->contact_email }}" class="contact-link">
-                                        {{ $touristService->contact_email }}
-                                    </a>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-                @endif
-            </div>
-        </div>
-    </div>
-</section>
+ 
 
 <!-- Related Services -->
 @if($relatedServices->count() > 0)
@@ -317,6 +260,14 @@
 
 @push('styles')
 <style>
+    .hero-section {
+        background: linear-gradient(rgba(97, 76, 57, 0.7), rgba(161, 129, 90, 0.6), rgba(222, 180, 122, 0.5)),
+        url('{{ asset("images/albadyah.jpg") }}');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    
     /* Hero Section */
     .service-header {
         margin-bottom: 2rem;
@@ -415,8 +366,18 @@
     
     .hero-actions {
         margin-top: 2rem;
+    }
+    
+    .location-actions-row {
         display: flex;
-        gap: 1rem;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+    
+    .service-actions-row {
+        display: flex;
+        gap: 0.75rem;
         flex-wrap: wrap;
     }
     
@@ -475,6 +436,24 @@
         box-shadow: 0 20px 50px rgba(0,0,0,0.3);
     }
     
+    /* Service Image */
+    .service-image {
+        position: relative;
+        height: 400px;
+        overflow: hidden;
+    }
+    
+    .service-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .service-image:hover img {
+        transform: scale(1.05);
+    }
+    
     .service-placeholder {
         width: 100%;
         height: 400px;
@@ -523,7 +502,7 @@
     }
     
     /* Content Cards */
-    .content-card, .info-card, .contact-card {
+    .content-card, .info-card, .contact-card, .location-card {
         background: white;
         border-radius: 20px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -732,6 +711,103 @@
     .contact-link:hover {
         color: var(--secondary-color);
         text-decoration: underline;
+    }
+    
+    /* Location Items */
+    .location-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+    }
+    
+    .location-item:last-child {
+        border-bottom: none;
+    }
+    
+    .location-item:hover {
+        background: rgba(97, 76, 57, 0.05);
+        border-radius: 10px;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    
+    .location-icon {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        box-shadow: 0 4px 15px rgba(97, 76, 57, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .location-icon::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.2) 0%, 
+                    rgba(255, 255, 255, 0.1) 50%, 
+                    rgba(255, 255, 255, 0.2) 100%);
+        border-radius: 12px;
+        box-shadow: 
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    
+    .location-icon i {
+        color: white;
+        font-size: 1.1rem;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 1;
+    }
+    
+    .location-text {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+    
+    .location-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+    
+    .location-value {
+        font-size: 1rem;
+        color: var(--primary-color);
+        font-weight: 600;
+        line-height: 1.2;
+    }
+    
+    .location-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .location-actions .btn {
+        border-radius: 8px;
+        padding: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .location-actions .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
     
     /* Related Services */

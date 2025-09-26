@@ -58,13 +58,7 @@
             
             <div class="col-lg-4">
                 <div class="governorate-image-container">
-                    @if($governorate->image_path)
-                        <img src="{{ asset('storage/' . $governorate->image_path) }}" alt="{{ $governorate->name_ar }}" class="governorate-image">
-                    @elseif($governorate->image_url)
-                        <img src="{{ $governorate->image_url }}" alt="{{ $governorate->name_ar }}" class="governorate-image">
-                    @else
-                        <img src="{{ asset('images/albadyah.jpg') }}" alt="{{ $governorate->name_ar }}" class="governorate-image">
-                    @endif
+                    <img src="{{ $governorate->image_url }}" alt="{{ $governorate->name_ar }}" class="governorate-image">
                     <div class="image-overlay">
                         <div class="image-badge">
                             <i class="fas fa-crown"></i>
@@ -233,8 +227,9 @@
                                 <a href="{{ route('tourism.wilayat-details', $governorate->id) }}" class="btn btn-primary w-100 mb-2">
                                     <i class="fas fa-map-marked-alt me-2"></i>عرض تفاصيل الولاية
                                 </a>
-                                <a href="https://www.google.com/maps/search/{{ urlencode($governorate->name_ar . ' سلطنة عمان') }}" target="_blank" class="btn btn-outline-success w-100">
-                                    <i class="fas fa-map-marker-alt me-2"></i>جوجل ماب
+                                <a href="https://www.google.com/maps/search/{{ urlencode($governorate->name_ar . ' سلطنة عمان') }}" target="_blank" class="btn btn-primary w-100 mb-2"
+                                    onmouseover="this.style.transform='translateY(-3px) scale(1.02)'; this.style.boxShadow='0 8px 25px rgba(66, 133, 244, 0.5)'" onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 6px 20px rgba(66, 133, 244, 0.4)'">
+                                    <i class="fab fa-google me-2"></i>جوجل ماب
                                 </a>
                             </div>
                         @else
@@ -272,6 +267,14 @@
 
 @push('styles')
 <style>
+    .hero-section {
+        background: linear-gradient(rgba(97, 76, 57, 0.7), rgba(161, 129, 90, 0.6), rgba(222, 180, 122, 0.5)),
+        url('{{ asset("images/albadyah.jpg") }}');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    
     /* Hero Section */
     .governorate-title {
         font-size: 4rem;
