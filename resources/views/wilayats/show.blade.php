@@ -98,7 +98,7 @@
                     </div>
                 </div>
                 
-                @if($wilayat->image_url)
+                @if($wilayat->has_image)
                 <div class="info-item mb-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="info-icon me-3">
@@ -111,6 +111,23 @@
                              alt="{{ $wilayat->name_ar }}" 
                              class="img-fluid rounded shadow"
                              style="max-height: 400px; max-width: 100%; object-fit: cover;">
+                    </div>
+                </div>
+                @else
+                <div class="info-item mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="info-icon me-3">
+                            <i class="fas fa-image text-muted"></i>
+                        </div>
+                        <h6 class="mb-0 text-muted">صورة الولاية</h6>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-light rounded shadow d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <div class="text-center">
+                                <i class="fas fa-image fa-3x text-muted mb-2"></i>
+                                <p class="text-muted mb-0">لا توجد صورة متاحة</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 @endif

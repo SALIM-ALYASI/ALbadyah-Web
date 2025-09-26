@@ -126,12 +126,12 @@
                     
                     <div class="mb-4">
                         <label for="image_url" class="form-label">
-                            <i class="fas fa-image me-1 text-primary"></i>
-                            رابط صورة الولاية
+                            <i class="fas fa-link me-1 text-primary"></i>
+                            رابط صورة الولاية (اختياري)
                         </label>
                         <div class="input-group">
                             <span class="input-group-text">
-                                <i class="fas fa-image"></i>
+                                <i class="fas fa-link"></i>
                             </span>
                             <input type="url" 
                                    class="form-control @error('image_url') is-invalid @enderror" 
@@ -147,7 +147,34 @@
                         @enderror
                         <div class="form-text">
                             <i class="fas fa-info-circle me-1"></i>
-                            أدخل رابط الصورة التي تمثل الولاية
+                            أدخل رابط الصورة من الإنترنت (اختياري)
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="image" class="form-label">
+                            <i class="fas fa-upload me-1 text-primary"></i>
+                            رفع صورة جديدة (مفضل)
+                        </label>
+                        <div class="input-group">
+                            <input type="file" 
+                                   class="form-control @error('image') is-invalid @enderror" 
+                                   id="image" 
+                                   name="image" 
+                                   accept="image/*"
+                                   onchange="previewImage(this)">
+                            <label class="input-group-text" for="image">
+                                <i class="fas fa-image"></i>
+                            </label>
+                        </div>
+                        @error('image')
+                            <div class="invalid-feedback d-block">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            يمكن رفع ملف صورة (GIF, PNG, JPG) بحجم أقصى 2MB
                         </div>
                     </div>
                     
@@ -183,7 +210,26 @@
 
 @push('scripts')
 <script>
-    // Image preview functionality
+    // Image preview functionality for file upload
+    function previewImage(input) {
+        const previewContainer = document.getElementById('image_preview_container');
+        const previewImage = document.getElementById('image_preview');
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewContainer.style.display = 'block';
+            };
+            
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            previewContainer.style.display = 'none';
+        }
+    }
+    
+    // Image preview functionality for URL
     document.getElementById('image_url').addEventListener('input', function() {
         const url = this.value;
         const previewContainer = document.getElementById('image_preview_container');
@@ -218,6 +264,21 @@
     
     // Form validation
     document.getElementById('wilayatForm').addEventListener('submit', function(e) {
+        const imageFile = document.getElementById('image').files[0];
+        const imageUrl = document.getElementById('image_url').value;
+        
+        if (!imageFile && !imageUrl) {
+            e.preventDefault();
+            alert('يرجى إدخال رابط صورة أو رفع ملف صورة');
+            return false;
+        }
+        
+        if (imageFile && imageFile.size > 2 * 1024 * 1024) {
+            e.preventDefault();
+            alert('حجم الصورة يجب أن يكون أقل من 2MB');
+            return false;
+        }
+        
         const submitBtn = document.getElementById('submitBtn');
         const originalText = submitBtn.innerHTML;
         

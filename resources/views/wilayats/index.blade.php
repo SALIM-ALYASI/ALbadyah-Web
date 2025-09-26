@@ -96,7 +96,7 @@
                         @endif
                     </td>
                     <td>
-                        @if($wilayat->image_url)
+                        @if($wilayat->has_image)
                             <div class="position-relative">
                                 <img src="{{ $wilayat->image_url }}" alt="{{ $wilayat->name_ar }}" 
                                      class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
