@@ -128,6 +128,26 @@
             z-index: 100;
         }
 
+        .header-menu-btn {
+            display: none;
+            background: #614c39;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            width: 45px;
+            height: 45px;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(97, 76, 57, 0.3);
+            transition: all 0.3s ease;
+            margin-left: 1rem;
+        }
+
+        .header-menu-btn:hover {
+            background: #4a3a2a;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(97, 76, 57, 0.4);
+        }
+
         .page-title {
             font-size: 1.5rem;
             font-weight: 600;
@@ -312,6 +332,7 @@
             .sidebar {
                 transform: translateX(100%);
                 width: 100%;
+                z-index: 1050;
             }
 
             .sidebar.show {
@@ -330,6 +351,12 @@
                 padding: 1rem;
             }
 
+            .header-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
             .mobile-menu-btn {
                 display: block;
                 position: fixed;
@@ -344,6 +371,31 @@
                 height: 50px;
                 font-size: 1.2rem;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            }
+
+            /* Overlay for mobile sidebar */
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1040;
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+            }
+        }
+
+        /* Tablet Responsive */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .header-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
         }
 
@@ -431,6 +483,9 @@
         <i class="fas fa-bars"></i>
     </button>
 
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -482,10 +537,15 @@
     <div class="main-wrapper">
         <!-- Top Header -->
         <div class="top-header">
-            <h2 class="page-title">
-                <i class="fas fa-tachometer-alt"></i>
-                @yield('page-title', 'لوحة التحكم')
-            </h2>
+            <div style="display: flex; align-items: center;">
+                <button class="header-menu-btn" onclick="toggleSidebar()" title="فتح القائمة">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 class="page-title">
+                    <i class="fas fa-tachometer-alt"></i>
+                    @yield('page-title', 'لوحة التحكم')
+                </h2>
+            </div>
             
             <div class="header-actions">
                 <form action="{{ route('admin.logout') }}" method="POST" style="display: inline;">
@@ -524,17 +584,33 @@
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
             sidebar.classList.toggle('show');
+            if (window.innerWidth <= 768) {
+                overlay.classList.toggle('show');
+            }
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
         }
         
         // Close sidebar when clicking outside
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const menuBtn = document.querySelector('.mobile-menu-btn');
+            const headerMenuBtn = document.querySelector('.header-menu-btn');
             
             if (window.innerWidth <= 768) {
-                if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
-                    sidebar.classList.remove('show');
+                if (!sidebar.contains(event.target) && 
+                    !menuBtn.contains(event.target) && 
+                    !headerMenuBtn.contains(event.target)) {
+                    closeSidebar();
                 }
             }
         });
@@ -542,9 +618,24 @@
         // Close sidebar on window resize
         window.addEventListener('resize', function() {
             const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
             if (window.innerWidth > 768) {
                 sidebar.classList.remove('show');
+                overlay.classList.remove('show');
             }
+        });
+
+        // Close sidebar when clicking on nav links (mobile)
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        closeSidebar();
+                    }
+                });
+            });
         });
         
         // Confirm delete
