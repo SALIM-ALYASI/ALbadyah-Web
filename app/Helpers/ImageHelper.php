@@ -2,73 +2,130 @@
 
 namespace App\Helpers;
 
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-
 class ImageHelper
 {
     /**
-     * رفع صورة واحدة وحفظها
+     * الحصول على رابط الصورة
+     *
+     * @param string|null $imagePath
+     * @param string|null $imageUrl
+     * @param string $defaultImage
+     * @return string
      */
-    public static function uploadSingleImage(UploadedFile $image, string $folder): string
+    public static function getImageUrl($imagePath = null, $imageUrl = null, $defaultImage = 'images/default-placeholder.jpg')
     {
-        $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-        $imagePath = $image->storeAs($folder, $imageName, 'public');
-        return $imagePath;
+        // إذا كان هناك مسار صورة محفوظة محلياً
+        if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
+            return asset('storage/' . $imagePath);
+        }
+        
+        // إذا كان هناك رابط صورة خارجي
+        if ($imageUrl && filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+            return $imageUrl;
+        }
+        
+        // إرجاع الصورة الافتراضية
+        return asset($defaultImage);
     }
-
+    
     /**
-     * حذف صورة من التخزين
+     * التحقق من وجود الصورة
+     *
+     * @param string|null $imagePath
+     * @param string|null $imageUrl
+     * @return bool
      */
-    public static function deleteImage(?string $imagePath): bool
+    public static function hasImage($imagePath = null, $imageUrl = null)
     {
-        if (!$imagePath) {
-            return false;
+        if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
+            return true;
         }
-
-        $fullPath = storage_path('app/public/' . $imagePath);
-        if (file_exists($fullPath)) {
-            return unlink($fullPath);
+        
+        if ($imageUrl && filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+            return true;
         }
-
+        
         return false;
     }
-
+    
     /**
-     * الحصول على رابط الصورة
+     * الحصول على معلومات الصورة
+     *
+     * @param string|null $imagePath
+     * @param string|null $imageUrl
+     * @return array
      */
-    public static function getImageUrl(?string $imagePath): ?string
+    public static function getImageInfo($imagePath = null, $imageUrl = null)
     {
-        if (!$imagePath) {
-            return null;
-        }
-
-        return asset('storage/' . $imagePath);
-    }
-
-    /**
-     * الحصول على مصفوفة من روابط الصور
-     */
-    public static function getImageUrls(array $imagePaths): array
-    {
-        return array_map(function($path) {
-            return self::getImageUrl($path);
-        }, array_filter($imagePaths));
-    }
-
-    /**
-     * رفع عدة صور
-     */
-    public static function uploadMultipleImages(array $images, string $folder): array
-    {
-        $uploadedPaths = [];
+        $info = [
+            'url' => self::getImageUrl($imagePath, $imageUrl),
+            'has_image' => self::hasImage($imagePath, $imageUrl),
+            'type' => null,
+            'size' => null,
+            'alt' => 'صورة المحافظة'
+        ];
         
-        foreach ($images as $image) {
-            if ($image instanceof UploadedFile) {
-                $uploadedPaths[] = self::uploadSingleImage($image, $folder);
-            }
+        if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
+            $info['type'] = 'local';
+            $info['size'] = filesize(storage_path('app/public/' . $imagePath));
+        } elseif ($imageUrl) {
+            $info['type'] = 'external';
         }
         
-        return $uploadedPaths;
+        return $info;
+    }
+    
+    /**
+     * حذف الصورة المحلية
+     *
+     * @param string $imagePath
+     * @return bool
+     */
+    public static function deleteImage($imagePath)
+    {
+        if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
+            return unlink(storage_path('app/public/' . $imagePath));
+        }
+        
+        return false;
+    }
+    
+    /**
+     * إنشاء صورة افتراضية
+     *
+     * @param string $text
+     * @param int $width
+     * @param int $height
+     * @return string
+     */
+    public static function createDefaultImage($text = 'صورة غير متوفرة', $width = 300, $height = 200)
+    {
+        // إنشاء صورة افتراضية باستخدام GD
+        $image = imagecreate($width, $height);
+        $bgColor = imagecolorallocate($image, 240, 240, 240);
+        $textColor = imagecolorallocate($image, 100, 100, 100);
+        
+        // إضافة النص
+        $font = 5; // خط افتراضي
+        $textWidth = imagefontwidth($font) * strlen($text);
+        $textHeight = imagefontheight($font);
+        $x = ($width - $textWidth) / 2;
+        $y = ($height - $textHeight) / 2;
+        
+        imagestring($image, $font, $x, $y, $text, $textColor);
+        
+        // حفظ الصورة
+        $filename = 'default_' . time() . '.png';
+        $path = storage_path('app/public/images/defaults/' . $filename);
+        
+        // إنشاء المجلد إذا لم يكن موجوداً
+        if (!file_exists(dirname($path))) {
+            mkdir(dirname($path), 0755, true);
+        }
+        
+        imagepng($image, $path);
+        imagedestroy($image);
+        
+        return 'images/defaults/' . $filename;
     }
 }

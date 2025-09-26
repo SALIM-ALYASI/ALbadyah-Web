@@ -88,7 +88,7 @@
                         @endif
                     </td>
                     <td>
-                        @if($governorate->image_url)
+                        @if($governorate->has_image)
                             <div class="position-relative">
                                 <img src="{{ $governorate->image_url }}" alt="{{ $governorate->name_ar }}" 
                                      class="rounded" style="width: 50px; height: 50px; object-fit: cover;">

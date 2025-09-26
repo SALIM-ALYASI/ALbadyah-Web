@@ -170,22 +170,7 @@
             @forelse($governorates->take(6) as $governorate)
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card h-100 mountain-shadow">
-                    @if($governorate->image_url)
-                        <img src="{{ $governorate->image_url }}" class="card-img-top" alt="{{ $governorate->name_ar }}" style="height: 200px; object-fit: cover;">
-                    @else
-                        @php
-                            $governorateImages = [
-                                'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // مسقط - عاصمة
-                                'https://images.unsplash.com/photo-1544735716-392fe2489ffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // الداخلية - جبال
-                                'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // ظفار - خضراء
-                                'https://images.unsplash.com/photo-1583417319070-4a69db38a482?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // الباطنة - سواحل
-                                'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // الشرقية - تراث
-                                'https://images.unsplash.com/photo-1544735716-392fe2489ffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'  // الوسطى - صحراء
-                            ];
-                            $governorateImage = $governorateImages[$loop->index % count($governorateImages)];
-                        @endphp
-                        <img src="{{ $governorateImage }}" class="card-img-top" alt="{{ $governorate->name_ar }}" style="height: 200px; object-fit: cover;">
-                    @endif
+                    <img src="{{ $governorate->image_url }}" class="card-img-top" alt="{{ $governorate->name_ar }}" style="height: 200px; object-fit: cover;">
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">{{ $governorate->name_ar }}</h5>
                         <p class="card-text">{{ $governorate->name_en }}</p>

@@ -33,4 +33,28 @@ class Governorate extends Model
     {
         return $this->hasMany(\App\Models\TouristService::class, 'governorate_id');
     }
+
+    /**
+     * الحصول على رابط الصورة
+     */
+    public function getImageUrlAttribute()
+    {
+        return getImageUrl($this->attributes['image_path'] ?? null, $this->attributes['image_url'] ?? null);
+    }
+
+    /**
+     * التحقق من وجود الصورة
+     */
+    public function getHasImageAttribute()
+    {
+        return hasImage($this->attributes['image_path'] ?? null, $this->attributes['image_url'] ?? null);
+    }
+
+    /**
+     * الحصول على معلومات الصورة
+     */
+    public function getImageInfoAttribute()
+    {
+        return getImageInfo($this->attributes['image_path'] ?? null, $this->attributes['image_url'] ?? null);
+    }
 }
