@@ -20,7 +20,7 @@
                     
                     <div class="service-meta">
                         @if($touristService->governorate)
-                            <div class="meta-item">
+                            <a href="{{ route('tourism.governorate', $touristService->governorate->id) }}" class="meta-item meta-link">
                                 <div class="meta-icon">
                                     <i class="fas fa-building"></i>
                                 </div>
@@ -28,11 +28,14 @@
                                     <span class="meta-label">المحافظة</span>
                                     <span class="meta-value">{{ $touristService->governorate->name_ar }}</span>
                                 </div>
-                            </div>
+                                <div class="meta-arrow">
+                                    <i class="fas fa-arrow-left"></i>
+                                </div>
+                            </a>
                         @endif
                         
                         @if($touristService->wilayat)
-                            <div class="meta-item">
+                            <a href="{{ route('tourism.wilayat-details', $touristService->wilayat->id) }}" class="meta-item meta-link">
                                 <div class="meta-icon">
                                     <i class="fas fa-map-marked-alt"></i>
                                 </div>
@@ -40,31 +43,40 @@
                                     <span class="meta-label">الولاية</span>
                                     <span class="meta-value">{{ $touristService->wilayat->name_ar }}</span>
                                 </div>
-                            </div>
+                                <div class="meta-arrow">
+                                    <i class="fas fa-arrow-left"></i>
+                                </div>
+                            </a>
                         @endif
                         
                         @if($touristService->contact_phone)
-                            <div class="meta-item">
+                            <a href="tel:{{ $touristService->contact_phone }}" class="meta-item meta-link">
                                 <div class="meta-icon">
                                     <i class="fas fa-phone"></i>
                                 </div>
                                 <div class="meta-text">
                                     <span class="meta-label">الهاتف</span>
-                                    <span class="meta-value">{{ $touristService->contact_phone }}</span>
+                                    <span class="meta-value">اتصل الآن</span>
                                 </div>
-                            </div>
+                                <div class="meta-arrow">
+                                    <i class="fas fa-phone-alt"></i>
+                                </div>
+                            </a>
                         @endif
                         
                         @if($touristService->contact_email)
-                            <div class="meta-item">
+                            <a href="mailto:{{ $touristService->contact_email }}" class="meta-item meta-link">
                                 <div class="meta-icon">
                                     <i class="fas fa-envelope"></i>
                                 </div>
                                 <div class="meta-text">
                                     <span class="meta-label">البريد الإلكتروني</span>
-                                    <span class="meta-value">{{ $touristService->contact_email }}</span>
+                                    <span class="meta-value">إرسال رسالة</span>
                                 </div>
-                            </div>
+                                <div class="meta-arrow">
+                                    <i class="fas fa-envelope-open"></i>
+                                </div>
+                            </a>
                         @endif
                     </div>
                     
@@ -109,9 +121,7 @@
                             
                             <a href="https://www.google.com/maps/search/{{ urlencode($locationQuery) }}" 
                                target="_blank" 
-                               class="btn btn-primary modern-btn mb-2"
-                               onmouseover="this.style.transform='translateY(-3px) scale(1.02)'; this.style.boxShadow='0 8px 25px rgba(66, 133, 244, 0.5)'" 
-                               onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 6px 20px rgba(66, 133, 244, 0.4)'">
+                               class="btn btn-primary modern-btn google-maps-btn mb-2">
                                 <i class="fab fa-google me-2"></i>جوجل ماب
                             </a>
                         </div>
@@ -124,8 +134,10 @@
                     @if($touristService->has_image)
                         <div class="service-image">
                             <img src="{{ $touristService->image_url }}" 
-                                 alt="{{ $touristService->name_ar }}" 
-                                 class="img-fluid rounded shadow">
+                                 alt="{{ $touristService->name_ar }} - {{ $touristService->serviceType->name_ar ?? 'خدمة سياحية' }}" 
+                                 class="img-fluid rounded shadow"
+                                 loading="lazy"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="service-overlay">
                                 <div class="service-badge">
                                     <i class="fas fa-star"></i>
@@ -133,8 +145,10 @@
                                 </div>
                             </div>
                         </div>
-                    @else
-                        <div class="service-placeholder">
+                    @endif
+                    
+                    @if(!$touristService->has_image)
+                        <div class="service-placeholder" style="display: none;">
                             <div class="service-icon">
                                 @if($touristService->serviceType)
                                     @switch($touristService->serviceType->name_en)
@@ -168,13 +182,196 @@
                             </div>
                         </div>
                     @endif
+                    
+                    <!-- Fallback placeholder for broken images -->
+                    <div class="service-placeholder fallback-placeholder" style="display: none;">
+                        <div class="service-icon">
+                            @if($touristService->serviceType)
+                                @switch($touristService->serviceType->name_en)
+                                    @case('Hotel')
+                                        <i class="fas fa-hotel"></i>
+                                        @break
+                                    @case('Restaurant')
+                                        <i class="fas fa-utensils"></i>
+                                        @break
+                                    @case('Transportation')
+                                        <i class="fas fa-car"></i>
+                                        @break
+                                    @case('Tour Guide')
+                                        <i class="fas fa-map-marked-alt"></i>
+                                        @break
+                                    @case('Shopping')
+                                        <i class="fas fa-shopping-bag"></i>
+                                        @break
+                                    @default
+                                        <i class="fas fa-concierge-bell"></i>
+                                @endswitch
+                            @else
+                                <i class="fas fa-concierge-bell"></i>
+                            @endif
+                        </div>
+                        <div class="service-overlay">
+                            <div class="service-badge">
+                                <i class="fas fa-image"></i>
+                                <span>صورة غير متاحة</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
- 
+<!-- Service Description Section -->
+@if($touristService->description_ar)
+<section class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-info-circle me-2"></i>وصف الخدمة
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="description-section">
+                            <div class="description-content">
+                                {{ $touristService->description_ar }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@endif
+
+<!-- Contact Information Section -->
+<section class="section bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="contact-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-address-book me-2"></i>معلومات الاتصال
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @if($touristService->contact_phone)
+                            <div class="col-md-6 mb-3">
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <i class="fas fa-phone"></i>
+                                    </div>
+                                    <div class="contact-text">
+                                        <span class="contact-label">الهاتف</span>
+                                        <a href="tel:{{ $touristService->contact_phone }}" class="contact-link">
+                                            {{ $touristService->contact_phone }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                            
+                            @if($touristService->contact_email)
+                            <div class="col-md-6 mb-3">
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="contact-text">
+                                        <span class="contact-label">البريد الإلكتروني</span>
+                                        <a href="mailto:{{ $touristService->contact_email }}" class="contact-link">
+                                            {{ $touristService->contact_email }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                            
+                            @if($touristService->website)
+                            <div class="col-md-6 mb-3">
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <i class="fas fa-globe"></i>
+                                    </div>
+                                    <div class="contact-text">
+                                        <span class="contact-label">الموقع الإلكتروني</span>
+                                        <a href="{{ $touristService->website }}" target="_blank" class="contact-link">
+                                            زيارة الموقع
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Location Information Section -->
+<section class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="location-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-map-marker-alt me-2"></i>معلومات الموقع
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @if($touristService->governorate)
+                            <div class="col-md-6 mb-3">
+                                <div class="location-item">
+                                    <div class="location-icon">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <div class="location-text">
+                                        <span class="location-label">المحافظة</span>
+                                        <span class="location-value">
+                                            <a href="{{ route('tourism.governorate', $touristService->governorate->id) }}" class="info-link">
+                                                {{ $touristService->governorate->name_ar }}
+                                            </a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                            
+                            @if($touristService->wilayat)
+                            <div class="col-md-6 mb-3">
+                                <div class="location-item">
+                                    <div class="location-icon">
+                                        <i class="fas fa-map-marked-alt"></i>
+                                    </div>
+                                    <div class="location-text">
+                                        <span class="location-label">الولاية</span>
+                                        <span class="location-value">
+                                            <a href="{{ route('tourism.wilayat', $touristService->wilayat->id) }}" class="info-link">
+                                                {{ $touristService->wilayat->name_ar }}
+                                            </a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Related Services -->
 @if($relatedServices->count() > 0)
@@ -260,12 +457,58 @@
 
 @push('styles')
 <style>
+    /* CSS Variables */
+    :root {
+        --primary-color: #614c39;
+        --secondary-color: #a1815a;
+        --accent-color: #deb47a;
+        --highlight-color: #c19b6c;
+        --neutral-color: #236b8b;
+        --text-dark: #2c3e50;
+        --text-light: #7f8c8d;
+        --bg-light: #f8f9fa;
+        --white: #ffffff;
+        --shadow-color: rgba(97, 76, 57, 0.3);
+        --shadow-light: rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Base Styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: 'Cairo', sans-serif;
+        line-height: 1.6;
+        color: var(--text-dark);
+        background-color: var(--white);
+    }
+    
     .hero-section {
         background: linear-gradient(rgba(97, 76, 57, 0.7), rgba(161, 129, 90, 0.6), rgba(222, 180, 122, 0.5)),
         url('{{ asset("images/albadyah.jpg") }}');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
+        position: relative;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(97, 76, 57, 0.1);
+        z-index: 1;
+    }
+    
+    .hero-section .container {
+        position: relative;
+        z-index: 2;
     }
     
     /* Hero Section */
@@ -318,12 +561,44 @@
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
         transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .meta-link {
+        text-decoration: none !important;
+        color: inherit !important;
+        cursor: pointer;
+    }
+
+    .meta-link:visited,
+    .meta-link:focus,
+    .meta-link:hover,
+    .meta-link:active {
+        color: inherit !important;
+        text-decoration: none !important;
+    }
+
+    .meta-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .meta-item:hover::before {
+        left: 100%;
     }
     
     .meta-item:hover {
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        border-color: rgba(255, 255, 255, 0.4);
     }
     
     .meta-icon {
@@ -362,6 +637,35 @@
         color: white;
         font-weight: 600;
         line-height: 1.2;
+    }
+
+    .meta-arrow {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        margin-right: 0.5rem;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .meta-arrow i {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+        transition: all 0.3s ease;
+    }
+
+    .meta-item:hover .meta-arrow {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+    }
+
+    .meta-item:hover .meta-arrow i {
+        color: white;
+        transform: translateX(-2px);
     }
     
     .hero-actions {
@@ -412,7 +716,22 @@
     .modern-btn:hover {
         background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
         transform: translateY(-3px);
-        box-shadow: 0 12px 35px rgba(97, 76, 57, 0.4);
+        box-shadow: 0 12px 35px var(--shadow-color);
+    }
+    
+    .google-maps-btn {
+        background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+        box-shadow: 0 8px 25px rgba(66, 133, 244, 0.4);
+    }
+    
+    .google-maps-btn:hover {
+        background: linear-gradient(135deg, #34a853 0%, #4285f4 100%);
+        box-shadow: 0 12px 35px rgba(66, 133, 244, 0.5);
+        transform: translateY(-3px) scale(1.02);
+    }
+    
+    .google-maps-btn:active {
+        transform: translateY(-1px) scale(1.01);
     }
     
     .btn-outline-primary {
@@ -499,6 +818,21 @@
     
     .service-badge i {
         font-size: 1.2rem;
+    }
+    
+    .fallback-placeholder {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+        border: 2px dashed var(--primary-color);
+        opacity: 0.8;
+    }
+    
+    .fallback-placeholder .service-icon {
+        color: var(--primary-color);
+    }
+    
+    .fallback-placeholder .service-badge {
+        background: rgba(97, 76, 57, 0.9);
+        color: white;
     }
     
     /* Content Cards */
@@ -946,17 +1280,20 @@
     }
     
     /* Responsive */
-    @media (max-width: 768px) {
+    @media (max-width: 992px) {
+        .hero-section {
+            min-height: 50vh;
+        }
+        
         .service-title {
-            font-size: 2.5rem;
+            font-size: 3rem;
         }
         
         .service-subtitle {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
         }
         
         .service-meta {
-            flex-direction: column;
             gap: 1rem;
         }
         
@@ -964,42 +1301,121 @@
             padding: 0.75rem 1rem;
         }
         
-        .hero-actions {
-            flex-direction: column;
+        .meta-arrow {
+            width: 30px;
+            height: 30px;
         }
         
-        .hero-actions .btn {
+        .meta-arrow i {
+            font-size: 0.8rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .hero-section {
+            min-height: 40vh;
+            background-attachment: scroll;
+        }
+        
+        .service-title {
+            font-size: 2.2rem;
+            line-height: 1.1;
+        }
+        
+        .service-subtitle {
+            font-size: 1.1rem;
+        }
+        
+        .service-meta {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .meta-item {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .meta-icon {
+            width: 40px;
+            height: 40px;
+            margin-left: 0.75rem;
+        }
+        
+        .meta-icon i {
+            font-size: 1rem;
+        }
+        
+        .hero-actions {
+            margin-top: 1.5rem;
+        }
+        
+        .location-actions-row,
+        .service-actions-row {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .modern-btn {
             width: 100%;
+            padding: 12px 20px;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
         }
         
         .service-placeholder {
-            height: 300px;
+            height: 250px;
         }
         
         .service-icon {
-            font-size: 3rem;
+            font-size: 2.5rem;
         }
         
         .section-title {
-            font-size: 2rem;
+            font-size: 1.8rem;
         }
         
         .cta-buttons {
             flex-direction: column;
             align-items: center;
+            gap: 0.75rem;
         }
         
         .cta-buttons .btn {
             width: 100%;
-            max-width: 300px;
+            max-width: 280px;
         }
         
         .cta-title {
-            font-size: 2rem;
+            font-size: 1.8rem;
+        }
+        
+        .cta-subtitle {
+            font-size: 1rem;
         }
         
         .card-body {
-            padding: 1.5rem;
+            padding: 1.25rem;
+        }
+        
+        .related-card {
+            margin-bottom: 1rem;
+        }
+        
+        .contact-item,
+        .location-item {
+            padding: 0.75rem 0;
+        }
+        
+        .contact-icon,
+        .location-icon {
+            width: 35px;
+            height: 35px;
+            margin-left: 0.75rem;
+        }
+        
+        .location-icon {
+            margin-right: 0.75rem;
         }
     }
     
@@ -1023,6 +1439,108 @@
         .cta-card {
             padding: 2rem 1rem;
         }
+        
+        .meta-arrow {
+            width: 25px;
+            height: 25px;
+        }
+        
+        .meta-arrow i {
+            font-size: 0.7rem;
+        }
+        
+        .fallback-placeholder {
+            height: 200px;
+        }
+        
+        .fallback-placeholder .service-icon {
+            font-size: 2rem;
+        }
+    }
+    
+    /* Performance Optimizations */
+    .hero-section {
+        will-change: transform;
+    }
+    
+    .modern-btn {
+        will-change: transform, box-shadow;
+    }
+    
+    .service-image img {
+        will-change: transform;
+    }
+    
+    /* Accessibility Improvements */
+    .modern-btn:focus,
+    .btn-outline-primary:focus {
+        outline: 3px solid rgba(255, 255, 255, 0.5);
+        outline-offset: 2px;
+    }
+    
+    .contact-link:focus,
+    .info-link:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+    
+    /* Loading States */
+    .service-image img[loading="lazy"] {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .service-image img[loading="lazy"].loaded {
+        opacity: 1;
     }
 </style>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Lazy loading image enhancement
+    const images = document.querySelectorAll('img[loading="lazy"]');
+    
+    images.forEach(img => {
+        img.addEventListener('load', function() {
+            this.classList.add('loaded');
+        });
+        
+        img.addEventListener('error', function() {
+            const fallback = this.parentElement.querySelector('.fallback-placeholder');
+            if (fallback) {
+                this.style.display = 'none';
+                fallback.style.display = 'flex';
+            }
+        });
+    });
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // Performance: Preload critical images
+    const criticalImages = document.querySelectorAll('.hero-section img, .service-image img');
+    criticalImages.forEach(img => {
+        if (img.src && !img.complete) {
+            const link = document.createElement('link');
+            link.rel = 'preload';
+            link.as = 'image';
+            link.href = img.src;
+            document.head.appendChild(link);
+        }
+    });
+});
+</script>
 @endpush

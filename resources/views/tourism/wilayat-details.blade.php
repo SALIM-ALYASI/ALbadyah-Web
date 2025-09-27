@@ -30,15 +30,17 @@
                     </div>
                     
                     <div class="hero-actions mt-4">
-                        <a href="{{ route('tourism.governorates') }}" class="btn btn-outline-light btn-lg me-3">
-                            <i class="fas fa-arrow-right me-2"></i>العودة للمحافظات
-                        </a>
-                        <a href="{{ route('tourism.wilayats') }}" class="btn btn-light btn-lg me-3">
-                            <i class="fas fa-list me-2"></i>عرض جميع الولايات
-                        </a>
-                        <a href="https://www.google.com/maps/search/{{ urlencode($governorate->name_ar . ' سلطنة عمان') }}" target="_blank" class="btn btn-outline-light btn-lg">
-                            <i class="fas fa-map-marker-alt me-2"></i>جوجل ماب
-                        </a>
+                        <div class="actions-row">
+                            <a href="{{ route('tourism.governorates') }}" class="btn btn-outline-light modern-btn me-2 mb-2">
+                                <i class="fas fa-arrow-right me-2"></i>العودة للمحافظات
+                            </a>
+                            <a href="{{ route('tourism.wilayats') }}" class="btn btn-light modern-btn me-2 mb-2">
+                                <i class="fas fa-list me-2"></i>عرض جميع الولايات
+                            </a>
+                            <a href="https://www.google.com/maps/search/{{ urlencode($governorate->name_ar . ' سلطنة عمان') }}" target="_blank" class="btn btn-outline-light google-maps-btn mb-2">
+                                <i class="fas fa-map-marker-alt me-2"></i>جوجل ماب
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -105,9 +107,7 @@
                                         position: relative;
                                         z-index: 2;
                                         transition: transform 0.3s ease;
-                                     "
-                                     onmouseover="this.style.transform='scale(1.02)'"
-                                     onmouseout="this.style.transform='scale(1)'">
+                                     ">
                             @else
                                 <div class="d-flex align-items-center justify-content-center" style="
                                     height: 200px;
@@ -327,14 +327,17 @@
     .hero-stats {
         display: flex;
         justify-content: center;
-        gap: 3rem;
-        margin: 2rem 0;
+        align-items: center;
+        gap: 2rem;
+        margin: 2rem auto;
         padding: 1.5rem;
         background: rgba(255, 255, 255, 0.15);
         border-radius: 20px;
         backdrop-filter: blur(10px);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.2);
+        max-width: 800px;
+        flex-wrap: wrap;
     }
 
     .hero-stats .stat-item {
@@ -342,6 +345,9 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
+        flex: 1;
+        min-width: 120px;
+        max-width: 150px;
     }
 
     .hero-stats .stat-number {
@@ -358,6 +364,53 @@
         color: rgba(255, 255, 255, 0.9);
         font-weight: 500;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Hero Actions */
+    .hero-actions {
+        margin-top: 2rem;
+    }
+    
+    .actions-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .modern-btn {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.2) 100%);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 25px;
+        padding: 12px 24px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .modern-btn:hover {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.3) 100%);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+    
+    .google-maps-btn {
+        background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 25px rgba(66, 133, 244, 0.4);
+    }
+    
+    .google-maps-btn:hover {
+        background: linear-gradient(135deg, #34a853 0%, #4285f4 100%);
+        box-shadow: 0 12px 35px rgba(66, 133, 244, 0.5);
+        transform: translateY(-3px) scale(1.02);
+        color: white;
     }
 
     /* Wilayat Section */
@@ -479,6 +532,10 @@
     .service-card:hover .service-image img {
         transform: scale(1.05);
     }
+    
+    .wilayat-image-container img:hover {
+        transform: scale(1.02);
+    }
 
     .no-image {
         height: 100%;
@@ -565,6 +622,35 @@
     }
 
     /* Responsive Design */
+    @media (max-width: 992px) {
+        .hero-stats {
+            max-width: 700px;
+            gap: 1.75rem;
+        }
+        
+        .hero-stats .stat-item {
+            min-width: 110px;
+            max-width: 140px;
+        }
+        
+        .hero-title {
+            font-size: 2.8rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+        }
+        
+        .actions-row {
+            gap: 1rem;
+        }
+        
+        .modern-btn, .google-maps-btn {
+            padding: 10px 20px;
+            font-size: 0.95rem;
+        }
+    }
+
     @media (max-width: 768px) {
         .hero-title {
             font-size: 2.2rem;
@@ -581,10 +667,27 @@
         .hero-stats {
             gap: 1.5rem;
             padding: 1rem;
+            max-width: 600px;
+        }
+        
+        .hero-stats .stat-item {
+            min-width: 100px;
+            max-width: 130px;
         }
 
         .hero-stats .stat-number {
             font-size: 2rem;
+        }
+        
+        .actions-row {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .modern-btn, .google-maps-btn {
+            width: 100%;
+            max-width: 280px;
+            margin: 0.25rem 0;
         }
 
         .wilayat-section {
@@ -645,6 +748,14 @@
         .hero-stats {
             flex-direction: column;
             gap: 1rem;
+            max-width: 300px;
+            padding: 1rem 0.5rem;
+        }
+        
+        .hero-stats .stat-item {
+            min-width: 80px;
+            max-width: 120px;
+            padding: 0.5rem;
         }
 
         .hero-stats .stat-number {
@@ -678,6 +789,50 @@
         .site-image,
         .service-image {
             height: 180px;
+        }
+        
+        .modern-btn, .google-maps-btn {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .hero-title {
+            font-size: 1.6rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 0.95rem;
+        }
+        
+        .hero-description {
+            font-size: 0.9rem;
+        }
+        
+        .hero-stats {
+            max-width: 280px;
+            padding: 0.75rem 0.25rem;
+        }
+        
+        .hero-stats .stat-item {
+            min-width: 70px;
+            max-width: 100px;
+            padding: 0.25rem;
+        }
+        
+        .hero-stats .stat-number {
+            font-size: 1.5rem;
+        }
+        
+        .hero-stats .stat-label {
+            font-size: 0.8rem;
+        }
+        
+        .modern-btn, .google-maps-btn {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            max-width: 250px;
         }
     }
 </style>

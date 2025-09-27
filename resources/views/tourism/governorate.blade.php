@@ -227,8 +227,7 @@
                                 <a href="{{ route('tourism.wilayat-details', $governorate->id) }}" class="btn btn-primary w-100 mb-2">
                                     <i class="fas fa-map-marked-alt me-2"></i>عرض تفاصيل الولاية
                                 </a>
-                                <a href="https://www.google.com/maps/search/{{ urlencode($governorate->name_ar . ' سلطنة عمان') }}" target="_blank" class="btn btn-primary w-100 mb-2"
-                                    onmouseover="this.style.transform='translateY(-3px) scale(1.02)'; this.style.boxShadow='0 8px 25px rgba(66, 133, 244, 0.5)'" onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 6px 20px rgba(66, 133, 244, 0.4)'">
+                                <a href="https://www.google.com/maps/search/{{ urlencode($governorate->name_ar . ' سلطنة عمان') }}" target="_blank" class="btn btn-primary google-maps-btn w-100 mb-2">
                                     <i class="fab fa-google me-2"></i>جوجل ماب
                                 </a>
                             </div>
@@ -298,6 +297,8 @@
         flex-wrap: wrap;
         gap: 1.5rem;
         margin-bottom: 2rem;
+        justify-content: center;
+        align-items: stretch;
     }
     
     .stat-item {
@@ -309,6 +310,9 @@
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
         transition: all 0.3s ease;
+        flex: 1;
+        min-width: 200px;
+        max-width: 250px;
     }
     
     .stat-item:hover {
@@ -426,11 +430,27 @@
         border-color: white;
     }
     
+    .google-maps-btn {
+        background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+        box-shadow: 0 8px 25px rgba(66, 133, 244, 0.4);
+    }
+    
+    .google-maps-btn:hover {
+        background: linear-gradient(135deg, #34a853 0%, #4285f4 100%);
+        box-shadow: 0 12px 35px rgba(66, 133, 244, 0.5);
+        transform: translateY(-3px) scale(1.02);
+    }
+    
+    .google-maps-btn:active {
+        transform: translateY(-1px) scale(1.01);
+    }
+    
     .governorate-image-container {
         position: relative;
         border-radius: 25px;
         overflow: hidden;
         box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        margin: 2rem 0;
     }
     
     .governorate-image {
@@ -843,6 +863,29 @@
     }
     
     /* Responsive */
+    @media (max-width: 992px) {
+        .governorate-stats {
+            gap: 1.25rem;
+        }
+        
+        .stat-item {
+            min-width: 180px;
+            max-width: 220px;
+        }
+        
+        .governorate-title {
+            font-size: 3.5rem;
+        }
+        
+        .governorate-subtitle {
+            font-size: 1.3rem;
+        }
+        
+        .governorate-image-container {
+            margin: 1.5rem 0;
+        }
+    }
+
     @media (max-width: 768px) {
         .governorate-title {
             font-size: 2.5rem;
@@ -855,10 +898,13 @@
         .governorate-stats {
             flex-direction: column;
             gap: 1rem;
+            align-items: center;
         }
         
         .stat-item {
             padding: 0.75rem 1rem;
+            min-width: 250px;
+            max-width: 300px;
         }
         
         .hero-actions {
@@ -871,6 +917,10 @@
         
         .governorate-image {
             height: 300px;
+        }
+        
+        .governorate-image-container {
+            margin: 1rem 0;
         }
         
         .section-title {
@@ -896,6 +946,28 @@
         }
     }
     
+    @media (max-width: 576px) {
+        .governorate-stats {
+            gap: 0.75rem;
+        }
+        
+        .stat-item {
+            min-width: 200px;
+            max-width: 250px;
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            margin-left: 0.75rem;
+        }
+        
+        .stat-icon i {
+            font-size: 1.1rem;
+        }
+    }
+
     @media (max-width: 480px) {
         .governorate-title {
             font-size: 2rem;
@@ -903,6 +975,16 @@
         
         .governorate-image {
             height: 250px;
+        }
+        
+        .governorate-image-container {
+            margin: 0.75rem 0;
+        }
+        
+        .stat-item {
+            min-width: 180px;
+            max-width: 220px;
+            padding: 0.5rem;
         }
         
         .card-body {

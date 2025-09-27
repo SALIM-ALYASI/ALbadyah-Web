@@ -5,30 +5,44 @@
 
 @section('content')
 <!-- Hero Section -->
-<section class="hero-section" style="min-height: 60vh;">
+<section class="hero-section">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <div class="hero-content fade-in-up">
+                <div class="hero-content">
+                    <div class="hero-breadcrumb">
+                        <a href="{{ route('tourism.tourist-sites') }}" class="breadcrumb-link">
+                            <i class="fas fa-arrow-right me-2"></i>المواقع السياحية
+                        </a>
+                        <span class="breadcrumb-separator">/</span>
+                        <span class="breadcrumb-current">{{ $touristSite->name_ar }}</span>
+                    </div>
 
                     <h1 class="site-title">{{ $touristSite->name_ar }}</h1>
                     <h2 class="site-subtitle">{{ $touristSite->name_en }}</h2>
 
+                    @if($touristSite->description_ar)
+                    <p class="site-description">{{ Str::limit($touristSite->description_ar, 200) }}</p>
+                    @endif
+
                     <div class="site-meta">
                         @if($touristSite->location)
-                        <div class="meta-item">
+                        <a href="https://maps.google.com/?q={{ urlencode($touristSite->location) }}" target="_blank" class="meta-item meta-link">
                             <div class="meta-icon">
                                 <i class="fas fa-map-marker-alt"></i>
                             </div>
                             <div class="meta-text">
                                 <span class="meta-label">الموقع</span>
-                                <span class="meta-value">{{ $touristSite->location }}</span>
+                                <span class="meta-value">فتح في خرائط جوجل</span>
                             </div>
-                        </div>
+                            <div class="meta-arrow">
+                                <i class="fas fa-external-link-alt"></i>
+                            </div>
+                        </a>
                         @endif
 
                         @if($touristSite->governorate)
-                        <div class="meta-item">
+                        <a href="{{ route('tourism.governorate', $touristSite->governorate->id) }}" class="meta-item meta-link">
                             <div class="meta-icon">
                                 <i class="fas fa-building"></i>
                             </div>
@@ -36,11 +50,14 @@
                                 <span class="meta-label">المحافظة</span>
                                 <span class="meta-value">{{ $touristSite->governorate->name_ar }}</span>
                             </div>
-                        </div>
+                            <div class="meta-arrow">
+                                <i class="fas fa-arrow-left"></i>
+                            </div>
+                        </a>
                         @endif
 
                         @if($touristSite->wilayat)
-                        <div class="meta-item">
+                        <a href="{{ route('tourism.wilayat-details', $touristSite->wilayat->id) }}" class="meta-item meta-link">
                             <div class="meta-icon">
                                 <i class="fas fa-map-marked-alt"></i>
                             </div>
@@ -48,17 +65,41 @@
                                 <span class="meta-label">الولاية</span>
                                 <span class="meta-value">{{ $touristSite->wilayat->name_ar }}</span>
                             </div>
-                        </div>
+                            <div class="meta-arrow">
+                                <i class="fas fa-arrow-left"></i>
+                            </div>
+                        </a>
                         @endif
+
+                        <a href="#gallery-section" class="meta-item meta-link">
+                            <div class="meta-icon">
+                                <i class="fas fa-images"></i>
+                            </div>
+                            <div class="meta-text">
+                                <span class="meta-label">الصور</span>
+                                <span class="meta-value">{{ $touristSite->images->count() }} صورة</span>
+                            </div>
+                            <div class="meta-arrow">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                        </a>
                     </div>
 
+                    <div class="hero-actions">
+                        <a href="#gallery-section" class="btn btn-primary modern-btn">
+                            <i class="fas fa-images me-2"></i>عرض الصور
+                        </a>
+                        <a href="#description-section" class="btn btn-outline-light modern-btn">
+                            <i class="fas fa-info-circle me-2"></i>اقرأ المزيد
+                        </a>
+                    </div>
                 </div>
             </div>
 
             <div class="col-lg-4">
-                @if($touristSite->images->count() > 0)
-                @php $firstImage = $touristSite->images->first(); @endphp
                 <div class="hero-image-container">
+                    @if($touristSite->images->count() > 0)
+                    @php $firstImage = $touristSite->images->first(); @endphp
                     @if($firstImage->image_path)
                     <img src="{{ asset($firstImage->image_path) }}" alt="{{ $touristSite->name_ar }}" class="hero-image">
                     @elseif($firstImage->image_url)
@@ -66,24 +107,25 @@
                     @else
                     <img src="{{ asset('images/albadyah.jpg') }}" alt="{{ $touristSite->name_ar }}" class="hero-image">
                     @endif
+                    @else
+                    <img src="{{ asset('images/albadyah.jpg') }}" alt="{{ $touristSite->name_ar }}" class="hero-image">
+                    @endif
+                    
                     <div class="image-overlay">
+                        <div class="image-badges">
+                            @if($touristSite->governorate)
+                            <span class="badge badge-governorate">{{ $touristSite->governorate->name_ar }}</span>
+                            @endif
+                            @if($touristSite->wilayat)
+                            <span class="badge badge-wilayat">{{ $touristSite->wilayat->name_ar }}</span>
+                            @endif
+                        </div>
                         <div class="image-counter">
                             <i class="fas fa-images"></i>
                             <span>{{ $touristSite->images->count() }} صورة</span>
                         </div>
                     </div>
                 </div>
-                @else
-                <div class="hero-image-container">
-                    <img src="{{ asset('images/albadyah.jpg') }}" alt="{{ $touristSite->name_ar }}" class="hero-image">
-                    <div class="image-overlay">
-                        <div class="image-counter">
-                            <i class="fas fa-images"></i>
-                            <span>لا توجد صور</span>
-                        </div>
-                    </div>
-                </div>
-                @endif
             </div>
         </div>
     </div>
@@ -91,7 +133,7 @@
 
 <!-- Image Gallery -->
 @if($touristSite->images->count() > 0)
-<section class="section bg-light">
+<section id="gallery-section" class="section bg-light">
     <div class="container">
         <div class="row">
             <div class="col-12">
@@ -154,7 +196,7 @@
 
 <!-- Site Description -->
 @if($touristSite->description_ar || $touristSite->description_en)
-<section class="section">
+<section id="description-section" class="section">
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
@@ -340,21 +382,61 @@
 
 @push('styles')
 <style>
+    :root {
+        --vh: 1vh;
+    }
+    
     .hero-section {
-        background: linear-gradient(rgba(97, 76, 57, 0.7), rgba(161, 129, 90, 0.6), rgba(222, 180, 122, 0.5)),
+        background: linear-gradient(rgba(97, 76, 57, 0.8), rgba(161, 129, 90, 0.7), rgba(222, 180, 122, 0.6)),
         url('{{ asset("images/albadyah.jpg") }}');
         background-size: cover;
         background-position: center;
-        background-attachment: fixed;
+        background-attachment: scroll;
+        min-height: calc(var(--vh, 1vh) * 80);
+        position: relative;
+        overflow: hidden;
     }
     
-    /* Hero Section */
-
+    /* Hero Breadcrumb */
+    .hero-breadcrumb {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        gap: 0.5rem;
+    }
+    
+    .breadcrumb-link {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+    
+    .breadcrumb-link:hover {
+        color: white;
+        transform: translateX(-3px);
+    }
+    
+    .breadcrumb-separator {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.8rem;
+    }
+    
+    .breadcrumb-current {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    /* Hero Content */
     .site-title {
         font-size: 4rem;
-        font-weight: 700;
+        font-weight: 800;
         color: white;
-        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         margin-bottom: 1rem;
         line-height: 1.2;
     }
@@ -362,9 +444,17 @@
     .site-subtitle {
         font-size: 1.5rem;
         color: rgba(255, 255, 255, 0.9);
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        margin-bottom: 2rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        margin-bottom: 1rem;
         font-weight: 400;
+    }
+    
+    .site-description {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 2rem;
+        line-height: 1.6;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     .site-meta {
@@ -383,12 +473,44 @@
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
         transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .meta-link {
+        text-decoration: none !important;
+        color: inherit !important;
+        cursor: pointer;
+    }
+
+    .meta-link:visited,
+    .meta-link:focus,
+    .meta-link:hover,
+    .meta-link:active {
+        color: inherit !important;
+        text-decoration: none !important;
+    }
+
+    .meta-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .meta-item:hover::before {
+        left: 100%;
     }
 
     .meta-item:hover {
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.4);
     }
 
     .meta-icon {
@@ -429,21 +551,57 @@
         line-height: 1.2;
     }
 
+    .meta-arrow {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        margin-right: 0.5rem;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .meta-arrow i {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+        transition: all 0.3s ease;
+    }
+
+    .meta-item:hover .meta-arrow {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+    }
+
+    .meta-item:hover .meta-arrow i {
+        color: white;
+        transform: translateX(-2px);
+    }
+
     .hero-actions {
         margin-top: 2rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
     }
 
     .modern-btn {
         background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         border: none;
         border-radius: 25px;
-        padding: 15px 30px;
-        font-weight: 700;
-        font-size: 1.1rem;
+        padding: 12px 24px;
+        font-weight: 600;
+        font-size: 1rem;
         transition: all 0.3s ease;
         box-shadow: 0 8px 25px rgba(97, 76, 57, 0.3);
         position: relative;
         overflow: hidden;
+        text-decoration: none;
+        color: white;
+        display: inline-flex;
+        align-items: center;
     }
 
     .modern-btn::before {
@@ -465,6 +623,19 @@
         background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
         transform: translateY(-3px);
         box-shadow: 0 12px 35px rgba(97, 76, 57, 0.4);
+        color: white;
+    }
+
+    .btn-outline-light.modern-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-outline-light.modern-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+        color: white;
     }
 
     .hero-image-container {
@@ -472,6 +643,7 @@
         border-radius: 25px;
         overflow: hidden;
         box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        margin: 2rem 0;
     }
 
     .hero-image {
@@ -481,16 +653,49 @@
         transition: all 0.3s ease;
     }
 
+    .hero-image-container:hover .hero-image {
+        transform: scale(1.02);
+    }
+
     .image-overlay {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 100%);
         display: flex;
-        align-items: flex-end;
+        flex-direction: column;
+        justify-content: space-between;
         padding: 1.5rem;
+    }
+
+    .image-badges {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .badge {
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--primary-color);
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        align-self: flex-start;
+    }
+
+    .badge-governorate {
+        background: linear-gradient(135deg, rgba(97, 76, 57, 0.9) 0%, rgba(161, 129, 90, 0.9) 100%);
+        color: white;
+    }
+
+    .badge-wilayat {
+        background: linear-gradient(135deg, rgba(222, 180, 122, 0.9) 0%, rgba(161, 129, 90, 0.9) 100%);
+        color: white;
     }
 
     .image-counter {
@@ -500,6 +705,8 @@
         border-radius: 20px;
         font-weight: 600;
         backdrop-filter: blur(10px);
+        align-self: flex-end;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     .image-counter i {
@@ -1111,14 +1318,44 @@
         border-color: white;
     }
 
-    /* Responsive */
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .hero-section {
+            min-height: calc(var(--vh, 1vh) * 70);
+        }
+        
+        .site-title {
+            font-size: 3.5rem;
+        }
+        
+        .site-subtitle {
+            font-size: 1.3rem;
+        }
+        
+        .site-description {
+            font-size: 1.1rem;
+        }
+        
+        .hero-image {
+            height: 350px;
+        }
+    }
+
     @media (max-width: 768px) {
+        .hero-section {
+            min-height: calc(var(--vh, 1vh) * 60);
+        }
+        
         .site-title {
             font-size: 2.5rem;
         }
 
         .site-subtitle {
             font-size: 1.2rem;
+        }
+        
+        .site-description {
+            font-size: 1rem;
         }
 
         .site-meta {
@@ -1129,9 +1366,29 @@
         .meta-item {
             padding: 0.75rem 1rem;
         }
+        
+        .meta-arrow {
+            width: 30px;
+            height: 30px;
+        }
+        
+        .meta-arrow i {
+            font-size: 0.8rem;
+        }
 
         .hero-image {
             height: 300px;
+        }
+        
+        .hero-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .modern-btn {
+            width: 100%;
+            max-width: 280px;
+            justify-content: center;
         }
 
         .section-title {
@@ -1157,13 +1414,36 @@
         }
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 576px) {
+        .hero-section {
+            min-height: calc(var(--vh, 1vh) * 50);
+        }
+        
         .site-title {
-            font-size: 2rem;
+            font-size: 2.2rem;
+        }
+        
+        .site-subtitle {
+            font-size: 1rem;
+        }
+        
+        .site-description {
+            font-size: 0.9rem;
+        }
+        
+        .hero-breadcrumb {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
         }
 
         .hero-image {
             height: 250px;
+        }
+        
+        .modern-btn {
+            padding: 10px 20px;
+            font-size: 0.9rem;
         }
 
         .card-body {
@@ -1174,11 +1454,82 @@
             padding: 2rem 1rem;
         }
     }
+
+    @media (max-width: 480px) {
+        .hero-section {
+            min-height: calc(var(--vh, 1vh) * 45);
+        }
+        
+        .site-title {
+            font-size: 1.8rem;
+        }
+        
+        .site-subtitle {
+            font-size: 0.9rem;
+        }
+        
+        .site-description {
+            font-size: 0.85rem;
+        }
+
+        .hero-image {
+            height: 220px;
+        }
+        
+        .meta-arrow {
+            width: 25px;
+            height: 25px;
+        }
+        
+        .meta-arrow i {
+            font-size: 0.7rem;
+        }
+        
+        .modern-btn {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+
+        .card-body {
+            padding: 0.75rem;
+        }
+
+        .cta-card {
+            padding: 1.5rem 0.75rem;
+        }
+    }
 </style>
 @endpush
 
 @push('scripts')
 <script>
+    // Smooth scrolling and viewport fixes
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fix iOS viewport issues
+        function fixViewport() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        
+        fixViewport();
+        window.addEventListener('resize', fixViewport);
+        window.addEventListener('orientationchange', fixViewport);
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    });
+
     // Function to copy link to clipboard
     function copyToClipboard(text) {
         // Create a temporary textarea element

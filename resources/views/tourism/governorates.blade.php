@@ -80,7 +80,7 @@
                                 
                                 <div class="governorate-actions">
                                     <a href="https://www.google.com/maps/search/{{ urlencode($governorate->name_ar . ' سلطنة عمان') }}" target="_blank" class="btn btn-outline-primary w-100 mb-2">
-                                        <i class="fas fa-map-marker-alt me-1"></i>جوجل ماب
+                                        <i class="fas fa-map-marker-alt me-2"></i>جوجل ماب
                                     </a>
                                     <a href="{{ route('tourism.governorate', $governorate->id) }}" class="btn btn-primary w-100">
                                         <i class="fas fa-eye me-1"></i>استكشف المحافظة
@@ -193,14 +193,17 @@
     .hero-stats {
         display: flex;
         justify-content: center;
-        gap: 3rem;
-        margin: 2rem 0;
+        align-items: center;
+        gap: 2rem;
+        margin: 2rem auto;
         padding: 1.5rem;
         background: rgba(255, 255, 255, 0.15);
         border-radius: 20px;
         backdrop-filter: blur(10px);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.2);
+        max-width: 800px;
+        flex-wrap: wrap;
     }
 
     .hero-stats .stat-item {
@@ -208,6 +211,9 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
+        flex: 1;
+        min-width: 120px;
+        max-width: 150px;
     }
 
     .hero-stats .stat-number {
@@ -318,14 +324,44 @@
         border-radius: 10px;
         font-weight: 500;
         transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
     }
 
     .governorate-actions .btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
+
+    .governorate-actions .btn i {
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
     
     /* Responsive Design */
+    @media (max-width: 992px) {
+        .hero-stats {
+            max-width: 700px;
+            gap: 1.75rem;
+        }
+        
+        .hero-stats .stat-item {
+            min-width: 110px;
+            max-width: 140px;
+        }
+        
+        .governorate-actions .btn {
+            min-width: 100px;
+            font-size: 0.9rem;
+        }
+        
+        .governorate-actions .btn i {
+            font-size: 0.9rem;
+        }
+    }
+
     @media (max-width: 768px) {
         .hero-title {
             font-size: 2.2rem;
@@ -338,6 +374,12 @@
         .hero-stats {
             gap: 1.5rem;
             padding: 1rem;
+            max-width: 600px;
+        }
+
+        .hero-stats .stat-item {
+            min-width: 100px;
+            max-width: 130px;
         }
 
         .hero-stats .stat-number {
@@ -358,6 +400,14 @@
         
         .governorate-actions .btn {
             width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            min-height: 48px;
+        }
+        
+        .governorate-actions .btn i {
+            font-size: 1rem;
+            margin-left: 0.5rem;
         }
         
         .cta-buttons .btn {
@@ -371,10 +421,42 @@
         .hero-stats {
             flex-direction: column;
             gap: 1rem;
+            max-width: 300px;
+            padding: 1rem 0.5rem;
+        }
+
+        .hero-stats .stat-item {
+            min-width: 80px;
+            max-width: 120px;
+            padding: 0.5rem;
         }
 
         .hero-stats .stat-number {
             font-size: 1.8rem;
+        }
+        
+        .governorate-actions .btn {
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+            min-height: 52px;
+        }
+        
+        .governorate-actions .btn i {
+            font-size: 1.1rem;
+            margin-left: 0.75rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .governorate-actions .btn {
+            padding: 1rem;
+            font-size: 1.05rem;
+            min-height: 56px;
+        }
+        
+        .governorate-actions .btn i {
+            font-size: 1.2rem;
+            margin-left: 1rem;
         }
     }
 </style>

@@ -62,26 +62,26 @@
 <!-- Stats Section -->
 <section class="stats-section section">
     <div class="container">
-        <div class="row">
-            <div class="col-lg-3 col-md-6">
+        <div class="row justify-content-center">
+            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
                 <div class="stat-item">
                     <span class="stat-number">{{ $stats['total_governorates'] }}</span>
                     <div class="stat-label">محافظة</div>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
                 <div class="stat-item">
                     <span class="stat-number">{{ $stats['total_wilayats'] }}</span>
                     <div class="stat-label">ولاية</div>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
                 <div class="stat-item">
                     <span class="stat-number">{{ $stats['total_tourist_sites'] }}</span>
                     <div class="stat-label">موقع سياحي</div>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
                 <div class="stat-item">
                     <span class="stat-number">{{ $stats['total_tourist_services'] }}</span>
                     <div class="stat-label">خدمة سياحية</div>
@@ -443,6 +443,151 @@
         .hero-stats .stat-number {
             font-size: 1.8rem;
         }
+    }
+
+    /* Stats Section Styles */
+    .stats-section {
+        background: linear-gradient(135deg, rgba(97, 76, 57, 0.8) 0%, rgba(161, 129, 90, 0.6) 50%, rgba(222, 180, 122, 0.7) 100%);
+        padding: 4rem 0;
+        position: relative;
+    }
+
+    .stats-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(97, 76, 57, 0.3) 0%, rgba(161, 129, 90, 0.2) 50%, rgba(222, 180, 122, 0.3) 100%);
+        backdrop-filter: blur(10px);
+        z-index: 1;
+    }
+
+    .stats-section .container {
+        position: relative;
+        z-index: 2;
+    }
+
+    .stats-section .stat-item {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stats-section .stat-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        border-radius: 20px;
+        z-index: -1;
+    }
+
+    .stats-section .stat-item:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .stats-section .stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        color: white;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .stats-section .stat-label {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Responsive adjustments for stats section */
+    @media (max-width: 992px) {
+        .stats-section .stat-number {
+            font-size: 2.5rem;
+        }
+        
+        .stats-section .stat-label {
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .stats-section {
+            padding: 3rem 0;
+        }
+        
+        .stats-section .stat-item {
+            padding: 1.5rem 1rem;
+        }
+        
+        .stats-section .stat-number {
+            font-size: 2.2rem;
+        }
+        
+        .stats-section .stat-label {
+            font-size: 0.9rem;
+        }
+        
+        .stats-section .row {
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .stats-section {
+            padding: 2rem 0;
+        }
+        
+        .stats-section .stat-item {
+            padding: 1.25rem 0.75rem;
+        }
+        
+        .stats-section .stat-number {
+            font-size: 2rem;
+        }
+        
+        .stats-section .stat-label {
+            font-size: 0.85rem;
+        }
+    }
+
+    /* Ensure proper centering on all screen sizes */
+    .stats-section .row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: stretch;
+    }
+
+    .stats-section .col-lg-3,
+    .stats-section .col-md-6,
+    .stats-section .col-sm-6 {
+        display: flex;
+        justify-content: center;
     }
 </style>
 @endpush
