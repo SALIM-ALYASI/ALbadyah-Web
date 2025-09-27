@@ -24,7 +24,7 @@ class TourismWebsiteController extends Controller
                 ->get();
 
             $governorates = Governorate::withCount(['touristSites', 'touristServices'])
-                ->orderBy('name_ar')
+                ->orderBy('name_ar', 'desc')
                 ->get();
 
             $stats = [
@@ -57,7 +57,7 @@ class TourismWebsiteController extends Controller
     {
         $governorates = Governorate::with(['wilayats', 'touristSites', 'touristServices'])
             ->withCount(['wilayats', 'touristSites', 'touristServices'])
-            ->orderBy('name_ar')
+            ->orderBy('name_ar', 'desc')
             ->get();
 
         return view('tourism.governorates', compact('governorates'));
