@@ -15,8 +15,8 @@ class ImageHelper
     public static function getImageUrl($imagePath = null, $imageUrl = null, $defaultImage = 'images/default-placeholder.jpg')
     {
         // إذا كان هناك مسار صورة محفوظة محلياً
-        if ($imagePath && file_exists(public_path($imagePath))) {
-            return asset($imagePath);
+        if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
+            return asset('storage/' . $imagePath);
         }
         
         // إذا كان هناك رابط صورة خارجي
@@ -37,7 +37,7 @@ class ImageHelper
      */
     public static function hasImage($imagePath = null, $imageUrl = null)
     {
-        if ($imagePath && file_exists(public_path($imagePath))) {
+        if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
             return true;
         }
         
@@ -65,9 +65,9 @@ class ImageHelper
             'alt' => 'صورة المحافظة'
         ];
         
-        if ($imagePath && file_exists(public_path($imagePath))) {
+        if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
             $info['type'] = 'local';
-            $info['size'] = filesize(public_path($imagePath));
+            $info['size'] = filesize(storage_path('app/public/' . $imagePath));
         } elseif ($imageUrl) {
             $info['type'] = 'external';
         }
@@ -83,8 +83,8 @@ class ImageHelper
      */
     public static function deleteImage($imagePath)
     {
-        if ($imagePath && file_exists(public_path($imagePath))) {
-            return unlink(public_path($imagePath));
+        if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
+            return unlink(storage_path('app/public/' . $imagePath));
         }
         
         return false;

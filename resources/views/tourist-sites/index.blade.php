@@ -53,7 +53,8 @@
                 <!-- Site Image -->
                 @if($site->images->count() > 0)
                     <div class="position-relative" style="height: 200px; overflow: hidden;">
-                        <img src="{{ $site->images->first()->image_url }}" 
+                        @php $firstImage = $site->images->first(); @endphp
+                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($firstImage->image_path, $firstImage->image_url, 'images/albadyah.jpg') }}" 
                              alt="{{ $site->name_ar }}" 
                              class="card-img-top" 
                              style="height: 100%; object-fit: cover;">

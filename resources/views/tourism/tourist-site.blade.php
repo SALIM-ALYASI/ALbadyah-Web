@@ -100,13 +100,7 @@
                 <div class="hero-image-container">
                     @if($touristSite->images->count() > 0)
                     @php $firstImage = $touristSite->images->first(); @endphp
-                    @if($firstImage->image_path)
-                    <img src="{{ asset($firstImage->image_path) }}" alt="{{ $touristSite->name_ar }}" class="hero-image">
-                    @elseif($firstImage->image_url)
-                    <img src="{{ $firstImage->image_url }}" alt="{{ $touristSite->name_ar }}" class="hero-image">
-                    @else
-                    <img src="{{ asset('images/albadyah.jpg') }}" alt="{{ $touristSite->name_ar }}" class="hero-image">
-                    @endif
+                    <img src="{{ \App\Helpers\ImageHelper::getImageUrl($firstImage->image_path, $firstImage->image_url, 'images/albadyah.jpg') }}" alt="{{ $touristSite->name_ar }}" class="hero-image">
                     @else
                     <img src="{{ asset('images/albadyah.jpg') }}" alt="{{ $touristSite->name_ar }}" class="hero-image">
                     @endif
@@ -149,16 +143,8 @@
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="gallery-card">
                     <div class="gallery-image-container">
-                        @if($image->image_path)
-                        <img src="{{ asset($image->image_path) }}" class="gallery-image" alt="{{ $touristSite->name_ar }}"
+                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($image->image_path, $image->image_url, 'images/albadyah.jpg') }}" class="gallery-image" alt="{{ $touristSite->name_ar }}"
                             data-bs-toggle="modal" data-bs-target="#imageModal{{ $image->id }}">
-                        @elseif($image->image_url)
-                        <img src="{{ $image->image_url }}" class="gallery-image" alt="{{ $touristSite->name_ar }}"
-                            data-bs-toggle="modal" data-bs-target="#imageModal{{ $image->id }}">
-                        @else
-                        <img src="{{ asset('images/albadyah.jpg') }}" class="gallery-image" alt="{{ $touristSite->name_ar }}"
-                            data-bs-toggle="modal" data-bs-target="#imageModal{{ $image->id }}">
-                        @endif
                         <div class="gallery-overlay">
                             <button class="gallery-btn" data-bs-toggle="modal" data-bs-target="#imageModal{{ $image->id }}">
                                 <i class="fas fa-expand"></i>
@@ -177,13 +163,7 @@
                             <button type="button" class="btn-close beautiful-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body beautiful-body p-0">
-                            @if($image->image_path)
-                            <img src="{{ asset($image->image_path) }}" class="beautiful-modal-image" alt="{{ $touristSite->name_ar }}">
-                            @elseif($image->image_url)
-                            <img src="{{ $image->image_url }}" class="beautiful-modal-image" alt="{{ $touristSite->name_ar }}">
-                            @else
-                            <img src="{{ asset('images/albadyah.jpg') }}" class="beautiful-modal-image" alt="{{ $touristSite->name_ar }}">
-                            @endif
+                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($image->image_path, $image->image_url, 'images/albadyah.jpg') }}" class="beautiful-modal-image" alt="{{ $touristSite->name_ar }}">
                         </div>
                     </div>
                 </div>
@@ -317,13 +297,7 @@
                     <div class="related-image-container">
                         @if($relatedSite->images->count() > 0)
                         @php $firstRelatedImage = $relatedSite->images->first(); @endphp
-                        @if($firstRelatedImage->image_path)
-                        <img src="{{ asset('storage/' . $firstRelatedImage->image_path) }}" class="related-image" alt="{{ $relatedSite->name_ar }}">
-                        @elseif($firstRelatedImage->image_url)
-                        <img src="{{ $firstRelatedImage->image_url }}" class="related-image" alt="{{ $relatedSite->name_ar }}">
-                        @else
-                        <img src="{{ asset('images/albadyah.jpg') }}" class="related-image" alt="{{ $relatedSite->name_ar }}">
-                        @endif
+                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($firstRelatedImage->image_path, $firstRelatedImage->image_url, 'images/albadyah.jpg') }}" class="related-image" alt="{{ $relatedSite->name_ar }}">
                         @else
                         <img src="{{ asset('images/albadyah.jpg') }}" class="related-image" alt="{{ $relatedSite->name_ar }}">
                         @endif

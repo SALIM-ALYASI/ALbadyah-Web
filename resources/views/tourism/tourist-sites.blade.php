@@ -182,13 +182,7 @@
                     <div class="site-image">
                         @if($site->images->count() > 0)
                         @php $firstImage = $site->images->first(); @endphp
-                        @if($firstImage->image_path)
-                        <img src="{{ asset($firstImage->image_path) }}" alt="{{ $site->name_ar }}" class="img-fluid">
-                        @elseif($firstImage->image_url)
-                        <img src="{{ $firstImage->image_url }}" alt="{{ $site->name_ar }}" class="img-fluid">
-                        @else
-                        <img src="{{ asset('images/albadyah.jpg') }}" alt="{{ $site->name_ar }}" class="img-fluid">
-                        @endif
+                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($firstImage->image_path, $firstImage->image_url, 'images/albadyah.jpg') }}" alt="{{ $site->name_ar }}" class="img-fluid">
                         @else
                         <img src="{{ asset('images/albadyah.jpg') }}" alt="{{ $site->name_ar }}" class="img-fluid">
                         @endif

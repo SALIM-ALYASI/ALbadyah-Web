@@ -251,11 +251,12 @@
                         @foreach($touristSite->images as $image)
                         <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
                             <div class="position-relative">
-                                <img src="{{ $image->image_url }}" 
+                                @php $imageUrl = \App\Helpers\ImageHelper::getImageUrl($image->image_path, $image->image_url, 'images/albadyah.jpg'); @endphp
+                                <img src="{{ $imageUrl }}" 
                                      alt="{{ $touristSite->name_ar }}" 
                                      class="img-fluid rounded shadow" 
                                      style="width: 100%; height: 200px; object-fit: cover; cursor: pointer;"
-                                     onclick="openImageModal('{{ $image->image_url }}', '{{ $touristSite->name_ar }}')">
+                                     onclick="openImageModal('{{ $imageUrl }}', '{{ $touristSite->name_ar }}')">
                                 <div class="position-absolute top-0 end-0 m-2">
                                     <form action="{{ route('tourist-sites.images.destroy', [$touristSite->id, $image->id]) }}" 
                                           method="POST" 

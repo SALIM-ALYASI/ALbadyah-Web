@@ -69,13 +69,7 @@
                 <div class="card h-100 mountain-shadow">
                     @if($site->images->count() > 0)
                         @php $firstSiteImage = $site->images->first(); @endphp
-                        @if($firstSiteImage->image_path)
-                            <img src="{{ asset($firstSiteImage->image_path) }}" class="card-img-top" alt="{{ $site->name_ar }}" style="height: 200px; object-fit: cover;">
-                        @elseif($firstSiteImage->image_url)
-                            <img src="{{ $firstSiteImage->image_url }}" class="card-img-top" alt="{{ $site->name_ar }}" style="height: 200px; object-fit: cover;">
-                        @else
-                            <img src="{{ asset('images/albadyah.jpg') }}" class="card-img-top" alt="{{ $site->name_ar }}" style="height: 200px; object-fit: cover;">
-                        @endif
+                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($firstSiteImage->image_path, $firstSiteImage->image_url, 'images/albadyah.jpg') }}" class="card-img-top" alt="{{ $site->name_ar }}" style="height: 200px; object-fit: cover;">
                     @else
                         <img src="{{ asset('images/albadyah.jpg') }}" class="card-img-top" alt="{{ $site->name_ar }}" style="height: 200px; object-fit: cover;">
                     @endif
