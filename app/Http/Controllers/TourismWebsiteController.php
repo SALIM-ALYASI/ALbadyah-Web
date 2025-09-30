@@ -66,11 +66,15 @@ class TourismWebsiteController extends Controller
     /**
      * عرض محافظة محددة
      */
-    public function governorate($id)
+    public function governorate($identifier)
     {
         $governorate = Governorate::with(['wilayats', 'touristSites', 'touristServices'])
             ->withCount(['wilayats', 'touristSites', 'touristServices'])
-            ->findOrFail($id);
+            ->where(function($query) use ($identifier) {
+                $query->where('id', $identifier)
+                      ->orWhere('slug', $identifier);
+            })
+            ->firstOrFail();
 
         $featuredSites = $governorate->touristSites()
             ->with(['images'])
@@ -126,10 +130,14 @@ class TourismWebsiteController extends Controller
     /**
      * عرض ولاية محددة
      */
-    public function wilayat($id)
+    public function wilayat($identifier)
     {
         $wilayat = Wilayat::with(['governorate', 'touristSites', 'touristServices'])
-            ->findOrFail($id);
+            ->where(function($query) use ($identifier) {
+                $query->where('id', $identifier)
+                      ->orWhere('slug', $identifier);
+            })
+            ->firstOrFail();
 
         return view('tourism.wilayat', compact('wilayat'));
     }
@@ -173,15 +181,19 @@ class TourismWebsiteController extends Controller
     /**
      * عرض موقع سياحي محدد
      */
-    public function touristSite($id)
+    public function touristSite($identifier)
     {
         $touristSite = TouristSite::with(['governorate', 'wilayat', 'images'])
-            ->findOrFail($id);
+            ->where(function($query) use ($identifier) {
+                $query->where('id', $identifier)
+                      ->orWhere('slug', $identifier);
+            })
+            ->firstOrFail();
 
         // مواقع مماثلة في نفس المحافظة
         $relatedSites = TouristSite::with(['images'])
             ->where('governorate_id', $touristSite->governorate_id)
-            ->where('id', '!=', $id)
+            ->where('id', '!=', $touristSite->id)
             ->take(4)
             ->get();
 
@@ -226,15 +238,19 @@ class TourismWebsiteController extends Controller
     /**
      * عرض خدمة سياحية محددة
      */
-    public function touristService($id)
+    public function touristService($identifier)
     {
         $touristService = TouristService::with(['serviceType', 'governorate', 'wilayat'])
-            ->findOrFail($id);
+            ->where(function($query) use ($identifier) {
+                $query->where('id', $identifier)
+                      ->orWhere('slug', $identifier);
+            })
+            ->firstOrFail();
 
         // خدمات مماثلة من نفس النوع
         $relatedServices = TouristService::with(['serviceType'])
             ->where('service_type_id', $touristService->service_type_id)
-            ->where('id', '!=', $id)
+            ->where('id', '!=', $touristService->id)
             ->take(4)
             ->get();
 

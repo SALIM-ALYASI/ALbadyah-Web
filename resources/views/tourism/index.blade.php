@@ -129,7 +129,7 @@
                             {{ $site->location ?? 'سلطنة عُمان' }}
                         </p>
                         <div class="mt-auto">
-                            <a href="{{ route('tourism.tourist-site', $site->id) }}" class="btn btn-primary">
+                            <a href="{{ route('tourism.tourist-site', $site->slug) }}" class="btn btn-primary">
                                 <i class="fas fa-eye me-1"></i>عرض التفاصيل
                             </a>
                         </div>

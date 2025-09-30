@@ -245,7 +245,7 @@
                         </div>
 
                         <div class="site-actions">
-                            <a href="{{ route('tourism.tourist-site', $site->id) }}" class="btn btn-primary site-btn">
+                            <a href="{{ route('tourism.tourist-site', $site->slug) }}" class="btn btn-primary site-btn">
                                 <i class="fas fa-eye me-2"></i>عرض التفاصيل
                             </a>
                         </div>

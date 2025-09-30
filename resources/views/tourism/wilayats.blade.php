@@ -143,7 +143,7 @@
                         </div>
                         
                         <div class="wilayat-actions">
-                            <a href="{{ route('tourism.wilayat', $wilayat->id) }}" class="btn btn-primary w-100 mb-2">
+                            <a href="{{ route('tourism.wilayat', $wilayat->slug) }}" class="btn btn-primary w-100 mb-2">
                                 <i class="fas fa-eye me-2"></i>عرض الولاية
                             </a>
                             <a href="https://www.google.com/maps/search/{{ urlencode($wilayat->name_ar . ' ' . $wilayat->governorate->name_ar . ' سلطنة عمان') }}" target="_blank" class="btn btn-outline-primary w-100">

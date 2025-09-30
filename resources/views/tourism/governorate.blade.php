@@ -102,7 +102,7 @@
                             <img src="{{ asset('images/albadyah.jpg') }}" class="featured-image" alt="{{ $site->name_ar }}">
                         @endif
                         <div class="featured-overlay">
-                            <a href="{{ route('tourism.tourist-site', $site->id) }}" class="featured-btn">
+                            <a href="{{ route('tourism.tourist-site', $site->slug) }}" class="featured-btn">
                                 <i class="fas fa-eye"></i>
                             </a>
                         </div>
@@ -119,7 +119,7 @@
                             </div>
                         @endif
                         
-                        <a href="{{ route('tourism.tourist-site', $site->id) }}" class="featured-link">
+                        <a href="{{ route('tourism.tourist-site', $site->slug) }}" class="featured-link">
                             عرض التفاصيل <i class="fas fa-arrow-left"></i>
                         </a>
                     </div>
@@ -227,7 +227,7 @@
                                 <a href="{{ route('tourism.wilayat-details', $governorate->id) }}" class="btn btn-primary w-100 mb-2">
                                     <i class="fas fa-map-marked-alt me-2"></i>عرض تفاصيل الولاية
                                 </a>
-                                <a href="https://www.google.com/maps/search/{{ urlencode($governorate->name_ar . ' سلطنة عمان') }}" target="_blank" class="btn btn-primary google-maps-btn w-100 mb-2">
+                                <a href="https://www.google.com/maps/search/{{ urlencode($governorate->name_ar . ' سلطنة عمان') }}" target="_blank" class="btn btn-primary w-100 mb-2">
                                     <i class="fab fa-google me-2"></i>جوجل ماب
                                 </a>
                             </div>

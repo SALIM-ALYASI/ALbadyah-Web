@@ -37,7 +37,7 @@
                             <a href="{{ route('tourism.wilayats') }}" class="btn btn-light modern-btn me-2 mb-2">
                                 <i class="fas fa-list me-2"></i>عرض جميع الولايات
                             </a>
-                            <a href="https://www.google.com/maps/search/{{ urlencode($governorate->name_ar . ' سلطنة عمان') }}" target="_blank" class="btn btn-outline-light google-maps-btn mb-2">
+                            <a href="https://www.google.com/maps/search/{{ urlencode($governorate->name_ar . ' سلطنة عمان') }}" target="_blank" class="btn btn-light modern-btn me-2 mb-2">
                                 <i class="fas fa-map-marker-alt me-2"></i>جوجل ماب
                             </a>
                         </div>
@@ -202,7 +202,7 @@
                                         <span>{{ count($site->images ?? []) }} صورة</span>
                                     </div>
                                 </div>
-                                <a href="{{ route('tourism.tourist-site', $site->id) }}" class="btn btn-primary w-100">
+                                <a href="{{ route('tourism.tourist-site', $site->slug) }}" class="btn btn-primary w-100">
                                     <i class="fas fa-eye me-2"></i>عرض التفاصيل
                                 </a>
                             </div>

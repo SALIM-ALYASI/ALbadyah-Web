@@ -328,7 +328,7 @@
                         <img src="{{ asset('images/albadyah.jpg') }}" class="related-image" alt="{{ $relatedSite->name_ar }}">
                         @endif
                         <div class="related-overlay">
-                            <a href="{{ route('tourism.tourist-site', $relatedSite->id) }}" class="related-btn">
+                            <a href="{{ route('tourism.tourist-site', $relatedSite->slug) }}" class="related-btn">
                                 <i class="fas fa-eye"></i>
                             </a>
                         </div>
@@ -345,7 +345,7 @@
                         </div>
                         @endif
 
-                        <a href="{{ route('tourism.tourist-site', $relatedSite->id) }}" class="related-link">
+                        <a href="{{ route('tourism.tourist-site', $relatedSite->slug) }}" class="related-link">
                             عرض التفاصيل <i class="fas fa-arrow-left"></i>
                         </a>
                     </div>

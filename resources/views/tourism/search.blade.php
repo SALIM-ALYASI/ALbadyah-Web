@@ -84,7 +84,7 @@
                         <p class="card-text">{{ $site->name_en }}</p>
                         <p class="card-text text-muted small">{{ Str::limit($site->description_ar, 100) }}</p>
                         <div class="mt-auto">
-                            <a href="{{ route('tourism.tourist-site', $site->id) }}" class="btn btn-primary">
+                            <a href="{{ route('tourism.tourist-site', $site->slug) }}" class="btn btn-primary">
                                 <i class="fas fa-eye me-1"></i>عرض التفاصيل
                             </a>
                         </div>

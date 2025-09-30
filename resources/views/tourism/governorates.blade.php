@@ -79,10 +79,10 @@
                                 </div>
                                 
                                 <div class="governorate-actions">
-                                    <a href="https://www.google.com/maps/search/{{ urlencode($governorate->name_ar . ' سلطنة عمان') }}" target="_blank" class="btn btn-outline-primary w-100 mb-2">
+                                    <a href="https://www.google.com/maps/search/{{ urlencode($governorate->name_ar . ' سلطنة عمان') }}" target="_blank" class="btn btn-primary w-100">
                                         <i class="fas fa-map-marker-alt me-2"></i>جوجل ماب
                                     </a>
-                                    <a href="{{ route('tourism.governorate', $governorate->id) }}" class="btn btn-primary w-100">
+                                    <a href="{{ route('tourism.governorate', $governorate->slug) }}" class="btn btn-primary w-100">
                                         <i class="fas fa-eye me-1"></i>استكشف المحافظة
                                     </a>
                                 </div>

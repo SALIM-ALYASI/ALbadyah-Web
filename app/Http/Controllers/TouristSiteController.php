@@ -8,6 +8,7 @@ use App\Models\Governorate;
 use App\Models\Wilayat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class TouristSiteController extends Controller
 {
@@ -105,8 +106,8 @@ class TouristSiteController extends Controller
             // حذف ملفات الصور من الخادم قبل حذف السجلات
             $images = TouristImage::where('tourist_site_id', $id)->get();
             foreach ($images as $image) {
-                if ($image->image_path && file_exists(public_path($image->image_path))) {
-                    unlink(public_path($image->image_path));
+                if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
+                    Storage::disk('public')->delete($image->image_path);
                 }
             }
             
@@ -138,19 +139,14 @@ class TouristSiteController extends Controller
             // معالجة ملفات الصور
             $imageFiles = $request->file('image_files') ?? [];
             if (!empty($imageFiles)) {
-                $uploadPath = public_path('images/tourist-sites');
-                if (!file_exists($uploadPath)) {
-                    mkdir($uploadPath, 0755, true);
-                }
-                
                 foreach ($imageFiles as $image) {
-                    $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                    $image->move($uploadPath, $imageName);
+                    $imagePath = $image->store('tourist-sites', 'public');
+                    $imageUrl = asset('storage/' . $imagePath);
                     
                     $imageRows[] = [
                         'tourist_site_id' => $site->id,
-                        'image_url'       => null,
-                        'image_path'      => 'images/tourist-sites/' . $imageName,
+                        'image_url'       => $imageUrl,
+                        'image_path'      => $imagePath,
                         'created_at'      => now(),
                         'updated_at'      => now(),
                     ];
@@ -190,8 +186,8 @@ class TouristSiteController extends Controller
 
         DB::transaction(function () use ($image) {
             // حذف ملف الصورة من الخادم
-            if ($image->image_path && file_exists(public_path($image->image_path))) {
-                unlink(public_path($image->image_path));
+            if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
+                Storage::disk('public')->delete($image->image_path);
             }
             
             $image->delete();

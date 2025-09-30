@@ -12,6 +12,7 @@ class TouristService extends Model
     protected $fillable = [
         'name_ar',
         'name_en',
+        'slug',
         'website_url',
         'image_url',
         'image_path',
@@ -104,6 +105,77 @@ class TouristService extends Model
             $this->attributes['image_path'] ?? null,
             $this->attributes['image_url'] ?? null
         );
+    }
+
+    /**
+     * إنشاء slug تلقائياً عند إنشاء أو تحديث الخدمة
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($service) {
+            if (empty($service->slug)) {
+                $service->slug = static::generateUniqueSlug($service->name_ar);
+            }
+        });
+
+        static::updating(function ($service) {
+            if ($service->isDirty('name_ar') && empty($service->slug)) {
+                $service->slug = static::generateUniqueSlug($service->name_ar);
+            }
+        });
+    }
+
+    /**
+     * إنشاء slug فريد من النص العربي
+     */
+    public static function generateUniqueSlug($text)
+    {
+        // تحويل النص العربي إلى slug
+        $slug = static::arabicToSlug($text);
+        
+        // التأكد من أن الـ slug فريد
+        $originalSlug = $slug;
+        $counter = 1;
+        
+        while (static::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+        
+        return $slug;
+    }
+
+    /**
+     * تحويل النص العربي إلى slug
+     */
+    private static function arabicToSlug($text)
+    {
+        // إزالة المسافات الزائدة وتحويلها إلى شرطات
+        $text = preg_replace('/\s+/', '-', trim($text));
+        
+        // إزالة الأحرف الخاصة
+        $text = preg_replace('/[^\p{L}\p{N}\-]/u', '', $text);
+        
+        // تحويل إلى أحرف صغيرة
+        $text = strtolower($text);
+        
+        // إزالة الشرطات المتعددة
+        $text = preg_replace('/-+/', '-', $text);
+        
+        // إزالة الشرطات من البداية والنهاية
+        $text = trim($text, '-');
+        
+        return $text;
+    }
+
+    /**
+     * البحث عن خدمة باستخدام slug
+     */
+    public static function findBySlug($slug)
+    {
+        return static::where('slug', $slug)->first();
     }
 }
 
