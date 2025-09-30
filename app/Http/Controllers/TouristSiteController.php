@@ -138,8 +138,12 @@ class TouristSiteController extends Controller
                 // معالجة ملفات الصور المحلية فقط
                 $imageFiles = $request->file('image_files');
                 foreach ($imageFiles as $image) {
-                    $imagePath = $image->store('tourist-sites', 'public');
-                    $imageUrl = asset('storage/' . $imagePath);
+                    // حفظ الصورة في مجلد public مباشرة
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $imagePath = 'images/tourist-sites/' . $filename;
+                    $image->move(public_path('images/tourist-sites/'), $filename);
+                    
+                    $imageUrl = asset($imagePath);
                     
                     $imageRows[] = [
                         'tourist_site_id' => $site->id,
@@ -175,8 +179,8 @@ class TouristSiteController extends Controller
 
         DB::transaction(function () use ($image) {
             // حذف ملف الصورة من الخادم
-            if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
-                Storage::disk('public')->delete($image->image_path);
+            if ($image->image_path && file_exists(public_path($image->image_path))) {
+                unlink(public_path($image->image_path));
             }
             
             $image->delete();

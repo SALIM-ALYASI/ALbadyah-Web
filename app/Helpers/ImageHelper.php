@@ -15,6 +15,11 @@ class ImageHelper
     public static function getImageUrl($imagePath = null, $imageUrl = null, $defaultImage = 'images/default-placeholder.jpg')
     {
         // إذا كان هناك مسار صورة محفوظة محلياً
+        if ($imagePath && file_exists(public_path($imagePath))) {
+            return asset($imagePath);
+        }
+        
+        // إذا كان هناك مسار صورة في storage (للتوافق مع النظام القديم)
         if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
             return asset('storage/' . $imagePath);
         }
@@ -37,6 +42,10 @@ class ImageHelper
      */
     public static function hasImage($imagePath = null, $imageUrl = null)
     {
+        if ($imagePath && file_exists(public_path($imagePath))) {
+            return true;
+        }
+        
         if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
             return true;
         }
