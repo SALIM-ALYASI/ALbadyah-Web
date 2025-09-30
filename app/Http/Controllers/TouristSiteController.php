@@ -127,18 +127,16 @@ class TouristSiteController extends Controller
         $site = TouristSite::findOrFail($id);
 
         $data = $request->validate([
-            'image_files'    => 'nullable|array',
+            'image_files'    => 'required|array|min:1',
             'image_files.*'  => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'image_urls'     => 'nullable|array',
-            'image_urls.*'   => 'required_with:image_urls|string|max:1024',
         ]);
 
-        DB::transaction(function () use ($site, $data, $request) {
-            $imageRows = [];
+        try {
+            DB::transaction(function () use ($site, $data, $request) {
+                $imageRows = [];
 
-            // معالجة ملفات الصور
-            $imageFiles = $request->file('image_files') ?? [];
-            if (!empty($imageFiles)) {
+                // معالجة ملفات الصور المحلية فقط
+                $imageFiles = $request->file('image_files');
                 foreach ($imageFiles as $image) {
                     $imagePath = $image->store('tourist-sites', 'public');
                     $imageUrl = asset('storage/' . $imagePath);
@@ -151,29 +149,20 @@ class TouristSiteController extends Controller
                         'updated_at'      => now(),
                     ];
                 }
-            }
 
-            // معالجة روابط الصور
-            $imageUrls = $data['image_urls'] ?? [];
-            if (!empty($imageUrls)) {
-                foreach ($imageUrls as $url) {
-                    $imageRows[] = [
-                        'tourist_site_id' => $site->id,
-                        'image_url'       => $url,
-                        'image_path'      => null,
-                        'created_at'      => now(),
-                        'updated_at'      => now(),
-                    ];
+                if (!empty($imageRows)) {
+                    TouristImage::insert($imageRows);
+                } else {
+                    throw new \Exception('لم يتم إرسال أي صور للحفظ');
                 }
-            }
-
-            if (!empty($imageRows)) {
-                TouristImage::insert($imageRows);
-            }
-        });
+            });
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'حدث خطأ أثناء حفظ الصور: ' . $e->getMessage());
+        }
 
         return redirect()->route('tourist-sites.show', $site->id)
-            ->with('success', 'تمت إضافة الصور بنجاح');
+            ->with('success', 'تمت إضافة الصور المحلية بنجاح');
     }
 
     /**

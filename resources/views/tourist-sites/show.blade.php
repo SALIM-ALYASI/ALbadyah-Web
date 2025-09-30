@@ -320,7 +320,7 @@
                         @enderror
                         <div class="form-text">
                             <i class="fas fa-info-circle me-1"></i>
-                            يمكنك اختيار عدة ملفات صور (JPG, PNG, GIF)
+                            يمكنك اختيار عدة ملفات صور (JPG, PNG, GIF) - الحد الأقصى 2MB لكل صورة
                         </div>
                     </div>
                     
@@ -330,25 +330,10 @@
                         <div id="preview_container" class="row"></div>
                     </div>
                     
-                    <!-- URL Input Section -->
-                    <div class="mb-3">
-                        <label for="image_url_input" class="form-label">
-                            <i class="fas fa-link me-1 text-primary"></i>
-                            أو رابط صورة
-                        </label>
-                        <div class="input-group">
-                            <input type="url" 
-                                   class="form-control" 
-                                   id="image_url_input" 
-                                   placeholder="https://example.com/image.jpg">
-                            <button class="btn btn-outline-primary" type="button" onclick="addImage()">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="images_list" class="mb-3">
-                        <!-- Images will be added here dynamically -->
+                    <!-- Note about local files only -->
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>ملاحظة:</strong> يمكن رفع ملفات الصور المحلية فقط. الصيغ المدعومة: JPG, PNG, GIF
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -450,47 +435,7 @@
         }
     }
     
-    function addImage() {
-        const input = document.getElementById('image_url_input');
-        const url = input.value.trim();
-        
-        if (!url || !isValidUrl(url)) {
-            alert('يرجى إدخال رابط صورة صحيح');
-            return;
-        }
-        
-        const imagesList = document.getElementById('images_list');
-        const imageDiv = document.createElement('div');
-        imageDiv.className = 'mb-2 p-2 border rounded d-flex align-items-center';
-        imageDiv.innerHTML = `
-            <img src="${url}" alt="معاينة" class="me-2" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
-            <div class="flex-grow-1">
-                <small class="text-muted d-block">${url}</small>
-            </div>
-            <button type="button" class="btn btn-sm btn-danger" onclick="removeImage(this)">
-                <i class="fas fa-times"></i>
-            </button>
-            <input type="hidden" name="image_urls[]" value="${url}">
-        `;
-        
-        imagesList.appendChild(imageDiv);
-        input.value = '';
-        imageCount++;
-    }
-    
-    function removeImage(button) {
-        button.closest('.mb-2').remove();
-        imageCount--;
-    }
-    
-    function isValidUrl(string) {
-        try {
-            new URL(string);
-            return true;
-        } catch (_) {
-            return false;
-        }
-    }
+    // تم إزالة دوال إضافة الروابط الخارجية - النظام يدعم الملفات المحلية فقط
     
     function confirmDelete() {
         return confirm('هل أنت متأكد من حذف هذا الموقع السياحي؟ سيتم حذف جميع الصور المرتبطة به أيضاً.');
