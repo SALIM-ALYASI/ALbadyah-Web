@@ -57,9 +57,7 @@ class SearchApiController extends Controller
                     $servicesQuery = TouristService::with(['serviceType', 'governorate', 'wilayat'])
                         ->where(function ($q) use ($query) {
                             $q->where('name_ar', 'like', "%$query%")
-                               ->orWhere('name_en', 'like', "%$query%")
-                               ->orWhere('description_ar', 'like', "%$query%")
-                               ->orWhere('description_en', 'like', "%$query%");
+                               ->orWhere('name_en', 'like', "%$query%");
                         });
 
                     if ($governorate_id) {
@@ -169,9 +167,7 @@ class SearchApiController extends Controller
             if ($query) {
                 $servicesQuery->where(function ($q) use ($query) {
                     $q->where('name_ar', 'like', "%$query%")
-                       ->orWhere('name_en', 'like', "%$query%")
-                       ->orWhere('description_ar', 'like', "%$query%")
-                       ->orWhere('description_en', 'like', "%$query%");
+                       ->orWhere('name_en', 'like', "%$query%");
                 });
             }
 

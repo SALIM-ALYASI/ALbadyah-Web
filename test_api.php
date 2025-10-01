@@ -5,8 +5,39 @@
  */
 
 $baseUrl = 'http://localhost:8000/api/v1';
+$authBaseUrl = 'http://localhost:8000/api';
 
 echo "=== Tourism Website API Test ===\n\n";
+
+// Test Authentication
+echo "0. Testing Authentication...\n";
+$loginData = json_encode([
+    'email' => 'admin@example.com',
+    'password' => 'admin123'
+]);
+
+$loginContext = stream_context_create([
+    'http' => [
+        'method' => 'POST',
+        'header' => 'Content-Type: application/json',
+        'content' => $loginData
+    ]
+]);
+
+$loginResponse = file_get_contents($authBaseUrl . '/login', false, $loginContext);
+$loginResult = json_decode($loginResponse, true);
+
+if ($loginResult && $loginResult['success']) {
+    echo "✅ Authentication working\n";
+    echo "   Token: " . substr($loginResult['data']['token'], 0, 20) . "...\n";
+    echo "   User: " . $loginResult['data']['user']['name'] . "\n";
+    $token = $loginResult['data']['token'];
+} else {
+    echo "❌ Authentication failed\n";
+    echo "   Response: " . $loginResponse . "\n";
+    exit(1);
+}
+echo "\n";
 
 // Test 1: Get General Stats
 echo "1. Testing General Stats...\n";
@@ -77,7 +108,8 @@ echo "\n";
 
 // Test 6: Search API
 echo "6. Testing Search API...\n";
-$response = file_get_contents($baseUrl . '/search?q=مسقط');
+$searchQuery = urlencode('مسقط');
+$response = file_get_contents($baseUrl . '/search?q=' . $searchQuery);
 $data = json_decode($response, true);
 if ($data && $data['success']) {
     echo "✅ Search API working\n";
@@ -85,6 +117,7 @@ if ($data && $data['success']) {
     echo "   Total results: " . $data['data']['total_results'] . "\n";
 } else {
     echo "❌ Search API failed\n";
+    echo "   Response: " . $response . "\n";
 }
 echo "\n";
 
@@ -126,6 +159,56 @@ if ($data && $data['success']) {
     echo "   Period visits: " . $data['data']['overview']['period_visits'] . "\n";
 } else {
     echo "❌ Visit Stats API failed\n";
+}
+echo "\n";
+
+// Test 9: Admin API with Authentication
+echo "9. Testing Admin API with Authentication...\n";
+$adminData = json_encode([
+    'name_ar' => 'الباطنة الشمالية',
+    'name_en' => 'North Al Batinah',
+    'description_ar' => 'محافظة الباطنة الشمالية',
+    'description_en' => 'North Al Batinah Governorate'
+]);
+
+$adminContext = stream_context_create([
+    'http' => [
+        'method' => 'POST',
+        'header' => "Content-Type: application/json\r\nAuthorization: Bearer $token",
+        'content' => $adminData
+    ]
+]);
+
+$adminResponse = file_get_contents($baseUrl . '/admin/governorates', false, $adminContext);
+$adminResult = json_decode($adminResponse, true);
+
+if ($adminResult && $adminResult['success']) {
+    echo "✅ Admin API working with authentication\n";
+    echo "   Created governorate: " . $adminResult['data']['name_ar'] . "\n";
+} else {
+    echo "❌ Admin API failed\n";
+    echo "   Response: " . $adminResponse . "\n";
+}
+echo "\n";
+
+// Test 10: Test /me endpoint
+echo "10. Testing /me endpoint...\n";
+$meContext = stream_context_create([
+    'http' => [
+        'method' => 'GET',
+        'header' => "Authorization: Bearer $token"
+    ]
+]);
+
+$meResponse = file_get_contents($authBaseUrl . '/me', false, $meContext);
+$meResult = json_decode($meResponse, true);
+
+if ($meResult && $meResult['success']) {
+    echo "✅ /me endpoint working\n";
+    echo "   User: " . $meResult['data']['user']['name'] . " (" . $meResult['data']['user']['email'] . ")\n";
+} else {
+    echo "❌ /me endpoint failed\n";
+    echo "   Response: " . $meResponse . "\n";
 }
 echo "\n";
 
