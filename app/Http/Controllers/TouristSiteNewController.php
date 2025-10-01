@@ -80,6 +80,8 @@ class TouristSiteNewController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all()); // مؤقت - للاختبار
+        Log::info('TouristSiteNew Store Method Called', $request->all());
         try {
             $data = $request->validate([
                 'name_ar' => 'required|string|max:255',
