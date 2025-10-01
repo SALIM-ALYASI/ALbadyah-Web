@@ -358,4 +358,25 @@ class TouristSiteNewController extends Controller
             ]);
         }
     }
+
+    /**
+     * حذف صورة من الموقع السياحي
+     */
+    public function destroyImage($touristSiteId, $imageId)
+    {
+        $touristSite = TouristSiteNew::findOrFail($touristSiteId);
+        $image = TouristImageNew::where('id', $imageId)
+                               ->where('tourist_site_id', $touristSiteId)
+                               ->firstOrFail();
+
+        // حذف الصورة من التخزين
+        if ($image->image_path && \Storage::disk('public')->exists($image->image_path)) {
+            \Storage::disk('public')->delete($image->image_path);
+        }
+
+        // حذف السجل من قاعدة البيانات
+        $image->delete();
+
+        return redirect()->back()->with('success', 'تم حذف الصورة بنجاح');
+    }
 }

@@ -73,7 +73,7 @@ Route::group([
         Route::delete('tourist-sites/{id}/images/{imageId}', [TouristSiteController::class, 'deleteImage'])->name('tourist-sites.images.destroy');
         
         // إدارة صور المواقع السياحية الجديدة
-        Route::delete('tourist-sites-new/{id}/images/{imageId}', [TouristSiteNewController::class, 'deleteImage'])->name('tourist-sites-new.images.destroy');
+        Route::delete('tourist-sites-new/{id}/images/{imageId}', [TouristSiteNewController::class, 'destroyImage'])->name('tourist-sites-new.images.destroy');
         Route::post('tourist-sites-new/{id}/images/order', [TouristSiteNewController::class, 'updateImageOrder'])->name('tourist-sites-new.images.order');
         
         // صفحة عرض جميع البيانات
