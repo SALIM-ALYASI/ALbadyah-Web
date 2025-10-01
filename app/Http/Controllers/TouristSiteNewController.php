@@ -80,7 +80,6 @@ class TouristSiteNewController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all()); // مؤقت - للاختبار
         Log::info('TouristSiteNew Store Method Called', $request->all());
         try {
             $data = $request->validate([
@@ -103,6 +102,9 @@ class TouristSiteNewController extends Controller
                 'meta_description_ar' => 'nullable|string',
                 'meta_description_en' => 'nullable|string',
             ]);
+
+            // معالجة checkbox is_active
+            $data['is_active'] = $request->has('is_active') ? true : false;
 
             DB::transaction(function () use ($data, $request) {
                 // إنشاء slug فريد
