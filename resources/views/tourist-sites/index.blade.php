@@ -10,7 +10,7 @@
         <h1 class="h3 mb-2">المواقع السياحية</h1>
         <p class="text-muted mb-0">إدارة وعرض جميع المواقع السياحية في النظام</p>
     </div>
-    <a href="{{ route('dashboard.tourist-sites.create') }}" class="btn btn-primary">
+    <a href="{{ route('tourist-sites.create') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i>
         إضافة موقع سياحي جديد
     </a>
@@ -91,15 +91,15 @@
                                 {{ $site->created_at->format('Y-m-d') }}
                             </small>
                             <div class="btn-group btn-group-sm">
-                                <a href="{{ route('dashboard.tourist-sites.show', $site->id) }}" 
+                                <a href="{{ route('tourist-sites.show', $site->id) }}" 
                                    class="btn btn-success" title="عرض التفاصيل">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="{{ route('dashboard.tourist-sites.edit', $site->id) }}" 
+                                <a href="{{ route('tourist-sites.edit', $site->id) }}" 
                                    class="btn btn-warning" title="تعديل">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('dashboard.tourist-sites.destroy', $site->id) }}" 
+                                <form action="{{ route('tourist-sites.destroy', $site->id) }}" 
                                       method="POST" style="display: inline;" 
                                       onsubmit="return confirmDelete()"
                                       id="deleteForm{{ $site->id }}">
@@ -125,7 +125,7 @@
                 <i class="fas fa-camera"></i>
                 <h4>لا توجد مواقع سياحية</h4>
                 <p class="mb-4">لم يتم إضافة أي مواقع سياحية بعد. ابدأ بإضافة أول موقع سياحي في النظام.</p>
-                <a href="{{ route('dashboard.tourist-sites.create') }}" class="btn btn-primary btn-lg">
+                <a href="{{ route('tourist-sites.create') }}" class="btn btn-primary btn-lg">
                     <i class="fas fa-plus"></i>
                     إضافة أول موقع سياحي
                 </a>

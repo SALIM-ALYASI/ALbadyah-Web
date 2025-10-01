@@ -11,11 +11,11 @@
         <p class="text-muted mb-0">إدارة وعرض جميع الخدمات السياحية في النظام</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('dashboard.tourist-services.create-location') }}" class="btn btn-primary">
+        <a href="{{ route('tourist-services.create-location') }}" class="btn btn-primary">
             <i class="fas fa-map-marker-alt"></i>
             إضافة موقع خدمة جديد
         </a>
-        <a href="{{ route('dashboard.tourist-services.create') }}" class="btn btn-outline-primary">
+        <a href="{{ route('tourist-services.create') }}" class="btn btn-outline-primary">
             <i class="fas fa-plus"></i>
             إضافة خدمة سريعة
         </a>
@@ -60,7 +60,7 @@
             </h6>
         </div>
         <div class="card-body">
-            <form method="GET" action="{{ route('dashboard.tourist-services.index') }}">
+            <form method="GET" action="{{ route('tourist-services.index') }}">
                 <div class="row">
                     <div class="col-md-3 mb-3">
                         <label for="q" class="form-label">البحث</label>
@@ -113,7 +113,7 @@
                         <i class="fas fa-search"></i>
                         بحث
                     </button>
-                    <a href="{{ route('dashboard.tourist-services.index') }}" class="btn btn-secondary">
+                    <a href="{{ route('tourist-services.index') }}" class="btn btn-secondary">
                         <i class="fas fa-times"></i>
                         مسح الفلاتر
                     </a>
@@ -164,15 +164,15 @@
                                 {{ $service->created_at->format('Y-m-d') }}
                             </small>
                             <div class="btn-group btn-group-sm">
-                                <a href="{{ route('dashboard.tourist-services.show', $service->id) }}" 
+                                <a href="{{ route('tourist-services.show', $service->id) }}" 
                                    class="btn btn-success" title="عرض التفاصيل">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="{{ route('dashboard.tourist-services.edit', $service->id) }}" 
+                                <a href="{{ route('tourist-services.edit', $service->id) }}" 
                                    class="btn btn-warning" title="تعديل">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('dashboard.tourist-services.destroy', $service->id) }}" 
+                                <form action="{{ route('tourist-services.destroy', $service->id) }}" 
                                       method="POST" style="display: inline;" 
                                       onsubmit="return confirmDelete()">
                                     @csrf
@@ -197,7 +197,7 @@
                 <i class="fas fa-concierge-bell"></i>
                 <h4>لا توجد خدمات سياحية</h4>
                 <p class="mb-4">لم يتم إضافة أي خدمات سياحية بعد. ابدأ بإضافة أول خدمة سياحية في النظام.</p>
-                <a href="{{ route('dashboard.tourist-services.create') }}" class="btn btn-primary btn-lg">
+                <a href="{{ route('tourist-services.create') }}" class="btn btn-primary btn-lg">
                     <i class="fas fa-plus"></i>
                     إضافة أول خدمة سياحية
                 </a>

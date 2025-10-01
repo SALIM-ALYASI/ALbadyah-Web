@@ -10,7 +10,7 @@
         <h1 class="h3 mb-2">المحافظات</h1>
         <p class="text-muted mb-0">إدارة وعرض جميع المحافظات في النظام</p>
     </div>
-    <a href="{{ route('dashboard.governorates.create') }}" class="btn btn-primary">
+    <a href="{{ route('governorates.create') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i>
         إضافة محافظة جديدة
     </a>
@@ -110,15 +110,15 @@
                     </td>
                     <td>
                         <div class="btn-group" role="group">
-                            <a href="{{ route('dashboard.governorates.show', $governorate->id) }}" 
+                            <a href="{{ route('governorates.show', $governorate->id) }}" 
                                class="btn btn-sm btn-success" title="عرض التفاصيل">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a href="{{ route('dashboard.governorates.edit', $governorate->id) }}" 
+                            <a href="{{ route('governorates.edit', $governorate->id) }}" 
                                class="btn btn-sm btn-warning" title="تعديل">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <form action="{{ route('dashboard.governorates.destroy', $governorate->id) }}" 
+                            <form action="{{ route('governorates.destroy', $governorate->id) }}" 
                                   method="POST" style="display: inline;" 
                                   onsubmit="return confirmDelete()">
                                 @csrf
@@ -142,7 +142,7 @@
                 <i class="fas fa-building"></i>
                 <h4>لا توجد محافظات</h4>
                 <p class="mb-4">لم يتم إضافة أي محافظات بعد. ابدأ بإضافة أول محافظة في النظام.</p>
-                <a href="{{ route('dashboard.governorates.create') }}" class="btn btn-primary btn-lg">
+                <a href="{{ route('governorates.create') }}" class="btn btn-primary btn-lg">
                     <i class="fas fa-plus"></i>
                     إضافة أول محافظة
                 </a>

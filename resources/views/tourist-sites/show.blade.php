@@ -11,11 +11,11 @@
         <p class="text-muted mb-0">عرض جميع معلومات الموقع السياحي</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('dashboard.tourist-sites.edit', $touristSite->id) }}" class="btn btn-warning">
+        <a href="{{ route('tourist-sites.edit', $touristSite->id) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i>
             تعديل
         </a>
-        <a href="{{ route('dashboard.tourist-sites.index') }}" class="btn btn-secondary">
+        <a href="{{ route('tourist-sites.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-right"></i>
             العودة للقائمة
         </a>
@@ -67,7 +67,7 @@
                             @if($touristSite->governorate)
                                 <div class="d-flex align-items-center">
                                     <span class="badge bg-info fs-6 me-2">{{ $touristSite->governorate->name_ar }}</span>
-                                    <a href="{{ route('dashboard.governorates.show', $touristSite->governorate->id) }}" class="btn btn-sm btn-outline-info">
+                                    <a href="{{ route('governorates.show', $touristSite->governorate->id) }}" class="btn btn-sm btn-outline-info">
                                         <i class="fas fa-external-link-alt"></i>
                                         عرض المحافظة
                                     </a>
@@ -87,7 +87,7 @@
                             @if($touristSite->wilayat)
                                 <div class="d-flex align-items-center">
                                     <span class="badge bg-secondary fs-6 me-2">{{ $touristSite->wilayat->name_ar }}</span>
-                                    <a href="{{ route('dashboard.wilayats.show', $touristSite->wilayat->id) }}" class="btn btn-sm btn-outline-secondary">
+                                    <a href="{{ route('wilayats.show', $touristSite->wilayat->id) }}" class="btn btn-sm btn-outline-secondary">
                                         <i class="fas fa-external-link-alt"></i>
                                         عرض الولاية
                                     </a>
@@ -155,7 +155,7 @@
                             آخر تحديث: {{ $touristSite->updated_at->format('Y-m-d H:i:s') }}
                         </small>
                     </div>
-                    <form action="{{ route('dashboard.tourist-sites.destroy', $touristSite->id) }}" 
+                    <form action="{{ route('tourist-sites.destroy', $touristSite->id) }}" 
                           method="POST" 
                           style="display: inline;" 
                           onsubmit="return confirmDelete()">
@@ -257,7 +257,7 @@
                                      style="width: 100%; height: 200px; object-fit: cover; cursor: pointer;"
                                      onclick="openImageModal('{{ $image->image_url }}', '{{ $touristSite->name_ar }}')">
                                 <div class="position-absolute top-0 end-0 m-2">
-                                    <form action="{{ route('dashboard.tourist-sites.images.destroy', [$touristSite->id, $image->id]) }}" 
+                                    <form action="{{ route('tourist-sites.images.destroy', [$touristSite->id, $image->id]) }}" 
                                           method="POST" 
                                           style="display: inline;"
                                           onsubmit="return confirm('هل أنت متأكد من حذف هذه الصورة؟')">
@@ -296,7 +296,7 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('dashboard.tourist-sites.images.store', $touristSite->id) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('tourist-sites.images.store', $touristSite->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <!-- File Upload Section -->

@@ -11,11 +11,11 @@
         <p class="text-muted mb-0">أدخل بيانات الخدمة السياحية في النموذج أدناه</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('dashboard.tourist-services.create-location') }}" class="btn btn-primary">
+        <a href="{{ route('tourist-services.create-location') }}" class="btn btn-primary">
             <i class="fas fa-map-marker-alt"></i>
             إضافة موقع خدمة جديد
         </a>
-        <a href="{{ route('dashboard.tourist-services.index') }}" class="btn btn-secondary">
+        <a href="{{ route('tourist-services.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-right"></i>
             العودة للقائمة
         </a>
@@ -32,7 +32,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('dashboard.tourist-services.store') }}" method="POST" id="serviceForm" enctype="multipart/form-data">
+                <form action="{{ route('tourist-services.store') }}" method="POST" id="serviceForm" enctype="multipart/form-data">
                     @csrf
                     
                     <!-- Basic Information -->
@@ -250,7 +250,7 @@
                     
                     <!-- Form Actions -->
                     <div class="d-flex gap-3 justify-content-end pt-3 border-top">
-                        <a href="{{ route('dashboard.tourist-services.index') }}" class="btn btn-secondary">
+                        <a href="{{ route('tourist-services.index') }}" class="btn btn-secondary">
                             <i class="fas fa-times"></i>
                             إلغاء
                         </a>

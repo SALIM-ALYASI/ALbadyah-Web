@@ -10,7 +10,7 @@
         <h1 class="h3 mb-2">إضافة محافظة جديدة</h1>
         <p class="text-muted mb-0">أدخل بيانات المحافظة الجديدة في النموذج أدناه</p>
     </div>
-    <a href="{{ route('dashboard.governorates.index') }}" class="btn btn-secondary">
+    <a href="{{ route('governorates.index') }}" class="btn btn-secondary">
         <i class="fas fa-arrow-right"></i>
         العودة للقائمة
     </a>
@@ -26,7 +26,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('dashboard.governorates.store') }}" method="POST" id="governorateForm" enctype="multipart/form-data">
+                <form action="{{ route('governorates.store') }}" method="POST" id="governorateForm" enctype="multipart/form-data">
                     @csrf
                     
                     <div class="row">
@@ -159,7 +159,7 @@
                     
                     <!-- Form Actions -->
                     <div class="d-flex gap-3 justify-content-end pt-3 border-top">
-                        <a href="{{ route('dashboard.governorates.index') }}" class="btn btn-secondary">
+                        <a href="{{ route('governorates.index') }}" class="btn btn-secondary">
                             <i class="fas fa-times"></i>
                             إلغاء
                         </a>

@@ -11,11 +11,11 @@
         <p class="text-muted mb-0">تعديل بيانات الخدمة السياحية: {{ $touristService->name_ar }}</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('dashboard.tourist-services.show', $touristService->id) }}" class="btn btn-success">
+        <a href="{{ route('tourist-services.show', $touristService->id) }}" class="btn btn-success">
             <i class="fas fa-eye"></i>
             عرض التفاصيل
         </a>
-        <a href="{{ route('dashboard.tourist-services.index') }}" class="btn btn-secondary">
+        <a href="{{ route('tourist-services.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-right"></i>
             العودة للقائمة
         </a>
@@ -33,7 +33,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('dashboard.tourist-services.update', $touristService->id) }}" method="POST" id="editForm">
+                <form action="{{ route('tourist-services.update', $touristService->id) }}" method="POST" id="editForm">
                     @csrf
                     @method('PUT')
                     
@@ -196,7 +196,7 @@
                     
                     <!-- Form Actions -->
                     <div class="d-flex gap-3 justify-content-end pt-3 border-top">
-                        <a href="{{ route('dashboard.tourist-services.show', $touristService->id) }}" class="btn btn-secondary">
+                        <a href="{{ route('tourist-services.show', $touristService->id) }}" class="btn btn-secondary">
                             <i class="fas fa-times"></i>
                             إلغاء
                         </a>

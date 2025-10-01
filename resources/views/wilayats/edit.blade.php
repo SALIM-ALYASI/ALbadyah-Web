@@ -11,11 +11,11 @@
         <p class="text-muted mb-0">تعديل بيانات الولاية: {{ $wilayat->name_ar }}</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('dashboard.wilayats.show', $wilayat->id) }}" class="btn btn-success">
+        <a href="{{ route('wilayats.show', $wilayat->id) }}" class="btn btn-success">
             <i class="fas fa-eye"></i>
             عرض التفاصيل
         </a>
-        <a href="{{ route('dashboard.wilayats.index') }}" class="btn btn-secondary">
+        <a href="{{ route('wilayats.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-right"></i>
             العودة للقائمة
         </a>
@@ -33,7 +33,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('dashboard.wilayats.update', $wilayat->id) }}" method="POST" id="editForm" enctype="multipart/form-data">
+                <form action="{{ route('wilayats.update', $wilayat->id) }}" method="POST" id="editForm" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     
@@ -201,7 +201,7 @@
                     
                     <!-- Form Actions -->
                     <div class="d-flex gap-3 justify-content-end pt-3 border-top">
-                        <a href="{{ route('dashboard.wilayats.show', $wilayat->id) }}" class="btn btn-secondary">
+                        <a href="{{ route('wilayats.show', $wilayat->id) }}" class="btn btn-secondary">
                             <i class="fas fa-times"></i>
                             إلغاء
                         </a>
