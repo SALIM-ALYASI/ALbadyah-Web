@@ -307,7 +307,7 @@
                                 <i class="fas fa-times mr-1"></i>
                                 إلغاء
                             </a>
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary" onclick="console.log('Form submitted');">
                                 <i class="fas fa-save mr-1"></i>
                                 حفظ الموقع السياحي
                             </button>

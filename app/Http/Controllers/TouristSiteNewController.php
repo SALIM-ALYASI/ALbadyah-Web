@@ -80,7 +80,11 @@ class TouristSiteNewController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info('TouristSiteNew Store Method Called', $request->all());
+        Log::info('=== TouristSiteNew Store Method Called ===');
+        Log::info('Request Data:', $request->all());
+        Log::info('Request Method:', [$request->method()]);
+        Log::info('Request URL:', [$request->fullUrl()]);
+        
         try {
             $data = $request->validate([
                 'name_ar' => 'required|string|max:255',
@@ -134,8 +138,9 @@ class TouristSiteNewController extends Controller
                 }
             });
 
+            Log::info('=== Tourist Site Created Successfully ===');
             return redirect()->route('tourist-sites-new.index')
-                ->with('success', 'تمت إضافة الموقع السياحي بنجاح');
+                ->with('success', 'تمت إضافة الموقع السياحي بنجاح!');
                 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return redirect()->back()

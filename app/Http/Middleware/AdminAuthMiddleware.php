@@ -24,6 +24,8 @@ class AdminAuthMiddleware
         
         // التحقق من وجود جلسة إدارية صحيحة
         if (!session('admin_access') || session('admin_secret') !== $adminSecret) {
+            // حفظ الـ URL الحالي للعودة إليه بعد تسجيل الدخول
+            session(['url.intended' => $request->fullUrl()]);
             return redirect()->route('admin.login')->with('error', 'يجب تسجيل الدخول للوصول للوحة التحكم');
         }
         

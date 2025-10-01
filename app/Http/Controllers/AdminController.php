@@ -79,7 +79,11 @@ class AdminController extends Controller
                 'admin_session_id' => uniqid('admin_', true)
             ]);
             
-            return redirect()->route('governorates.index')
+            // إعادة التوجيه للصفحة المطلوبة أو صفحة المحافظات كافتراضي
+            $intended = session()->pull('url.intended');
+            $redirectTo = $intended ?: route('governorates.index');
+            
+            return redirect($redirectTo)
                 ->with('success', 'مرحباً بك في لوحة التحكم');
         }
 
