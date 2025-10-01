@@ -24,7 +24,16 @@ class CorsMiddleware
                 ->header('Access-Control-Max-Age', '86400');
         }
 
-        $response = $next($request);
+        try {
+            $response = $next($request);
+        } catch (\Exception $e) {
+            // Handle exceptions and add CORS headers even for error responses
+            $response = response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ في الخادم',
+                'error' => $e->getMessage()
+            ], 500);
+        }
 
         // Add CORS headers to the response
         $response->headers->set('Access-Control-Allow-Origin', '*');

@@ -254,24 +254,39 @@
 
 @push('scripts')
 <script>
-    // Form validation
-    document.getElementById('touristSiteForm').addEventListener('submit', function(e) {
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('touristSiteForm');
         const submitBtn = document.getElementById('submitBtn');
-        const originalText = submitBtn.innerHTML;
         
-        // Show loading state
-        submitBtn.innerHTML = '<span class="loading"></span> جاري الحفظ...';
-        submitBtn.disabled = true;
+        // Auto-focus on first input
+        document.getElementById('name_ar').focus();
         
-        // Reset button after 3 seconds (in case of validation errors)
-        setTimeout(() => {
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }, 3000);
+        // Form validation and submission
+        form.addEventListener('submit', function(e) {
+            const nameAr = document.getElementById('name_ar').value.trim();
+            const nameEn = document.getElementById('name_en').value.trim();
+            const descAr = document.getElementById('description_ar').value.trim();
+            const descEn = document.getElementById('description_en').value.trim();
+            
+            // Validate required fields
+            if (!nameAr || !nameEn || !descAr || !descEn) {
+                e.preventDefault();
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return false;
+            }
+            
+            // Show loading state
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="loading"></span> جاري الحفظ...';
+            submitBtn.disabled = true;
+            
+            // Reset button after 10 seconds (in case of server issues)
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 10000);
+        });
     });
-    
-    // Auto-focus on first input
-    document.getElementById('name_ar').focus();
 </script>
 @endpush
 @endsection

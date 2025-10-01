@@ -25,15 +25,15 @@ class Wilayat extends Model
      */
     public function governorate()
     {
-        return $this->belongsTo(\App\Models\Governorate::class, 'governorate_id');
+        return $this->belongsTo(Governorate::class, 'governorate_id');
     }
     public function touristSites()
     {
-        return $this->hasMany(\App\Models\TouristSite::class, 'wilayat_id');
+        return $this->hasMany(TouristSite::class, 'wilayat_id');
     }
     public function touristServices()
     {
-        return $this->hasMany(\App\Models\TouristService::class, 'wilayat_id');
+        return $this->hasMany(TouristService::class, 'wilayat_id');
     }
 
     /**
@@ -41,7 +41,10 @@ class Wilayat extends Model
      */
     public function getImageUrlAttribute()
     {
-        return getImageUrl($this->attributes['image_path'] ?? null, $this->attributes['image_url'] ?? null);
+        return \App\Helpers\ImageHelper::getImageUrl(
+            $this->attributes['image_path'] ?? null, 
+            $this->attributes['image_url'] ?? null
+        );
     }
 
     /**
@@ -49,7 +52,10 @@ class Wilayat extends Model
      */
     public function getHasImageAttribute()
     {
-        return hasImage($this->attributes['image_path'] ?? null, $this->attributes['image_url'] ?? null);
+        return \App\Helpers\ImageHelper::hasImage(
+            $this->attributes['image_path'] ?? null, 
+            $this->attributes['image_url'] ?? null
+        );
     }
 
     /**
@@ -57,7 +63,10 @@ class Wilayat extends Model
      */
     public function getImageInfoAttribute()
     {
-        return getImageInfo($this->attributes['image_path'] ?? null, $this->attributes['image_url'] ?? null);
+        return \App\Helpers\ImageHelper::getImageInfo(
+            $this->attributes['image_path'] ?? null, 
+            $this->attributes['image_url'] ?? null
+        );
     }
 
     /**

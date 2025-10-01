@@ -106,6 +106,7 @@ class TouristServiceController extends Controller
             // حفظ الصورة في مجلد public
             $image->move($uploadPath, $imageName);
             $data['image_path'] = 'images/tourist-services/' . $imageName;
+            $data['image_url'] = \App\Helpers\ImageHelper::getImageUrl($data['image_path'], null);
         }
 
         TouristService::create($data);

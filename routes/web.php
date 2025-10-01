@@ -5,6 +5,7 @@ use App\Http\Controllers\GovernorateController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\WilayatController;
 use App\Http\Controllers\TouristSiteController;
+use App\Http\Controllers\TouristSiteNewController;
 use App\Http\Controllers\TouristServiceController;
 use App\Http\Controllers\TourismWebsiteController;
 use App\Http\Controllers\VisitController;
@@ -40,14 +41,25 @@ Route::get('/admin/login', [AdminController::class, 'showLogin'])->name('admin.l
 Route::post('/admin/login', [AdminController::class, 'login']);
 Route::post('/admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
 
+// مسار login الافتراضي - يعيد التوجيه إلى admin.login
+Route::get('/login', function () {
+    return redirect()->route('admin.login');
+})->name('login');
+
 // حماية لوحة التحكم باستخدام middleware متقدم
 Route::group([
     'prefix' => 'dashboard',
     'middleware' => 'admin.auth'
     ], function () {
+        // الصفحة الرئيسية للوحة التحكم
+        Route::get('/', function () {
+            return redirect()->route('governorates.index');
+        })->name('dashboard');
+        
         Route::resource('governorates', GovernorateController::class);
         Route::resource('wilayats', WilayatController::class);
         Route::resource('tourist-sites', TouristSiteController::class);
+        Route::resource('tourist-sites-new', TouristSiteNewController::class);
         Route::resource('tourist-services', TouristServiceController::class);
         
         // روابط إضافية للخدمات السياحية
@@ -56,9 +68,13 @@ Route::group([
         Route::get('tourist-services/{id}/add-services', [TouristServiceController::class, 'addServices'])->name('tourist-services.add-services');
         Route::post('tourist-services/{id}/store-services', [TouristServiceController::class, 'storeServices'])->name('tourist-services.store-services');
         
-        // إدارة صور المواقع السياحية
+        // إدارة صور المواقع السياحية القديمة
         Route::post('tourist-sites/{id}/images', [TouristSiteController::class, 'addImages'])->name('tourist-sites.images.store');
         Route::delete('tourist-sites/{id}/images/{imageId}', [TouristSiteController::class, 'deleteImage'])->name('tourist-sites.images.destroy');
+        
+        // إدارة صور المواقع السياحية الجديدة
+        Route::delete('tourist-sites-new/{id}/images/{imageId}', [TouristSiteNewController::class, 'deleteImage'])->name('tourist-sites-new.images.destroy');
+        Route::post('tourist-sites-new/{id}/images/order', [TouristSiteNewController::class, 'updateImageOrder'])->name('tourist-sites-new.images.order');
         
         // صفحة عرض جميع البيانات
         Route::get('/data-viewer', [TouristServiceController::class, 'dataViewer'])->name('data-viewer.index');

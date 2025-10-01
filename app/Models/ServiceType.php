@@ -17,7 +17,7 @@ class ServiceType extends Model
     // كل نوع خدمة يمتلك عدة خدمات سياحية
     public function touristServices()
     {
-        return $this->hasMany(\App\Models\TouristService::class, 'service_type_id');
+        return $this->hasMany(TouristService::class, 'service_type_id');
     }
 }
 

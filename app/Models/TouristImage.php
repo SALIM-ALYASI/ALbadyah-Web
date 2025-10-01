@@ -12,7 +12,7 @@ class TouristImage extends Model
 
     public function touristSite()
     {
-        return $this->belongsTo(\App\Models\TouristSite::class, 'tourist_site_id');
+        return $this->belongsTo(TouristSite::class, 'tourist_site_id');
     }
 
     /**

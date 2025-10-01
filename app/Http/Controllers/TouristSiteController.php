@@ -9,6 +9,7 @@ use App\Models\Wilayat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class TouristSiteController extends Controller
 {
@@ -36,21 +37,34 @@ class TouristSiteController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name_ar'        => 'required|string|max:255',
-            'name_en'        => 'required|string|max:255',
-            'description_ar' => 'required|string',
-            'description_en' => 'required|string',
-            'location'       => 'nullable|string|max:255',
-            'website_url'    => 'nullable|url|max:255',
-            'governorate_id' => 'nullable|integer|exists:governorates,id',
-            'wilayat_id'     => 'nullable|integer|exists:wilayats,id',
-        ]);
+        try {
+            $data = $request->validate([
+                'name_ar'        => 'required|string|max:255',
+                'name_en'        => 'required|string|max:255',
+                'description_ar' => 'required|string',
+                'description_en' => 'required|string',
+                'location'       => 'nullable|string|max:255',
+                'website_url'    => 'nullable|url|max:255',
+                'governorate_id' => 'nullable|integer|exists:governorates,id',
+                'wilayat_id'     => 'nullable|integer|exists:wilayats,id',
+            ]);
 
-        $site = TouristSite::create($data);
+            $site = TouristSite::create($data);
 
-        return redirect()->route('tourist-sites.index')
-            ->with('success', 'تمت إضافة الموقع السياحي بنجاح');
+            return redirect()->route('tourist-sites.show', $site->id)
+                ->with('success', 'تمت إضافة الموقع السياحي بنجاح');
+                
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput();
+        } catch (\Exception $e) {
+            Log::error('Error creating tourist site: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return redirect()->back()
+                ->with('error', 'حدث خطأ أثناء حفظ الموقع السياحي: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     /**
@@ -78,23 +92,34 @@ class TouristSiteController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $site = TouristSite::findOrFail($id);
+        try {
+            $site = TouristSite::findOrFail($id);
 
-        $data = $request->validate([
-            'name_ar'        => 'sometimes|string|max:255',
-            'name_en'        => 'sometimes|string|max:255',
-            'description_ar' => 'sometimes|string',
-            'description_en' => 'sometimes|string',
-            'location'       => 'nullable|string|max:255',
-            'website_url'    => 'nullable|url|max:255',
-            'governorate_id' => 'nullable|integer|exists:governorates,id',
-            'wilayat_id'     => 'nullable|integer|exists:wilayats,id',
-        ]);
+            $data = $request->validate([
+                'name_ar'        => 'required|string|max:255',
+                'name_en'        => 'required|string|max:255',
+                'description_ar' => 'required|string',
+                'description_en' => 'required|string',
+                'location'       => 'nullable|string|max:255',
+                'website_url'    => 'nullable|url|max:255',
+                'governorate_id' => 'nullable|integer|exists:governorates,id',
+                'wilayat_id'     => 'nullable|integer|exists:wilayats,id',
+            ]);
 
-        $site->update($data);
+            $site->update($data);
 
-        return redirect()->route('tourist-sites.index')
-            ->with('success', 'تم تحديث بيانات الموقع السياحي بنجاح');
+            return redirect()->route('tourist-sites.index')
+                ->with('success', 'تم تحديث بيانات الموقع السياحي بنجاح');
+                
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput();
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'حدث خطأ أثناء تحديث الموقع السياحي: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     /**
@@ -102,21 +127,43 @@ class TouristSiteController extends Controller
      */
     public function destroy($id)
     {
-        DB::transaction(function () use ($id) {
-            // حذف ملفات الصور من الخادم قبل حذف السجلات
-            $images = TouristImage::where('tourist_site_id', $id)->get();
-            foreach ($images as $image) {
-                if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
-                    Storage::disk('public')->delete($image->image_path);
-                }
-            }
+        try {
+            // التحقق من وجود الموقع
+            $site = TouristSite::findOrFail($id);
             
-            TouristImage::where('tourist_site_id', $id)->delete();
-            TouristSite::where('id', $id)->delete();
-        });
+            DB::transaction(function () use ($id, $site) {
+                // حذف ملفات الصور من الخادم قبل حذف السجلات
+                $images = TouristImage::where('tourist_site_id', $id)->get();
+                foreach ($images as $image) {
+                    // حذف من storage
+                    if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
+                        Storage::disk('public')->delete($image->image_path);
+                    }
+                    // حذف الصور المحلية أيضاً
+                    if ($image->image_path && file_exists(public_path($image->image_path))) {
+                        unlink(public_path($image->image_path));
+                    }
+                }
+                
+                // حذف سجلات الصور من قاعدة البيانات
+                TouristImage::where('tourist_site_id', $id)->delete();
+                
+                // حذف الموقع السياحي
+                $site->delete();
+            });
 
-        return redirect()->route('tourist-sites.index')
-            ->with('success', 'تم حذف الموقع السياحي بنجاح');
+            return redirect()->route('tourist-sites.index')
+                ->with('success', 'تم حذف الموقع السياحي بنجاح');
+                
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return redirect()->route('tourist-sites.index')
+                ->with('error', 'الموقع السياحي غير موجود');
+        } catch (\Exception $e) {
+            Log::error('Error deleting tourist site: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return redirect()->back()
+                ->with('error', 'حدث خطأ أثناء حذف الموقع السياحي: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -124,16 +171,22 @@ class TouristSiteController extends Controller
      */
     public function addImages(Request $request, $id)
     {
-        $site = TouristSite::findOrFail($id);
-
-        $data = $request->validate([
-            'image_files'    => 'required|array|min:1',
-            'image_files.*'  => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
         try {
+            $site = TouristSite::findOrFail($id);
+
+            $data = $request->validate([
+                'image_files'    => 'required|array|min:1',
+                'image_files.*'  => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+
             DB::transaction(function () use ($site, $data, $request) {
                 $imageRows = [];
+
+                // إنشاء مجلد الصور إذا لم يكن موجوداً
+                $uploadPath = public_path('images/tourist-sites/');
+                if (!file_exists($uploadPath)) {
+                    mkdir($uploadPath, 0755, true);
+                }
 
                 // معالجة ملفات الصور المحلية فقط
                 $imageFiles = $request->file('image_files');
@@ -141,9 +194,9 @@ class TouristSiteController extends Controller
                     // حفظ الصورة في مجلد public مباشرة
                     $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
                     $imagePath = 'images/tourist-sites/' . $filename;
-                    $image->move(public_path('images/tourist-sites/'), $filename);
+                    $image->move($uploadPath, $filename);
                     
-                    $imageUrl = asset($imagePath);
+                    $imageUrl = \App\Helpers\ImageHelper::getImageUrl($imagePath, null);
                     
                     $imageRows[] = [
                         'tourist_site_id' => $site->id,
@@ -160,13 +213,18 @@ class TouristSiteController extends Controller
                     throw new \Exception('لم يتم إرسال أي صور للحفظ');
                 }
             });
+
+            return redirect()->route('tourist-sites.show', $site->id)
+                ->with('success', 'تمت إضافة الصور بنجاح');
+                
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput();
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'حدث خطأ أثناء حفظ الصور: ' . $e->getMessage());
         }
-
-        return redirect()->route('tourist-sites.show', $site->id)
-            ->with('success', 'تمت إضافة الصور المحلية بنجاح');
     }
 
     /**
@@ -174,20 +232,31 @@ class TouristSiteController extends Controller
      */
     public function deleteImage($id, $imageId)
     {
-        $site = TouristSite::findOrFail($id);
-        $image = TouristImage::where('tourist_site_id', $id)->findOrFail($imageId);
+        try {
+            $site = TouristSite::findOrFail($id);
+            $image = TouristImage::where('tourist_site_id', $id)->findOrFail($imageId);
 
-        DB::transaction(function () use ($image) {
-            // حذف ملف الصورة من الخادم
-            if ($image->image_path && file_exists(public_path($image->image_path))) {
-                unlink(public_path($image->image_path));
-            }
-            
-            $image->delete();
-        });
+            DB::transaction(function () use ($image) {
+                // حذف ملف الصورة من الخادم
+                if ($image->image_path && file_exists(public_path($image->image_path))) {
+                    unlink(public_path($image->image_path));
+                }
+                
+                // حذف من storage أيضاً إذا كان موجوداً
+                if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
+                    Storage::disk('public')->delete($image->image_path);
+                }
+                
+                $image->delete();
+            });
 
-        return redirect()->route('tourist-sites.show', $site->id)
-            ->with('success', 'تم حذف الصورة بنجاح');
+            return redirect()->route('tourist-sites.show', $site->id)
+                ->with('success', 'تم حذف الصورة بنجاح');
+                
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'حدث خطأ أثناء حذف الصورة: ' . $e->getMessage());
+        }
     }
 }
 

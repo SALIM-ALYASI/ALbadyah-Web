@@ -29,36 +29,48 @@ class GovernorateController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name_ar' => 'required|string|max:255',
-            'name_en' => 'required|string|max:255',
-            'website_url' => 'nullable|url',
-            'image_url' => 'nullable|url',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        try {
+            $request->validate([
+                'name_ar' => 'required|string|max:255',
+                'name_en' => 'required|string|max:255',
+                'website_url' => 'nullable|url',
+                'image_url' => 'nullable|url',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
 
-        $data = $request->all();
+            $data = $request->only(['name_ar', 'name_en', 'website_url', 'image_url']);
 
-        // رفع الصورة إذا تم اختيارها
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            
-            // إنشاء المجلد إذا لم يكن موجوداً
-            $uploadPath = public_path('images/governorates');
-            if (!file_exists($uploadPath)) {
-                mkdir($uploadPath, 0755, true);
+            // رفع الصورة إذا تم اختيارها
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                
+                // إنشاء المجلد إذا لم يكن موجوداً
+                $uploadPath = public_path('images/governorates');
+                if (!file_exists($uploadPath)) {
+                    mkdir($uploadPath, 0755, true);
+                }
+                
+                // حفظ الصورة في مجلد public
+                $image->move($uploadPath, $imageName);
+                $data['image_path'] = 'images/governorates/' . $imageName;
+                $data['image_url'] = \App\Helpers\ImageHelper::getImageUrl($data['image_path'], null);
             }
-            
-            // حفظ الصورة في مجلد public
-            $image->move($uploadPath, $imageName);
-            $data['image_path'] = 'images/governorates/' . $imageName;
+
+            Governorate::create($data);
+
+            return redirect()->route('governorates.index')
+                ->with('success', 'تمت إضافة المحافظة بنجاح');
+                
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput();
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'حدث خطأ أثناء حفظ المحافظة: ' . $e->getMessage())
+                ->withInput();
         }
-
-        Governorate::create($data);
-
-        return redirect()->route('governorates.index')
-            ->with('success', 'تمت إضافة المحافظة بنجاح');
     }
 
     /**
@@ -84,46 +96,58 @@ class GovernorateController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $governorate = Governorate::findOrFail($id);
+        try {
+            $governorate = Governorate::findOrFail($id);
 
-        $request->validate([
-            'name_ar' => 'sometimes|string|max:255',
-            'name_en' => 'sometimes|string|max:255',
-            'website_url' => 'nullable|url',
-            'image_url' => 'nullable|url',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+            $request->validate([
+                'name_ar' => 'sometimes|required|string|max:255',
+                'name_en' => 'sometimes|required|string|max:255',
+                'website_url' => 'nullable|url',
+                'image_url' => 'nullable|url',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
 
-        $data = $request->all();
+            $data = $request->only(['name_ar', 'name_en', 'website_url', 'image_url']);
 
-        // رفع الصورة الجديدة إذا تم اختيارها
-        if ($request->hasFile('image')) {
-            // حذف الصورة القديمة إذا كانت موجودة
-            if ($governorate->image_path) {
-                $oldImagePath = public_path($governorate->image_path);
-                if (file_exists($oldImagePath)) {
-                    unlink($oldImagePath);
+            // رفع الصورة الجديدة إذا تم اختيارها
+            if ($request->hasFile('image')) {
+                // حذف الصورة القديمة إذا كانت موجودة
+                if ($governorate->image_path) {
+                    $oldImagePath = public_path($governorate->image_path);
+                    if (file_exists($oldImagePath)) {
+                        unlink($oldImagePath);
+                    }
                 }
+
+                $image = $request->file('image');
+                $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                
+                // إنشاء المجلد إذا لم يكن موجوداً
+                $uploadPath = public_path('images/governorates');
+                if (!file_exists($uploadPath)) {
+                    mkdir($uploadPath, 0755, true);
+                }
+                
+                // حفظ الصورة في مجلد public
+                $image->move($uploadPath, $imageName);
+                $data['image_path'] = 'images/governorates/' . $imageName;
+                $data['image_url'] = \App\Helpers\ImageHelper::getImageUrl($data['image_path'], null);
             }
 
-            $image = $request->file('image');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            
-            // إنشاء المجلد إذا لم يكن موجوداً
-            $uploadPath = public_path('images/governorates');
-            if (!file_exists($uploadPath)) {
-                mkdir($uploadPath, 0755, true);
-            }
-            
-            // حفظ الصورة في مجلد public
-            $image->move($uploadPath, $imageName);
-            $data['image_path'] = 'images/governorates/' . $imageName;
+            $governorate->update($data);
+
+            return redirect()->route('governorates.index')
+                ->with('success', 'تم تعديل بيانات المحافظة بنجاح');
+                
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput();
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'حدث خطأ أثناء تحديث المحافظة: ' . $e->getMessage())
+                ->withInput();
         }
-
-        $governorate->update($data);
-
-        return redirect()->route('governorates.index')
-            ->with('success', 'تم تعديل بيانات المحافظة بنجاح');
     }
 
     /**
@@ -131,11 +155,26 @@ class GovernorateController extends Controller
      */
     public function destroy($id)
     {
-        $governorate = Governorate::findOrFail($id);
-        $governorate->delete();
+        try {
+            $governorate = Governorate::findOrFail($id);
+            
+            // حذف الصورة إذا كانت موجودة
+            if ($governorate->image_path) {
+                $oldImagePath = public_path($governorate->image_path);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+            
+            $governorate->delete();
 
-        return redirect()->route('governorates.index')
-            ->with('success', 'تم حذف المحافظة بنجاح');
+            return redirect()->route('governorates.index')
+                ->with('success', 'تم حذف المحافظة بنجاح');
+                
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'حدث خطأ أثناء حذف المحافظة: ' . $e->getMessage());
+        }
     }
 }
 

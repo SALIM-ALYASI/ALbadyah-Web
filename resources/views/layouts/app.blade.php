@@ -512,6 +512,12 @@
                     المواقع السياحية
                 </a>
             </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->routeIs('tourist-sites-new.*') ? 'active' : '' }}" href="{{ route('tourist-sites-new.index') }}">
+                    <i class="fas fa-map-marked-alt"></i>
+                    المواقع السياحية الجديدة
+                </a>
+            </div>
         <div class="nav-item">
             <a class="nav-link {{ request()->routeIs('tourist-services.*') ? 'active' : '' }}" href="{{ route('tourist-services.index') }}">
                 <i class="fas fa-concierge-bell"></i>

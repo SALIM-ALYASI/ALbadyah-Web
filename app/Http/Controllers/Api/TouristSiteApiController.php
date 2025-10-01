@@ -122,7 +122,7 @@ class TouristSiteApiController extends Controller
             $images = $site->images->map(function($image) use ($site) {
                 return [
                     'id' => $image->id,
-                    'url' => asset('storage/' . $image->image_path),
+                    'url' => $image->image_url,
                     'alt' => $image->alt_text ?? $site->name_ar,
                     'created_at' => $image->created_at,
                 ];
@@ -278,12 +278,13 @@ class TouristSiteApiController extends Controller
                 
                 $imageModel = $site->images()->create([
                     'image_path' => $path,
+                    'image_url' => \App\Helpers\ImageHelper::getImageUrl($path, null),
                     'alt_text' => $altText,
                 ]);
 
                 $uploadedImages[] = [
                     'id' => $imageModel->id,
-                    'url' => asset('storage/' . $path),
+                    'url' => $imageModel->image_url,
                     'alt' => $altText,
                 ];
             }

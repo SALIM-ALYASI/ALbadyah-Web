@@ -54,7 +54,7 @@
                 @if($site->images->count() > 0)
                     <div class="position-relative" style="height: 200px; overflow: hidden;">
                         @php $firstImage = $site->images->first(); @endphp
-                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($firstImage->image_path, $firstImage->image_url, 'images/albadyah.jpg') }}" 
+                        <img src="{{ $firstImage->image_url }}" 
                              alt="{{ $site->name_ar }}" 
                              class="card-img-top" 
                              style="height: 100%; object-fit: cover;">
@@ -101,7 +101,8 @@
                                 </a>
                                 <form action="{{ route('tourist-sites.destroy', $site->id) }}" 
                                       method="POST" style="display: inline;" 
-                                      onsubmit="return confirmDelete()">
+                                      onsubmit="return confirmDelete()"
+                                      id="deleteForm{{ $site->id }}">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger" title="حذف">
@@ -178,5 +179,38 @@
         font-size: 0.9rem;
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+    function confirmDelete() {
+        return confirm('هل أنت متأكد من حذف هذا الموقع السياحي؟ سيتم حذف جميع الصور المرتبطة به أيضاً.');
+    }
+    
+    // إضافة معالجة أفضل للنموذج
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteForms = document.querySelectorAll('form[action*="destroy"]');
+        deleteForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                if (!confirmDelete()) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // إضافة loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحذف...';
+                    submitBtn.disabled = true;
+                }
+            });
+        });
+    });
+    
+    // إضافة معالجة للأخطاء
+    window.addEventListener('error', function(e) {
+        console.error('JavaScript Error:', e.error);
+    });
+</script>
 @endpush
 @endsection

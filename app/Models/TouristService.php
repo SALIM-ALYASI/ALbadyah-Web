@@ -26,19 +26,19 @@ class TouristService extends Model
     // نوع الخدمة (من جدول service_types)
     public function serviceType()
     {
-        return $this->belongsTo(\App\Models\ServiceType::class, 'service_type_id');
+        return $this->belongsTo(ServiceType::class, 'service_type_id');
     }
 
     // المحافظة (اختياري)
     public function governorate()
     {
-        return $this->belongsTo(\App\Models\Governorate::class, 'governorate_id');
+        return $this->belongsTo(Governorate::class, 'governorate_id');
     }
 
     // الولاية (اختياري)
     public function wilayat()
     {
-        return $this->belongsTo(\App\Models\Wilayat::class, 'wilayat_id');
+        return $this->belongsTo(Wilayat::class, 'wilayat_id');
     }
 
     /**

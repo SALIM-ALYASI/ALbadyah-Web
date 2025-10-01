@@ -25,19 +25,19 @@ class TouristSite extends Model
     // كل موقع يتبع محافظة
     public function governorate()
     {
-        return $this->belongsTo(\App\Models\Governorate::class, 'governorate_id');
+        return $this->belongsTo(Governorate::class, 'governorate_id');
     }
 
     // كل موقع يتبع ولاية
     public function wilayat()
     {
-        return $this->belongsTo(\App\Models\Wilayat::class, 'wilayat_id');
+        return $this->belongsTo(Wilayat::class, 'wilayat_id');
     }
 
     // لكل موقع عدة صور
     public function images()
     {
-        return $this->hasMany(\App\Models\TouristImage::class, 'tourist_site_id');
+        return $this->hasMany(TouristImage::class, 'tourist_site_id');
     }
 
     /**

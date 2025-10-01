@@ -52,7 +52,7 @@ class TouristSiteResource extends JsonResource
                 return $this->images->map(function ($image) {
                     return [
                         'id' => $image->id,
-                        'url' => asset('storage/' . $image->image_path),
+                        'url' => $image->image_url,
                         'alt' => $image->alt_text ?? $this->name_ar,
                         'created_at' => $image->created_at?->format('Y-m-d H:i:s'),
                     ];
@@ -61,7 +61,7 @@ class TouristSiteResource extends JsonResource
             'main_image' => $this->when($this->images && $this->images->count() > 0, function () {
                 $firstImage = $this->images->first();
                 return [
-                    'url' => asset('storage/' . $firstImage->image_path),
+                    'url' => $firstImage->image_url,
                     'alt' => $firstImage->alt_text ?? $this->name_ar,
                 ];
             }),
