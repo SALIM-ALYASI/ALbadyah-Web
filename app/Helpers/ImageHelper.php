@@ -26,11 +26,46 @@ class ImageHelper
         
         // إذا كان هناك رابط صورة خارجي
         if ($imageUrl && filter_var($imageUrl, FILTER_VALIDATE_URL)) {
-            return $imageUrl;
+            // تصحيح URL إذا كان يحتوي على localhost
+            $correctedUrl = self::correctImageUrl($imageUrl);
+            return $correctedUrl;
         }
         
         // إرجاع الصورة الافتراضية
         return asset($defaultImage);
+    }
+    
+    /**
+     * تصحيح URL الصورة
+     *
+     * @param string $imageUrl
+     * @return string
+     */
+    public static function correctImageUrl($imageUrl)
+    {
+        // إذا كان URL يحتوي على localhost أو 127.0.0.1، نستخرج المسار النسبي
+        if (strpos($imageUrl, 'localhost') !== false || strpos($imageUrl, '127.0.0.1') !== false) {
+            // البحث عن /storage/ في URL
+            if (preg_match('/\/storage\/(.+)$/', $imageUrl, $matches)) {
+                return asset('storage/' . $matches[1]);
+            }
+        }
+        
+        // استخراج المسار النسبي من URL
+        $parsedUrl = parse_url($imageUrl);
+        
+        if (isset($parsedUrl['path'])) {
+            // إزالة /storage/ من البداية إذا كان موجوداً
+            $path = ltrim($parsedUrl['path'], '/');
+            if (strpos($path, 'storage/') === 0) {
+                $path = substr($path, 8); // إزالة 'storage/'
+            }
+            
+            // إنشاء URL جديد باستخدام asset()
+            return asset('storage/' . $path);
+        }
+        
+        return $imageUrl;
     }
     
     /**
@@ -51,7 +86,16 @@ class ImageHelper
         }
         
         if ($imageUrl && filter_var($imageUrl, FILTER_VALIDATE_URL)) {
-            return true;
+            // التحقق من وجود الملف في storage
+            $parsedUrl = parse_url($imageUrl);
+            if (isset($parsedUrl['path'])) {
+                $path = ltrim($parsedUrl['path'], '/');
+                if (strpos($path, 'storage/') === 0) {
+                    $relativePath = substr($path, 8); // إزالة 'storage/'
+                    return file_exists(storage_path('app/public/' . $relativePath));
+                }
+            }
+            return true; // افتراض وجود الصورة إذا كان URL صحيح
         }
         
         return false;
