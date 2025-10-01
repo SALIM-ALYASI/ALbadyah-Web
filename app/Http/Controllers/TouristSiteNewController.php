@@ -95,10 +95,6 @@ class TouristSiteNewController extends Controller
                 'governorate_id' => 'nullable|integer|exists:governorates,id',
                 'wilayat_id' => 'nullable|integer|exists:wilayats,id',
                 'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'meta_title_ar' => 'nullable|string|max:255',
-                'meta_title_en' => 'nullable|string|max:255',
-                'meta_description_ar' => 'nullable|string',
-                'meta_description_en' => 'nullable|string',
             ]);
 
             // تعيين القيم الافتراضية للحقول المحذوفة
@@ -201,10 +197,6 @@ class TouristSiteNewController extends Controller
                 'governorate_id' => 'nullable|integer|exists:governorates,id',
                 'wilayat_id' => 'nullable|integer|exists:wilayats,id',
                 'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'meta_title_ar' => 'nullable|string|max:255',
-                'meta_title_en' => 'nullable|string|max:255',
-                'meta_description_ar' => 'nullable|string',
-                'meta_description_en' => 'nullable|string',
             ]);
 
             // تعيين القيم الافتراضية للحقول المحذوفة

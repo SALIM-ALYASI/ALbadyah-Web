@@ -177,64 +177,6 @@
                             </div>
                         </div>
 
-                        <!-- SEO -->
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5 class="card-title">إعدادات SEO</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="meta_title_ar">عنوان SEO (عربي)</label>
-                                                    <input type="text" name="meta_title_ar" id="meta_title_ar" 
-                                                           class="form-control @error('meta_title_ar') is-invalid @enderror" 
-                                                           value="{{ old('meta_title_ar') }}">
-                                                    @error('meta_title_ar')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="meta_title_en">عنوان SEO (إنجليزي)</label>
-                                                    <input type="text" name="meta_title_en" id="meta_title_en" 
-                                                           class="form-control @error('meta_title_en') is-invalid @enderror" 
-                                                           value="{{ old('meta_title_en') }}">
-                                                    @error('meta_title_en')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="meta_description_ar">وصف SEO (عربي)</label>
-                                                    <textarea name="meta_description_ar" id="meta_description_ar" rows="3" 
-                                                              class="form-control @error('meta_description_ar') is-invalid @enderror">{{ old('meta_description_ar') }}</textarea>
-                                                    @error('meta_description_ar')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="meta_description_en">وصف SEO (إنجليزي)</label>
-                                                    <textarea name="meta_description_en" id="meta_description_en" rows="3" 
-                                                              class="form-control @error('meta_description_en') is-invalid @enderror">{{ old('meta_description_en') }}</textarea>
-                                                    @error('meta_description_en')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="card-footer">
