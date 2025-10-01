@@ -45,11 +45,11 @@
             </p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('governorates.edit', $governorate->id) }}" class="btn btn-warning btn-lg">
+            <a href="{{ route('dashboard.governorates.edit', $governorate->id) }}" class="btn btn-warning btn-lg">
                 <i class="fas fa-edit me-2"></i>
                 تعديل
             </a>
-            <a href="{{ route('governorates.index') }}" class="btn btn-light btn-lg">
+            <a href="{{ route('dashboard.governorates.index') }}" class="btn btn-light btn-lg">
                 <i class="fas fa-arrow-right me-2"></i>
                 العودة للقائمة
             </a>
@@ -249,7 +249,7 @@
                             آخر تحديث: {{ $governorate->updated_at->format('Y-m-d H:i:s') }}
                         </small>
                     </div>
-                    <form action="{{ route('governorates.destroy', $governorate->id) }}" 
+                    <form action="{{ route('dashboard.governorates.destroy', $governorate->id) }}" 
                           method="POST" 
                           style="display: inline;" 
                           onsubmit="return confirmDelete()">
@@ -434,7 +434,7 @@
                                         <i class="fas fa-calendar me-1"></i>
                                         {{ $wilayat->created_at->format('Y-m-d') }}
                                     </small>
-                                    <a href="{{ route('wilayats.show', $wilayat->id) }}" 
+                                    <a href="{{ route('dashboard.wilayats.show', $wilayat->id) }}" 
                                        class="btn btn-sm btn-primary">
                                         <i class="fas fa-eye me-1"></i>
                                         عرض التفاصيل
@@ -502,7 +502,7 @@
                         <i class="fas fa-map-marked-alt fa-4x text-muted mb-3" style="opacity: 0.6;"></i>
                         <h5 class="text-muted mb-2">لا توجد ولايات متاحة</h5>
                         <p class="text-muted mb-3">لم يتم إضافة أي ولايات لهذه المحافظة بعد</p>
-                        <a href="{{ route('wilayats.create') }}" class="btn btn-primary">
+                        <a href="{{ route('dashboard.wilayats.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus me-2"></i>
                             إضافة أول ولاية
                         </a>

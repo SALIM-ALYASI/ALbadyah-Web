@@ -495,19 +495,19 @@
         
         <div class="sidebar-nav">
             <div class="nav-item">
-                <a class="nav-link {{ request()->routeIs('governorates.*') ? 'active' : '' }}" href="{{ route('governorates.index') }}">
+                <a class="nav-link {{ request()->routeIs('dashboard.governorates.*') ? 'active' : '' }}" href="{{ route('dashboard.governorates.index') }}">
                     <i class="fas fa-building"></i>
                     المحافظات
                 </a>
             </div>
             <div class="nav-item">
-                <a class="nav-link {{ request()->routeIs('wilayats.*') ? 'active' : '' }}" href="{{ route('wilayats.index') }}">
+                <a class="nav-link {{ request()->routeIs('dashboard.wilayats.*') ? 'active' : '' }}" href="{{ route('dashboard.wilayats.index') }}">
                     <i class="fas fa-map-marked-alt"></i>
                     الولايات
                 </a>
             </div>
             <div class="nav-item">
-                <a class="nav-link {{ request()->routeIs('tourist-sites.*') ? 'active' : '' }}" href="{{ route('tourist-sites.index') }}">
+                <a class="nav-link {{ request()->routeIs('dashboard.tourist-sites.*') ? 'active' : '' }}" href="{{ route('dashboard.tourist-sites.index') }}">
                     <i class="fas fa-camera"></i>
                     المواقع السياحية
                 </a>
@@ -519,7 +519,7 @@
                 </a>
             </div>
         <div class="nav-item">
-            <a class="nav-link {{ request()->routeIs('tourist-services.*') ? 'active' : '' }}" href="{{ route('tourist-services.index') }}">
+            <a class="nav-link {{ request()->routeIs('dashboard.tourist-services.*') ? 'active' : '' }}" href="{{ route('dashboard.tourist-services.index') }}">
                 <i class="fas fa-concierge-bell"></i>
                 الخدمات السياحية
             </a>

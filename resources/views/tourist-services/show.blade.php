@@ -11,15 +11,15 @@
         <p class="text-muted mb-0">عرض جميع معلومات الخدمة السياحية</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('tourist-services.add-services', $touristService->id) }}" class="btn btn-success">
+        <a href="{{ route('dashboard.tourist-services.add-services', $touristService->id) }}" class="btn btn-success">
             <i class="fas fa-plus"></i>
             إضافة خدمات
         </a>
-        <a href="{{ route('tourist-services.edit', $touristService->id) }}" class="btn btn-warning">
+        <a href="{{ route('dashboard.tourist-services.edit', $touristService->id) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i>
             تعديل
         </a>
-        <a href="{{ route('tourist-services.index') }}" class="btn btn-secondary">
+        <a href="{{ route('dashboard.tourist-services.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-right"></i>
             العودة للقائمة
         </a>
@@ -85,7 +85,7 @@
                             @if($touristService->governorate)
                                 <div class="d-flex align-items-center">
                                     <span class="badge bg-info fs-6 me-2">{{ $touristService->governorate->name_ar }}</span>
-                                    <a href="{{ route('governorates.show', $touristService->governorate->id) }}" class="btn btn-sm btn-outline-info">
+                                    <a href="{{ route('dashboard.governorates.show', $touristService->governorate->id) }}" class="btn btn-sm btn-outline-info">
                                         <i class="fas fa-external-link-alt"></i>
                                         عرض المحافظة
                                     </a>
@@ -109,7 +109,7 @@
                             @if($touristService->wilayat)
                                 <div class="d-flex align-items-center">
                                     <span class="badge bg-secondary fs-6 me-2">{{ $touristService->wilayat->name_ar }}</span>
-                                    <a href="{{ route('wilayats.show', $touristService->wilayat->id) }}" class="btn btn-sm btn-outline-secondary">
+                                    <a href="{{ route('dashboard.wilayats.show', $touristService->wilayat->id) }}" class="btn btn-sm btn-outline-secondary">
                                         <i class="fas fa-external-link-alt"></i>
                                         عرض الولاية
                                     </a>
@@ -166,7 +166,7 @@
                             آخر تحديث: {{ $touristService->updated_at->format('Y-m-d H:i:s') }}
                         </small>
                     </div>
-                    <form action="{{ route('tourist-services.destroy', $touristService->id) }}" 
+                    <form action="{{ route('dashboard.tourist-services.destroy', $touristService->id) }}" 
                           method="POST" 
                           style="display: inline;" 
                           onsubmit="return confirmDelete()">

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\TouristSiteApiController;
 use App\Http\Controllers\Api\TouristServiceApiController;
 use App\Http\Controllers\Api\VisitApiController;
 use App\Http\Controllers\Api\SearchApiController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,11 @@ use App\Http\Controllers\Api\SearchApiController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+// Authentication Routes
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+Route::get('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 
 // Public API Routes (no authentication required)
 Route::prefix('v1')->group(function () {

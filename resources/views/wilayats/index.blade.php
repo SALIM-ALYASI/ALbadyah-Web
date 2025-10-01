@@ -10,7 +10,7 @@
         <h1 class="h3 mb-2">الولايات</h1>
         <p class="text-muted mb-0">إدارة وعرض جميع الولايات في النظام</p>
     </div>
-    <a href="{{ route('wilayats.create') }}" class="btn btn-primary">
+    <a href="{{ route('dashboard.wilayats.create') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i>
         إضافة ولاية جديدة
     </a>
@@ -118,15 +118,15 @@
                     </td>
                     <td>
                         <div class="btn-group" role="group">
-                            <a href="{{ route('wilayats.show', $wilayat->id) }}" 
+                            <a href="{{ route('dashboard.wilayats.show', $wilayat->id) }}" 
                                class="btn btn-sm btn-success" title="عرض التفاصيل">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a href="{{ route('wilayats.edit', $wilayat->id) }}" 
+                            <a href="{{ route('dashboard.wilayats.edit', $wilayat->id) }}" 
                                class="btn btn-sm btn-warning" title="تعديل">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <form action="{{ route('wilayats.destroy', $wilayat->id) }}" 
+                            <form action="{{ route('dashboard.wilayats.destroy', $wilayat->id) }}" 
                                   method="POST" style="display: inline;" 
                                   onsubmit="return confirmDelete()">
                                 @csrf
@@ -150,7 +150,7 @@
                 <i class="fas fa-map-marked-alt"></i>
                 <h4>لا توجد ولايات</h4>
                 <p class="mb-4">لم يتم إضافة أي ولايات بعد. ابدأ بإضافة أول ولاية في النظام.</p>
-                <a href="{{ route('wilayats.create') }}" class="btn btn-primary btn-lg">
+                <a href="{{ route('dashboard.wilayats.create') }}" class="btn btn-primary btn-lg">
                     <i class="fas fa-plus"></i>
                     إضافة أول ولاية
                 </a>

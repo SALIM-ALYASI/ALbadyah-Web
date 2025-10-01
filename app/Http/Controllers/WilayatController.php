@@ -63,7 +63,7 @@ class WilayatController extends Controller
 
         Wilayat::create($data);
 
-        return redirect()->route('wilayats.index')
+        return redirect()->route('dashboard.wilayats.index')
             ->with('success', 'تمت إضافة الولاية بنجاح');
     }
 
@@ -133,7 +133,7 @@ class WilayatController extends Controller
 
         $wilayat->update($data);
 
-        return redirect()->route('wilayats.index')
+        return redirect()->route('dashboard.wilayats.index')
             ->with('success', 'تم تعديل بيانات الولاية بنجاح');
     }
 
@@ -145,7 +145,7 @@ class WilayatController extends Controller
         $wilayat = Wilayat::findOrFail($id);
         $wilayat->delete();
 
-        return redirect()->route('wilayats.index')
+        return redirect()->route('dashboard.wilayats.index')
             ->with('success', 'تم حذف الولاية بنجاح');
     }
 }

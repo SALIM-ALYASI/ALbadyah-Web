@@ -13,7 +13,7 @@ class AdminController extends Controller
     {
         // إذا كان مسجل دخول بالفعل، إعادة توجيه للوحة التحكم
         if (session('admin_access') && session('admin_secret') === env('ADMIN_SECRET')) {
-            return redirect()->route('governorates.index');
+            return redirect()->route('dashboard.governorates.index');
         }
         
         return view('admin.login');
@@ -79,7 +79,7 @@ class AdminController extends Controller
                 'admin_session_id' => uniqid('admin_', true)
             ]);
             
-            return redirect()->route('governorates.index')
+            return redirect()->route('dashboard.governorates.index')
                 ->with('success', 'مرحباً بك في لوحة التحكم');
         }
 

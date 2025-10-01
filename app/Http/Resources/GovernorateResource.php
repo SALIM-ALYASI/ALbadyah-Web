@@ -28,9 +28,9 @@ class GovernorateResource extends JsonResource
                 'lng' => (float) $this->longitude,
             ]),
             'stats' => [
-                'wilayats_count' => $this->wilayats_count ?? $this->wilayats->count(),
-                'tourist_sites_count' => $this->tourist_sites_count ?? $this->tourist_sites->count(),
-                'tourist_services_count' => $this->tourist_services_count ?? $this->tourist_services->count(),
+                'wilayats_count' => $this->wilayats_count ?? $this->wilayats?->count() ?? 0,
+                'tourist_sites_count' => $this->tourist_sites_count ?? $this->tourist_sites?->count() ?? 0,
+                'tourist_services_count' => $this->tourist_services_count ?? $this->tourist_services?->count() ?? 0,
             ],
             'wilayats' => WilayatResource::collection($this->whenLoaded('wilayats')),
             'tourist_sites' => TouristSiteResource::collection($this->whenLoaded('tourist_sites')),

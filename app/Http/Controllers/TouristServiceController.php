@@ -111,7 +111,7 @@ class TouristServiceController extends Controller
 
         TouristService::create($data);
 
-        return redirect()->route('tourist-services.index')
+        return redirect()->route('dashboard.tourist-services.index')
             ->with('success', 'تمت إضافة الخدمة السياحية بنجاح');
     }
 
@@ -149,7 +149,7 @@ class TouristServiceController extends Controller
 
         $location = TouristService::create($data);
 
-        return redirect()->route('tourist-services.add-services', $location->id)
+        return redirect()->route('dashboard.tourist-services.add-services', $location->id)
             ->with('success', 'تم إنشاء الموقع بنجاح. يمكنك الآن إضافة الخدمات.');
     }
 
@@ -209,7 +209,7 @@ class TouristServiceController extends Controller
             }
         });
 
-        return redirect()->route('tourist-services.show', $location->id)
+        return redirect()->route('dashboard.tourist-services.show', $location->id)
             ->with('success', 'تمت إضافة الخدمات بنجاح');
     }
 
@@ -278,7 +278,7 @@ class TouristServiceController extends Controller
 
         $service->update($data);
 
-        return redirect()->route('tourist-services.index')
+        return redirect()->route('dashboard.tourist-services.index')
             ->with('success', 'تم تحديث بيانات الخدمة السياحية بنجاح');
     }
 
@@ -290,7 +290,7 @@ class TouristServiceController extends Controller
         $service = TouristService::findOrFail($id);
         $service->delete();
 
-        return redirect()->route('tourist-services.index')
+        return redirect()->route('dashboard.tourist-services.index')
             ->with('success', 'تم حذف الخدمة السياحية بنجاح');
     }
 

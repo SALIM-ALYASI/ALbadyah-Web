@@ -10,7 +10,7 @@
         <h1 class="h3 mb-2">إضافة موقع سياحي جديد</h1>
         <p class="text-muted mb-0">أدخل بيانات الموقع السياحي الجديد في النموذج أدناه</p>
     </div>
-    <a href="{{ route('tourist-sites.index') }}" class="btn btn-secondary">
+    <a href="{{ route('dashboard.tourist-sites.index') }}" class="btn btn-secondary">
         <i class="fas fa-arrow-right"></i>
         العودة للقائمة
     </a>
@@ -27,7 +27,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('tourist-sites.store') }}" method="POST" id="touristSiteForm">
+                <form action="{{ route('dashboard.tourist-sites.store') }}" method="POST" id="touristSiteForm">
                     @csrf
                     
                     <div class="row">
@@ -205,7 +205,7 @@
                     
                     <!-- Form Actions -->
                     <div class="d-flex gap-3 justify-content-end pt-3 border-top">
-                        <a href="{{ route('tourist-sites.index') }}" class="btn btn-secondary">
+                        <a href="{{ route('dashboard.tourist-sites.index') }}" class="btn btn-secondary">
                             <i class="fas fa-times"></i>
                             إلغاء
                         </a>

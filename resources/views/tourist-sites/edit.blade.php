@@ -11,11 +11,11 @@
         <p class="text-muted mb-0">تعديل بيانات الموقع السياحي: {{ $touristSite->name_ar }}</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('tourist-sites.show', $touristSite->id) }}" class="btn btn-success">
+        <a href="{{ route('dashboard.tourist-sites.show', $touristSite->id) }}" class="btn btn-success">
             <i class="fas fa-eye"></i>
             عرض التفاصيل
         </a>
-        <a href="{{ route('tourist-sites.index') }}" class="btn btn-secondary">
+        <a href="{{ route('dashboard.tourist-sites.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-right"></i>
             العودة للقائمة
         </a>
@@ -33,7 +33,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('tourist-sites.update', $touristSite->id) }}" method="POST" id="editForm">
+                <form action="{{ route('dashboard.tourist-sites.update', $touristSite->id) }}" method="POST" id="editForm">
                     @csrf
                     @method('PUT')
                     
@@ -204,7 +204,7 @@
                     
                     <!-- Form Actions -->
                     <div class="d-flex gap-3 justify-content-end pt-3 border-top">
-                        <a href="{{ route('tourist-sites.show', $touristSite->id) }}" class="btn btn-secondary">
+                        <a href="{{ route('dashboard.tourist-sites.show', $touristSite->id) }}" class="btn btn-secondary">
                             <i class="fas fa-times"></i>
                             إلغاء
                         </a>
@@ -232,7 +232,7 @@
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="text-muted">الصور الحالية ({{ $touristSite->images->count() }})</span>
-                            <a href="{{ route('tourist-sites.show', $touristSite->id) }}" class="btn btn-sm btn-outline-primary">
+                            <a href="{{ route('dashboard.tourist-sites.show', $touristSite->id) }}" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-cog"></i>
                                 إدارة الصور
                             </a>
@@ -255,7 +255,7 @@
                     <div class="text-center py-3">
                         <i class="fas fa-image fa-2x text-muted mb-2"></i>
                         <p class="text-muted mb-3">لا توجد صور للموقع السياحي</p>
-                        <a href="{{ route('tourist-sites.show', $touristSite->id) }}" class="btn btn-primary btn-sm">
+                        <a href="{{ route('dashboard.tourist-sites.show', $touristSite->id) }}" class="btn btn-primary btn-sm">
                             <i class="fas fa-plus"></i>
                             إضافة صور
                         </a>

@@ -11,11 +11,11 @@
         <p class="text-muted mb-0">أضف خدمات متعددة للموقع: {{ $location->name_ar }}</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('tourist-services.show', $location->id) }}" class="btn btn-outline-primary">
+        <a href="{{ route('dashboard.tourist-services.show', $location->id) }}" class="btn btn-outline-primary">
             <i class="fas fa-eye"></i>
             عرض الموقع
         </a>
-        <a href="{{ route('tourist-services.index') }}" class="btn btn-secondary">
+        <a href="{{ route('dashboard.tourist-services.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-right"></i>
             العودة للقائمة
         </a>
@@ -78,7 +78,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('tourist-services.store-services', $location->id) }}" method="POST" enctype="multipart/form-data" id="servicesForm">
+                <form action="{{ route('dashboard.tourist-services.store-services', $location->id) }}" method="POST" enctype="multipart/form-data" id="servicesForm">
                     @csrf
                     
                     <!-- Services Array Section -->
@@ -207,7 +207,7 @@
                     
                     <!-- Form Actions -->
                     <div class="d-flex gap-3 justify-content-end pt-3 border-top">
-                        <a href="{{ route('tourist-services.show', $location->id) }}" class="btn btn-secondary">
+                        <a href="{{ route('dashboard.tourist-services.show', $location->id) }}" class="btn btn-secondary">
                             <i class="fas fa-times"></i>
                             إلغاء
                         </a>

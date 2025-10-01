@@ -45,11 +45,11 @@
             </p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('wilayats.edit', $wilayat->id) }}" class="btn btn-warning btn-lg">
+            <a href="{{ route('dashboard.wilayats.edit', $wilayat->id) }}" class="btn btn-warning btn-lg">
                 <i class="fas fa-edit me-2"></i>
                 تعديل
             </a>
-            <a href="{{ route('wilayats.index') }}" class="btn btn-light btn-lg">
+            <a href="{{ route('dashboard.wilayats.index') }}" class="btn btn-light btn-lg">
                 <i class="fas fa-arrow-right me-2"></i>
                 العودة للقائمة
             </a>
@@ -107,7 +107,7 @@
                             @if($wilayat->governorate)
                                 <div class="d-flex align-items-center">
                                     <span class="badge bg-info fs-6 me-2">{{ $wilayat->governorate->name_ar }}</span>
-                                    <a href="{{ route('governorates.show', $wilayat->governorate->id) }}" class="btn btn-sm btn-outline-info">
+                                    <a href="{{ route('dashboard.governorates.show', $wilayat->governorate->id) }}" class="btn btn-sm btn-outline-info">
                                         <i class="fas fa-external-link-alt"></i>
                                         عرض المحافظة
                                     </a>
@@ -256,7 +256,7 @@
                             آخر تحديث: {{ $wilayat->updated_at->format('Y-m-d H:i:s') }}
                         </small>
                     </div>
-                    <form action="{{ route('wilayats.destroy', $wilayat->id) }}" 
+                    <form action="{{ route('dashboard.wilayats.destroy', $wilayat->id) }}" 
                           method="POST" 
                           style="display: inline;" 
                           onsubmit="return confirmDelete()">
