@@ -512,7 +512,7 @@ function deleteSelectedImages() {
             const imageId = checkbox.dataset.imageId;
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = `{{ route('tourist-sites-new.images.destroy', [$touristSite->id, '']) }}/${imageId}`;
+            form.action = `{{ url('dashboard/tourist-sites-new') }}/{{ $touristSite->id }}/images/${imageId}`;
             
             const csrfToken = document.createElement('input');
             csrfToken.type = 'hidden';
