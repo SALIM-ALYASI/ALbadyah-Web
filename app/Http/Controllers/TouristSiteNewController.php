@@ -379,4 +379,53 @@ class TouristSiteNewController extends Controller
 
         return redirect()->back()->with('success', 'تم حذف الصورة بنجاح');
     }
+
+    /**
+     * رفع صور جديدة للموقع السياحي
+     */
+    public function storeImages(Request $request, $touristSiteId)
+    {
+        $touristSite = TouristSiteNew::findOrFail($touristSiteId);
+        
+        $request->validate([
+            'images' => 'required|array|min:1',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        $uploadedCount = 0;
+        $errors = [];
+
+        foreach ($request->file('images') as $image) {
+            try {
+                $filename = time() . '_' . Str::random(10) . '.' . $image->getClientOriginalExtension();
+                $path = $image->storeAs('tourist-sites/images', $filename, 'public');
+                
+                // تحديد ترتيب الصورة
+                $maxOrder = TouristImageNew::where('tourist_site_id', $touristSiteId)->max('sort_order') ?? 0;
+                
+                TouristImageNew::create([
+                    'tourist_site_id' => $touristSiteId,
+                    'image_path' => $path,
+                    'image_url' => \App\Helpers\ImageHelper::getImageUrl($path, null),
+                    'alt_text_ar' => $image->getClientOriginalName(),
+                    'alt_text_en' => $image->getClientOriginalName(),
+                    'sort_order' => $maxOrder + 1,
+                ]);
+                
+                $uploadedCount++;
+            } catch (\Exception $e) {
+                $errors[] = $image->getClientOriginalName() . ': ' . $e->getMessage();
+            }
+        }
+
+        if ($uploadedCount > 0) {
+            $message = "تم رفع {$uploadedCount} صورة بنجاح";
+            if (!empty($errors)) {
+                $message .= ". أخطاء: " . implode(', ', $errors);
+            }
+            return redirect()->back()->with('success', $message);
+        } else {
+            return redirect()->back()->with('error', 'فشل في رفع الصور: ' . implode(', ', $errors));
+        }
+    }
 }
