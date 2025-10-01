@@ -92,14 +92,8 @@ class TouristSiteNewController extends Controller
                 'description_ar' => 'required|string',
                 'description_en' => 'required|string',
                 'location' => 'nullable|string|max:255',
-                'website_url' => 'nullable|url|max:255',
-                'phone' => 'nullable|string|max:20',
-                'email' => 'nullable|email|max:255',
-                'latitude' => 'nullable|numeric|between:-90,90',
-                'longitude' => 'nullable|numeric|between:-180,180',
                 'governorate_id' => 'nullable|integer|exists:governorates,id',
                 'wilayat_id' => 'nullable|integer|exists:wilayats,id',
-                'is_active' => 'boolean',
                 'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'meta_title_ar' => 'nullable|string|max:255',
                 'meta_title_en' => 'nullable|string|max:255',
@@ -107,8 +101,8 @@ class TouristSiteNewController extends Controller
                 'meta_description_en' => 'nullable|string',
             ]);
 
-            // معالجة checkbox is_active
-            $data['is_active'] = $request->has('is_active') ? true : false;
+            // تعيين القيم الافتراضية للحقول المحذوفة
+            $data['is_active'] = true; // افتراضياً الموقع نشط
 
             DB::transaction(function () use ($data, $request) {
                 // إنشاء slug فريد
@@ -204,20 +198,17 @@ class TouristSiteNewController extends Controller
                 'description_ar' => 'required|string',
                 'description_en' => 'required|string',
                 'location' => 'nullable|string|max:255',
-                'website_url' => 'nullable|url|max:255',
-                'phone' => 'nullable|string|max:20',
-                'email' => 'nullable|email|max:255',
-                'latitude' => 'nullable|numeric|between:-90,90',
-                'longitude' => 'nullable|numeric|between:-180,180',
                 'governorate_id' => 'nullable|integer|exists:governorates,id',
                 'wilayat_id' => 'nullable|integer|exists:wilayats,id',
-                'is_active' => 'boolean',
                 'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'meta_title_ar' => 'nullable|string|max:255',
                 'meta_title_en' => 'nullable|string|max:255',
                 'meta_description_ar' => 'nullable|string',
                 'meta_description_en' => 'nullable|string',
             ]);
+
+            // تعيين القيم الافتراضية للحقول المحذوفة
+            $data['is_active'] = $request->has('is_active') ? true : false;
 
             DB::transaction(function () use ($site, $data, $request) {
                 // تحديث slug إذا تغير الاسم

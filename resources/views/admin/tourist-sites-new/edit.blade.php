@@ -87,80 +87,6 @@
                                 </div>
                             </div>
 
-                            <!-- معلومات الاتصال والموقع -->
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5 class="card-title">معلومات الاتصال والموقع</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="form-group">
-                                            <label for="website_url">رابط الموقع</label>
-                                            <input type="url" name="website_url" id="website_url" 
-                                                   class="form-control @error('website_url') is-invalid @enderror" 
-                                                   value="{{ old('website_url', $touristSite->website_url) }}">
-                                            @error('website_url')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="phone">رقم الهاتف</label>
-                                            <input type="text" name="phone" id="phone" 
-                                                   class="form-control @error('phone') is-invalid @enderror" 
-                                                   value="{{ old('phone', $touristSite->phone) }}">
-                                            @error('phone')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="email">البريد الإلكتروني</label>
-                                            <input type="email" name="email" id="email" 
-                                                   class="form-control @error('email') is-invalid @enderror" 
-                                                   value="{{ old('email', $touristSite->email) }}">
-                                            @error('email')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="latitude">خط العرض</label>
-                                                    <input type="number" name="latitude" id="latitude" step="any" 
-                                                           class="form-control @error('latitude') is-invalid @enderror" 
-                                                           value="{{ old('latitude', $touristSite->latitude) }}">
-                                                    @error('latitude')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="longitude">خط الطول</label>
-                                                    <input type="number" name="longitude" id="longitude" step="any" 
-                                                           class="form-control @error('longitude') is-invalid @enderror" 
-                                                           value="{{ old('longitude', $touristSite->longitude) }}">
-                                                    @error('longitude')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <div class="form-check">
-                                                <input type="checkbox" name="is_active" id="is_active" value="1" 
-                                                       class="form-check-input" {{ old('is_active', $touristSite->is_active) ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="is_active">
-                                                    الموقع نشط
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="row mt-3">
@@ -204,6 +130,16 @@
                                             @error('wilayat_id')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
+                                        </div>
+
+                                        <div class="form-group mt-3">
+                                            <div class="form-check">
+                                                <input type="checkbox" name="is_active" id="is_active" value="1" 
+                                                       class="form-check-input" {{ old('is_active', $touristSite->is_active) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="is_active">
+                                                    الموقع نشط
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
