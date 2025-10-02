@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Log;
 
 class TouristSiteController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('web');
+    }
     /**
      * عرض قائمة المواقع السياحية
      */
@@ -95,6 +99,12 @@ class TouristSiteController extends Controller
      */
     public function store(Request $request)
     {
+        // Debug: تسجيل البيانات المرسلة
+        Log::info('TouristSite Store Method Called');
+        Log::info('Request Data:', $request->all());
+        Log::info('Request Method:', [$request->method()]);
+        Log::info('Request URL:', [$request->fullUrl()]);
+        
         try {
             $data = $request->validate([
                 'name_ar'        => 'required|string|max:255',

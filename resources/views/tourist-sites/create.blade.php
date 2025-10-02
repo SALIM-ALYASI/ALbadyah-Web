@@ -27,7 +27,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('tourist-sites.store') }}" method="POST" id="touristSiteForm">
+                <form action="{{ route('tourist-sites.store') }}" method="POST" enctype="multipart/form-data" id="touristSiteForm">
                     @csrf
                     
                     <div class="row">
@@ -202,6 +202,71 @@
                             </div>
                         @enderror
                     </div>
+
+                    <!-- الصورة المميزة -->
+                    <div class="mb-4">
+                        <label for="featured_image" class="form-label">
+                            <i class="fas fa-image me-1 text-primary"></i>
+                            الصورة المميزة
+                        </label>
+                        <input type="file" 
+                               class="form-control @error('featured_image') is-invalid @enderror" 
+                               id="featured_image" 
+                               name="featured_image" 
+                               accept="image/*">
+                        @error('featured_image')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            اختر صورة مميزة للموقع السياحي (اختياري)
+                        </div>
+                    </div>
+
+                    <!-- الصور الإضافية -->
+                    <div class="mb-4">
+                        <label for="images" class="form-label">
+                            <i class="fas fa-images me-1 text-primary"></i>
+                            الصور الإضافية
+                        </label>
+                        <input type="file" 
+                               class="form-control @error('images') is-invalid @enderror" 
+                               id="images" 
+                               name="images[]" 
+                               accept="image/*"
+                               multiple>
+                        @error('images')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            يمكنك اختيار عدة صور للموقع السياحي (اختياري)
+                        </div>
+                    </div>
+
+                    <!-- حالة التفعيل -->
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" 
+                                   type="checkbox" 
+                                   id="is_active" 
+                                   name="is_active" 
+                                   value="1" 
+                                   {{ old('is_active', true) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_active">
+                                <i class="fas fa-toggle-on me-1 text-success"></i>
+                                تفعيل الموقع السياحي
+                            </label>
+                        </div>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            المواقع المفعلة ستظهر للزوار
+                        </div>
+                    </div>
                     
                     <!-- Form Actions -->
                     <div class="d-flex gap-3 justify-content-end pt-3 border-top">
@@ -215,6 +280,19 @@
                         </button>
                     </div>
                 </form>
+
+                <!-- JavaScript للتحقق من إرسال الـ form -->
+                <script>
+                document.getElementById('touristSiteForm').addEventListener('submit', function(e) {
+                    console.log('Form is being submitted...');
+                    console.log('Form data:', new FormData(this));
+                    
+                    // إظهار رسالة تحميل
+                    const submitBtn = document.getElementById('submitBtn');
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+                    submitBtn.disabled = true;
+                });
+                </script>
             </div>
         </div>
     </div>
