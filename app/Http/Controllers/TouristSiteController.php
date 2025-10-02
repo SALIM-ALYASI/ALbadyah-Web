@@ -99,7 +99,6 @@ class TouristSiteController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
         // Debug: تسجيل البيانات المرسلة
         Log::info('TouristSite Store Method Called');
         Log::info('Request Data:', $request->all());
@@ -139,7 +138,7 @@ class TouristSiteController extends Controller
                 }
             });
 
-            return redirect()->route('tourist-sitesController.index')
+            return redirect()->route('tourist-sites.index')
                 ->with('success', 'تمت إضافة الموقع السياحي بنجاح');
                 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -196,7 +195,7 @@ class TouristSiteController extends Controller
 
             $site->update($data);
 
-            return redirect()->route('tourist-sitesController.index')
+            return redirect()->route('tourist-sites.index')
                 ->with('success', 'تم تحديث بيانات الموقع السياحي بنجاح');
                 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -240,11 +239,11 @@ class TouristSiteController extends Controller
                 $site->delete();
             });
 
-            return redirect()->route('tourist-sitesController.index')
+            return redirect()->route('tourist-sites.index')
                 ->with('success', 'تم حذف الموقع السياحي بنجاح');
                 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return redirect()->route('tourist-sitesController.index')
+            return redirect()->route('tourist-sites.index')
                 ->with('error', 'الموقع السياحي غير موجود');
         } catch (\Exception $e) {
             Log::error('Error deleting tourist site: ' . $e->getMessage());
@@ -302,7 +301,7 @@ class TouristSiteController extends Controller
                 }
             });
 
-            return redirect()->route('tourist-sitesController.show', $site->id)
+            return redirect()->route('tourist-sites.show', $site->id)
                 ->with('success', 'تمت إضافة الصور بنجاح');
                 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -338,7 +337,7 @@ class TouristSiteController extends Controller
                 $image->delete();
             });
 
-            return redirect()->route('tourist-sitesController.show', $site->id)
+            return redirect()->route('tourist-sites.show', $site->id)
                 ->with('success', 'تم حذف الصورة بنجاح');
                 
         } catch (\Exception $e) {

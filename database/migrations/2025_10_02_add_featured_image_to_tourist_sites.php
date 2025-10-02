@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('tourist_sites', function (Blueprint $table) {
             if (!Schema::hasColumn('tourist_sites', 'featured_image')) {
-                $table->string('featured_image')->nullable()->after('is_active');
+                $table->string('featured_image')->nullable()->after('wilayat_id');
             }
         });
     }
