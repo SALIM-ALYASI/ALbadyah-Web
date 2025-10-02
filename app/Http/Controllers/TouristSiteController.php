@@ -16,10 +16,68 @@ class TouristSiteController extends Controller
     /**
      * عرض قائمة المواقع السياحية
      */
-    public function index()
+    public function index(Request $request)
     {
-        $touristSites = TouristSite::with(['images', 'governorate', 'wilayat'])->latest()->get();
-        return view('tourist-sites.index', compact('touristSites'));
+        try {
+            $query = TouristSite::with(['images' => function($query) {
+                $query->ordered()->take(1); // تحميل أول صورة فقط للأداء
+            }, 'governorate', 'wilayat']);
+
+            // البحث
+            if ($request->filled('search')) {
+                $search = trim($request->search);
+                if (!empty($search)) {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('name_ar', 'like', "%{$search}%")
+                          ->orWhere('name_en', 'like', "%{$search}%")
+                          ->orWhere('description_ar', 'like', "%{$search}%")
+                          ->orWhere('description_en', 'like', "%{$search}%");
+                    });
+                }
+            }
+
+            // فلترة حسب المحافظة
+            if ($request->filled('governorate_id') && is_numeric($request->governorate_id)) {
+                $query->where('governorate_id', $request->governorate_id);
+            }
+
+            // فلترة حسب الولاية
+            if ($request->filled('wilayat_id') && is_numeric($request->wilayat_id)) {
+                $query->where('wilayat_id', $request->wilayat_id);
+            }
+
+            // فلترة حسب الحالة
+            if ($request->filled('status')) {
+                $query->where('is_active', $request->status === 'active');
+            }
+
+            // الحصول على النتائج مع الترقيم
+            $touristSites = $query->latest('created_at')->paginate(15);
+            
+            // تحميل بيانات الفلاتر
+            $governorates = Governorate::orderBy('name_ar')->get();
+            $wilayats = Wilayat::orderBy('name_ar')->get();
+
+            // إضافة معلومات إضافية للـ View
+            $totalSites = TouristSite::count();
+            $activeSites = TouristSite::where('is_active', true)->count();
+
+            return view('tourist-sites.index', compact(
+                'touristSites', 
+                'governorates', 
+                'wilayats',
+                'totalSites',
+                'activeSites'
+            ));
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Database error in tourist sites index: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'حدث خطأ في قاعدة البيانات. يرجى المحاولة مرة أخرى.');
+        } catch (\Exception $e) {
+            Log::error('Error fetching tourist sites: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return redirect()->back()->with('error', 'حدث خطأ غير متوقع في جلب البيانات. يرجى التحقق من سجلات النظام.');
+        }
     }
 
     /**
@@ -47,11 +105,30 @@ class TouristSiteController extends Controller
                 'website_url'    => 'nullable|url|max:255',
                 'governorate_id' => 'nullable|integer|exists:governorates,id',
                 'wilayat_id'     => 'nullable|integer|exists:wilayats,id',
+                'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
 
-            $site = TouristSite::create($data);
+            // تعيين القيم الافتراضية
+            $data['is_active'] = $request->has('is_active') ? true : false;
 
-            return redirect()->route('tourist-sites.show', $site->id)
+            DB::transaction(function () use ($data, $request) {
+                // معالجة الصورة المميزة
+                if ($request->hasFile('featured_image')) {
+                    $image = $request->file('featured_image');
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $path = $image->storeAs('tourist-sites/featured', $filename, 'public');
+                    $data['featured_image'] = $path;
+                }
+
+                $site = TouristSite::create($data);
+                
+                // معالجة الصور الإضافية
+                if ($request->hasFile('images')) {
+                    $this->handleImages($site->id, $request->file('images'));
+                }
+            });
+
+            return redirect()->route('tourist-sites.index')
                 ->with('success', 'تمت إضافة الموقع السياحي بنجاح');
                 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -256,6 +333,30 @@ class TouristSiteController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'حدث خطأ أثناء حذف الصورة: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * معالجة رفع الصور
+     */
+    private function handleImages($touristSiteId, $images)
+    {
+        foreach ($images as $index => $image) {
+            $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $path = $image->storeAs('tourist-sites/images', $filename, 'public');
+            
+            // تحديد ترتيب الصورة
+            $maxOrder = TouristImage::where('tourist_site_id', $touristSiteId)->max('sort_order') ?? 0;
+            
+            TouristImage::create([
+                'tourist_site_id' => $touristSiteId,
+                'image_path' => $path,
+                'image_url' => \App\Helpers\ImageHelper::getImageUrl($path, null),
+                'alt_text_ar' => $image->getClientOriginalName(),
+                'alt_text_en' => $image->getClientOriginalName(),
+                'sort_order' => $maxOrder + $index + 1,
+                'is_featured' => $index === 0, // أول صورة تكون مميزة
+            ]);
         }
     }
 }
