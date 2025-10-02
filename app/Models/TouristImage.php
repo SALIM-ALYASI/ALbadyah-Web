@@ -8,7 +8,20 @@ class TouristImage extends Model
 {
     use \Illuminate\Database\Eloquent\Factories\HasFactory;
 
-    protected $fillable = ['tourist_site_id','image_url','image_path'];
+    protected $fillable = [
+        'tourist_site_id',
+        'image_url',
+        'image_path',
+        'alt_text_ar',
+        'alt_text_en',
+        'sort_order',
+        'is_featured',
+    ];
+
+    protected $casts = [
+        'is_featured' => 'boolean',
+        'sort_order' => 'integer',
+    ];
 
     public function touristSite()
     {
@@ -46,5 +59,29 @@ class TouristImage extends Model
             $this->attributes['image_path'] ?? null,
             $this->attributes['image_url'] ?? null
         );
+    }
+
+    /**
+     * Get alt text by language
+     */
+    public function getAltText($lang = 'ar')
+    {
+        return $lang === 'en' ? $this->alt_text_en : $this->alt_text_ar;
+    }
+
+    /**
+     * Scope for ordered images
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order')->orderBy('created_at');
+    }
+
+    /**
+     * Scope for featured images
+     */
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
     }
 }

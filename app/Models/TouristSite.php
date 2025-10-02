@@ -20,6 +20,12 @@ class TouristSite extends Model
         'website_url',
         'governorate_id',
         'wilayat_id',
+        'is_active',
+        'featured_image',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     // كل موقع يتبع محافظة
@@ -83,6 +89,60 @@ class TouristSite extends Model
     public static function findBySlug($slug)
     {
         return static::where('slug', $slug)->first();
+    }
+
+    /**
+     * فلترة المواقع النشطة فقط
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * فلترة المواقع حسب المحافظة
+     */
+    public function scopeByGovernorate($query, $governorateId)
+    {
+        return $query->where('governorate_id', $governorateId);
+    }
+
+    /**
+     * فلترة المواقع حسب الولاية
+     */
+    public function scopeByWilayat($query, $wilayatId)
+    {
+        return $query->where('wilayat_id', $wilayatId);
+    }
+
+    /**
+     * الحصول على الصورة المميزة
+     */
+    public function getFeaturedImageAttribute($value)
+    {
+        if ($value) {
+            return \App\Helpers\ImageHelper::getImageUrl($value, null);
+        }
+        
+        // إذا لم تكن هناك صورة مميزة، احصل على أول صورة
+        $firstImage = $this->images()->featured()->first() ?: $this->images()->first();
+        return $firstImage ? $firstImage->image_url : asset('images/default-tourist-site.jpg');
+    }
+
+    /**
+     * الحصول على اسم الموقع حسب اللغة
+     */
+    public function getName($lang = 'ar')
+    {
+        return $lang === 'en' ? $this->name_en : $this->name_ar;
+    }
+
+    /**
+     * الحصول على وصف الموقع حسب اللغة
+     */
+    public function getDescription($lang = 'ar')
+    {
+        return $lang === 'en' ? $this->description_en : $this->description_ar;
     }
 }
 

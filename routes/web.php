@@ -5,7 +5,6 @@ use App\Http\Controllers\GovernorateController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\WilayatController;
 use App\Http\Controllers\TouristSiteController;
-use App\Http\Controllers\TouristSiteNewController;
 use App\Http\Controllers\TouristServiceController;
 use App\Http\Controllers\TourismWebsiteController;
 use App\Http\Controllers\VisitController;
@@ -59,7 +58,6 @@ Route::group([
         Route::resource('governorates', GovernorateController::class);
         Route::resource('wilayats', WilayatController::class);
         Route::resource('tourist-sites', TouristSiteController::class);
-        Route::resource('tourist-sites-new', TouristSiteNewController::class);
         Route::resource('tourist-services', TouristServiceController::class);
         
         // روابط إضافية للخدمات السياحية
@@ -72,10 +70,6 @@ Route::group([
         Route::post('tourist-sites/{id}/images', [TouristSiteController::class, 'addImages'])->name('tourist-sites.images.store');
         Route::delete('tourist-sites/{id}/images/{imageId}', [TouristSiteController::class, 'deleteImage'])->name('tourist-sites.images.destroy');
         
-        // إدارة صور المواقع السياحية الجديدة
-        Route::post('tourist-sites-new/{id}/images', [TouristSiteNewController::class, 'storeImages'])->name('tourist-sites-new.images.store');
-        Route::delete('tourist-sites-new/{id}/images/{imageId}', [TouristSiteNewController::class, 'destroyImage'])->name('tourist-sites-new.images.destroy');
-        Route::post('tourist-sites-new/{id}/images/order', [TouristSiteNewController::class, 'updateImageOrder'])->name('tourist-sites-new.images.order');
         
         // صفحة عرض جميع البيانات
         Route::get('/data-viewer', [TouristServiceController::class, 'dataViewer'])->name('data-viewer.index');
