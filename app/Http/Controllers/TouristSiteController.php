@@ -13,10 +13,6 @@ use Illuminate\Support\Facades\Log;
 
 class TouristSiteController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('web');
-    }
     /**
      * عرض قائمة المواقع السياحية
      */
