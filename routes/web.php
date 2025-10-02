@@ -57,7 +57,7 @@ Route::group([
         
         Route::resource('governorates', GovernorateController::class);
         Route::resource('wilayats', WilayatController::class);
-        Route::resource('tourist-sites', TouristSiteController::class);
+        Route::resource('tourist-sitesController', TouristSiteController::class);
         Route::resource('tourist-services', TouristServiceController::class);
         
         // روابط إضافية للخدمات السياحية

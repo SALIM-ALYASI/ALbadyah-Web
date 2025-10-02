@@ -11,11 +11,11 @@
         <p class="text-muted mb-0">عرض جميع معلومات الموقع السياحي</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('tourist-sites.edit', $touristSite->id) }}" class="btn btn-warning">
+        <a href="{{ route('tourist-sitesController.edit', $touristSite->id) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i>
             تعديل
         </a>
-        <a href="{{ route('tourist-sites.index') }}" class="btn btn-secondary">
+        <a href="{{ route('tourist-sitesController.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-right"></i>
             العودة للقائمة
         </a>
@@ -155,7 +155,7 @@
                             آخر تحديث: {{ $touristSite->updated_at->format('Y-m-d H:i:s') }}
                         </small>
                     </div>
-                    <form action="{{ route('tourist-sites.destroy', $touristSite->id) }}" 
+                    <form action="{{ route('tourist-sitesController.destroy', $touristSite->id) }}" 
                           method="POST" 
                           style="display: inline;" 
                           onsubmit="return confirmDelete()">

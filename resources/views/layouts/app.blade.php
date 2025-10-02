@@ -508,7 +508,7 @@
             </div>
            
             <div class="nav-item">
-                <a class="nav-link {{ request()->routeIs('tourist-sites.*') ? 'active' : '' }}" href="{{ route('tourist-sites.index') }}">
+                <a class="nav-link {{ request()->routeIs('tourist-sites.*') ? 'active' : '' }}" href="{{ route('tourist-sitesController.index') }}">
                     <i class="fas fa-map-marked-alt"></i>
                     المواقع السياحية  
                 </a>
