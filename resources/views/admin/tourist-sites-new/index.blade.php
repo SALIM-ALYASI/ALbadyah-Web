@@ -8,10 +8,17 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title">
-                        <i class="fas fa-map-marked-alt mr-2"></i>
-                        إدارة المواقع السياحية الجديدة
-                    </h3>
+                    <div>
+                        <h3 class="card-title">
+                            <i class="fas fa-map-marked-alt mr-2"></i>
+                            إدارة المواقع السياحية الجديدة
+                        </h3>
+                        @if(isset($totalSites) && isset($activeSites))
+                            <small class="text-muted">
+                                إجمالي المواقع: {{ $totalSites }} | المواقع النشطة: {{ $activeSites }}
+                            </small>
+                        @endif
+                    </div>
                     <div>
                         <a href="{{ route('tourist-sites-new.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus mr-1"></i>
@@ -108,9 +115,13 @@
                                     <tr>
                                         <td>{{ $loop->iteration + ($touristSites->currentPage() - 1) * $touristSites->perPage() }}</td>
                                         <td>
-                                            @if($site->featured_image)
-                                                <img src="{{ $site->featured_image }}" alt="{{ $site->name_ar }}" 
-                                                     class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                            @php
+                                                $imageUrl = \App\Helpers\ImageHelper::getImageUrl($site->getRawOriginal('featured_image'), null, 'images/default-tourist-site.jpg');
+                                            @endphp
+                                            @if($site->getRawOriginal('featured_image'))
+                                                <img src="{{ $imageUrl }}" alt="{{ $site->name_ar }}" 
+                                                     class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;"
+                                                     onerror="this.src='{{ asset('images/default-tourist-site.jpg') }}'; this.onerror=null;">
                                             @else
                                                 <div class="bg-light d-flex align-items-center justify-content-center" 
                                                      style="width: 60px; height: 60px;">
@@ -170,7 +181,15 @@
                                             <div class="py-4">
                                                 <i class="fas fa-map-marked-alt fa-3x text-muted mb-3"></i>
                                                 <h5 class="text-muted">لا توجد مواقع سياحية</h5>
-                                                <p class="text-muted">لم يتم العثور على أي مواقع سياحية تطابق معايير البحث</p>
+                                                @if(request()->hasAny(['search', 'governorate_id', 'wilayat_id', 'status']))
+                                                    <p class="text-muted">لم يتم العثور على أي مواقع سياحية تطابق معايير البحث المحددة</p>
+                                                    <a href="{{ route('tourist-sites-new.index') }}" class="btn btn-secondary mr-2">
+                                                        <i class="fas fa-times mr-1"></i>
+                                                        إزالة الفلاتر
+                                                    </a>
+                                                @else
+                                                    <p class="text-muted">لم يتم إضافة أي مواقع سياحية بعد</p>
+                                                @endif
                                                 <a href="{{ route('tourist-sites-new.create') }}" class="btn btn-primary">
                                                     <i class="fas fa-plus mr-1"></i>
                                                     إضافة موقع سياحي جديد

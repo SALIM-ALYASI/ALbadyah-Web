@@ -20,26 +20,31 @@ class TouristSiteNewController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = TouristSiteNew::with(['images', 'governorate', 'wilayat']);
+            // إنشاء الاستعلام مع تحميل العلاقات المطلوبة
+            $query = TouristSiteNew::with(['images' => function($query) {
+                $query->ordered()->take(1); // تحميل أول صورة فقط للأداء
+            }, 'governorate', 'wilayat']);
 
             // البحث
             if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where(function ($q) use ($search) {
-                    $q->where('name_ar', 'like', "%{$search}%")
-                      ->orWhere('name_en', 'like', "%{$search}%")
-                      ->orWhere('description_ar', 'like', "%{$search}%")
-                      ->orWhere('description_en', 'like', "%{$search}%");
-                });
+                $search = trim($request->search);
+                if (!empty($search)) {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('name_ar', 'like', "%{$search}%")
+                          ->orWhere('name_en', 'like', "%{$search}%")
+                          ->orWhere('description_ar', 'like', "%{$search}%")
+                          ->orWhere('description_en', 'like', "%{$search}%");
+                    });
+                }
             }
 
             // فلترة حسب المحافظة
-            if ($request->filled('governorate_id')) {
+            if ($request->filled('governorate_id') && is_numeric($request->governorate_id)) {
                 $query->where('governorate_id', $request->governorate_id);
             }
 
             // فلترة حسب الولاية
-            if ($request->filled('wilayat_id')) {
+            if ($request->filled('wilayat_id') && is_numeric($request->wilayat_id)) {
                 $query->where('wilayat_id', $request->wilayat_id);
             }
 
@@ -48,15 +53,32 @@ class TouristSiteNewController extends Controller
                 $query->where('is_active', $request->status === 'active');
             }
 
-            $touristSites = $query->latest()->paginate(15);
-            $governorates = Governorate::all();
-            $wilayats = Wilayat::all();
-
-            return view('admin.tourist-sites-new.index', compact('touristSites', 'governorates', 'wilayats'));
+            // الحصول على النتائج مع الترقيم
+            $touristSites = $query->latest('created_at')->paginate(15);
             
+            // تحميل بيانات الفلاتر
+            $governorates = Governorate::orderBy('name_ar')->get();
+            $wilayats = Wilayat::orderBy('name_ar')->get();
+
+            // إضافة معلومات إضافية للـ View
+            $totalSites = TouristSiteNew::count();
+            $activeSites = TouristSiteNew::where('is_active', true)->count();
+
+            return view('admin.tourist-sites-new.index', compact(
+                'touristSites', 
+                'governorates', 
+                'wilayats',
+                'totalSites',
+                'activeSites'
+            ));
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Database error in tourist sites index: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'حدث خطأ في قاعدة البيانات. يرجى المحاولة مرة أخرى.');
         } catch (\Exception $e) {
             Log::error('Error fetching tourist sites: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'حدث خطأ في جلب البيانات');
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return redirect()->back()->with('error', 'حدث خطأ غير متوقع في جلب البيانات. يرجى التحقق من سجلات النظام.');
         }
     }
 
@@ -370,8 +392,8 @@ class TouristSiteNewController extends Controller
                                ->firstOrFail();
 
         // حذف الصورة من التخزين
-        if ($image->image_path && \Storage::disk('public')->exists($image->image_path)) {
-            \Storage::disk('public')->delete($image->image_path);
+        if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
+            Storage::disk('public')->delete($image->image_path);
         }
 
         // حذف السجل من قاعدة البيانات
