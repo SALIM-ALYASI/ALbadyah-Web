@@ -123,7 +123,7 @@ class GovernorateApiController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $governorates,
-            ]);
+            ], 200, [], JSON_UNESCAPED_UNICODE);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
