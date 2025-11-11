@@ -3,12 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Visit;
+use App\Models\VisitAggregate;
+use App\Models\VisitLog;
+use App\Services\VisitTracker;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
+use Symfony\Component\HttpFoundation\Cookie;
 
 class VisitApiController extends Controller
 {
+    public function __construct(
+        private readonly VisitTracker $visitTracker
+    ) {
+        //
+    }
+
     /**
      * تسجيل زيارة جديدة
      */
@@ -16,25 +25,52 @@ class VisitApiController extends Controller
     {
         try {
             $validated = $request->validate([
-                'ip_address' => 'required|ip',
+                'ip_address' => 'nullable|ip',
                 'user_agent' => 'nullable|string|max:500',
-                'page_url' => 'nullable|string|max:500',
-                'referrer' => 'nullable|string|max:500',
+                'page_url' => 'nullable|string|max:255',
+                'referrer' => 'nullable|string|max:255',
                 'country' => 'nullable|string|max:100',
                 'city' => 'nullable|string|max:100',
+                'session_id' => 'nullable|uuid',
             ]);
 
-            $visit = Visit::create($validated);
+            $result = $this->visitTracker->track($request, [
+                'session_id' => $validated['session_id'] ?? null,
+                'ip' => $validated['ip_address'] ?? $request->ip(),
+                'user_agent' => $validated['user_agent'] ?? $request->userAgent(),
+                'country' => $validated['country'] ?? null,
+                'city' => $validated['city'] ?? null,
+                'path' => $validated['page_url'] ?? $request->path(),
+                'referer' => $validated['referrer'] ?? $request->headers->get('referer'),
+            ]);
 
-            return response()->json([
+            $response = response()->json([
                 'success' => true,
                 'message' => 'تم تسجيل الزيارة بنجاح',
                 'data' => [
-                    'id' => $visit->id,
-                    'ip_address' => $visit->ip_address,
-                    'created_at' => $visit->created_at,
+                    'id' => $result['log']->id,
+                    'session_id' => $result['session_id'],
+                    'is_unique' => $result['is_unique'],
+                    'visited_at' => $result['log']->visited_at,
                 ]
             ], 201);
+
+            if ($result['is_new_session']) {
+                $cookie = new Cookie(
+                    name: 'visit_session',
+                    value: $result['session_id'],
+                    expire: now()->addDays(30),
+                    path: '/',
+                    secure: false,
+                    httpOnly: false,
+                    raw: false,
+                    sameSite: Cookie::SAMESITE_LAX
+                );
+
+                $response->headers->setCookie($cookie);
+            }
+
+            return $response;
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -50,43 +86,39 @@ class VisitApiController extends Controller
     public function stats(Request $request)
     {
         try {
-            $period = $request->get('period', '30'); // days
-            $startDate = now()->subDays($period);
+            $period = max((int) $request->get('period', 30), 1);
+            $startDate = Carbon::now()->subDays($period);
 
             $stats = [
-                'total_visits' => Visit::count(),
-                'period_visits' => Visit::where('created_at', '>=', $startDate)->count(),
-                'unique_visitors' => Visit::distinct('ip_address')->count(),
-                'period_unique_visitors' => Visit::where('created_at', '>=', $startDate)
-                    ->distinct('ip_address')->count(),
+                'total_visits' => VisitLog::count(),
+                'period_visits' => VisitLog::where('visited_at', '>=', $startDate)->count(),
+                'unique_visitors' => VisitLog::distinct('fingerprint')->count('fingerprint'),
+                'period_unique_visitors' => VisitLog::where('visited_at', '>=', $startDate)
+                    ->distinct('fingerprint')->count('fingerprint'),
             ];
 
             // إحصائيات حسب البلدان
-            $countryStats = Visit::select('country', DB::raw('count(*) as visits'))
+            $countryStats = VisitAggregate::selectRaw('country, SUM(visits_count) as visits')
                 ->whereNotNull('country')
-                ->where('created_at', '>=', $startDate)
+                ->where('date', '>=', $startDate->toDateString())
                 ->groupBy('country')
                 ->orderByDesc('visits')
                 ->limit(10)
                 ->get();
 
             // إحصائيات حسب الصفحات
-            $pageStats = Visit::select('page_url', DB::raw('count(*) as visits'))
-                ->whereNotNull('page_url')
-                ->where('created_at', '>=', $startDate)
-                ->groupBy('page_url')
+            $pageStats = VisitAggregate::selectRaw('path, SUM(visits_count) as visits')
+                ->whereNotNull('path')
+                ->where('date', '>=', $startDate->toDateString())
+                ->groupBy('path')
                 ->orderByDesc('visits')
                 ->limit(10)
                 ->get();
 
             // إحصائيات يومية للفترة المحددة
-            $dailyStats = Visit::select(
-                    DB::raw('DATE(created_at) as date'),
-                    DB::raw('count(*) as visits'),
-                    DB::raw('count(DISTINCT ip_address) as unique_visitors')
-                )
-                ->where('created_at', '>=', $startDate)
-                ->groupBy(DB::raw('DATE(created_at)'))
+            $dailyStats = VisitAggregate::selectRaw('date, SUM(visits_count) as visits, SUM(unique_visits_count) as unique_visitors')
+                ->where('date', '>=', $startDate->toDateString())
+                ->groupBy('date')
                 ->orderBy('date')
                 ->get();
 
@@ -117,8 +149,8 @@ class VisitApiController extends Controller
     public function total()
     {
         try {
-            $total = Visit::count();
-            $unique = Visit::distinct('ip_address')->count();
+            $total = VisitLog::count();
+            $unique = VisitLog::distinct('fingerprint')->count('fingerprint');
 
             return response()->json([
                 'success' => true,
@@ -142,49 +174,39 @@ class VisitApiController extends Controller
     public function adminStats(Request $request)
     {
         try {
-            $period = $request->get('period', '30');
-            $startDate = now()->subDays($period);
+            $period = max((int) $request->get('period', 30), 1);
+            $startDate = Carbon::now()->subDays($period);
 
             // إحصائيات شاملة
             $overview = [
-                'total_visits' => Visit::count(),
-                'period_visits' => Visit::where('created_at', '>=', $startDate)->count(),
-                'unique_visitors' => Visit::distinct('ip_address')->count(),
-                'period_unique_visitors' => Visit::where('created_at', '>=', $startDate)
-                    ->distinct('ip_address')->count(),
-                'avg_visits_per_day' => Visit::where('created_at', '>=', $startDate)
-                    ->selectRaw('COUNT(*) / ? as avg_visits', [$period])
+                'total_visits' => VisitLog::count(),
+                'period_visits' => VisitLog::where('visited_at', '>=', $startDate)->count(),
+                'unique_visitors' => VisitLog::distinct('fingerprint')->count('fingerprint'),
+                'period_unique_visitors' => VisitLog::where('visited_at', '>=', $startDate)
+                    ->distinct('fingerprint')->count('fingerprint'),
+                'avg_visits_per_day' => VisitAggregate::where('date', '>=', $startDate->toDateString())
+                    ->selectRaw('SUM(visits_count) / ? as avg_visits', [$period])
                     ->value('avg_visits'),
             ];
 
             // إحصائيات حسب الساعة
-            $hourlyStats = Visit::select(
-                    DB::raw('HOUR(created_at) as hour'),
-                    DB::raw('count(*) as visits')
-                )
-                ->where('created_at', '>=', $startDate)
-                ->groupBy(DB::raw('HOUR(created_at)'))
+            $hourlyStats = VisitLog::selectRaw('HOUR(visited_at) as hour, COUNT(*) as visits')
+                ->where('visited_at', '>=', $startDate)
+                ->groupBy('hour')
                 ->orderBy('hour')
                 ->get();
 
             // إحصائيات حسب اليوم في الأسبوع
-            $weeklyStats = Visit::select(
-                    DB::raw('DAYOFWEEK(created_at) as day_of_week'),
-                    DB::raw('count(*) as visits')
-                )
-                ->where('created_at', '>=', $startDate)
-                ->groupBy(DB::raw('DAYOFWEEK(created_at)'))
+            $weeklyStats = VisitLog::selectRaw('DAYOFWEEK(visited_at) as day_of_week, COUNT(*) as visits')
+                ->where('visited_at', '>=', $startDate)
+                ->groupBy('day_of_week')
                 ->orderBy('day_of_week')
                 ->get();
 
             // إحصائيات حسب الشهر
-            $monthlyStats = Visit::select(
-                    DB::raw('MONTH(created_at) as month'),
-                    DB::raw('YEAR(created_at) as year'),
-                    DB::raw('count(*) as visits')
-                )
-                ->where('created_at', '>=', $startDate)
-                ->groupBy(DB::raw('MONTH(created_at)'), DB::raw('YEAR(created_at)'))
+            $monthlyStats = VisitLog::selectRaw('MONTH(visited_at) as month, YEAR(visited_at) as year, COUNT(*) as visits')
+                ->where('visited_at', '>=', $startDate)
+                ->groupBy('year', 'month')
                 ->orderBy('year')
                 ->orderBy('month')
                 ->get();
@@ -215,27 +237,26 @@ class VisitApiController extends Controller
     {
         try {
             $format = $request->get('format', 'json'); // json, csv
-            $period = $request->get('period', '30');
-            $startDate = now()->subDays($period);
+            $period = max((int) $request->get('period', '30'), 1);
+            $startDate = Carbon::now()->subDays($period);
 
-            $visits = Visit::where('created_at', '>=', $startDate)
-                ->orderBy('created_at', 'desc')
+            $visits = VisitLog::where('visited_at', '>=', $startDate)
+                ->orderBy('visited_at', 'desc')
                 ->get();
 
             if ($format === 'csv') {
-                $csvData = "ID,IP Address,Country,City,Page URL,Referrer,User Agent,Created At\n";
+                $csvData = "ID,Country,City,Path,Referrer,Is Unique,Visited At\n";
                 
                 foreach ($visits as $visit) {
                     $csvData .= sprintf(
-                        "%d,%s,%s,%s,%s,%s,%s,%s\n",
+                        "%d,%s,%s,%s,%s,%s,%s\n",
                         $visit->id,
-                        $visit->ip_address,
                         $visit->country ?? '',
                         $visit->city ?? '',
-                        $visit->page_url ?? '',
-                        $visit->referrer ?? '',
-                        str_replace(',', ';', $visit->user_agent ?? ''),
-                        $visit->created_at->format('Y-m-d H:i:s')
+                        $visit->path ?? '',
+                        $visit->referer ?? '',
+                        $visit->is_unique ? 'yes' : 'no',
+                        $visit->visited_at?->format('Y-m-d H:i:s')
                     );
                 }
 

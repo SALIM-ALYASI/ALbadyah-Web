@@ -35,5 +35,9 @@ return [
         ],
     ],
 
+    'visits' => [
+        'duplicate_window_minutes' => (int) env('VISIT_DUPLICATE_WINDOW_MINUTES', 60 * 24),
+    ],
+
 
 ];

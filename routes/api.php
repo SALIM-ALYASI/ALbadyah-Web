@@ -31,6 +31,7 @@ Route::prefix('v1')->group(function () {
     
     // Governorates API
     Route::get('/governorates', [GovernorateApiController::class, 'index']);
+    Route::get('/governorates/hierarchy', [GovernorateApiController::class, 'hierarchy']);
     Route::get('/governorates/{identifier}', [GovernorateApiController::class, 'show']);
     Route::get('/governorates/{identifier}/wilayats', [GovernorateApiController::class, 'wilayats']);
     Route::get('/governorates/{identifier}/tourist-sites', [GovernorateApiController::class, 'touristSites']);

@@ -2,183 +2,243 @@
 
 namespace App\Helpers;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 class ImageHelper
 {
     /**
-     * الحصول على رابط الصورة
+     * تخزين ملف مرفوع في التخزين العام.
+     */
+    public static function storeUploadedImage(UploadedFile $image, string $directory, ?string $oldPath = null): string
+    {
+        if ($oldPath) {
+            self::deleteImage($oldPath);
+        }
+
+        return $image->store($directory, ['disk' => 'public']);
+    }
+
+    /**
+     * تخزين صورة ممررة كنص Base64.
      *
-     * @param string|null $imagePath
-     * @param string|null $imageUrl
-     * @param string $defaultImage
-     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public static function storeBase64Image(string $base64Image, string $directory, ?string $oldPath = null): string
+    {
+        if ($oldPath) {
+            self::deleteImage($oldPath);
+        }
+
+        if (preg_match('/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/', $base64Image, $matches) !== 1) {
+            throw new \InvalidArgumentException('الصورة المرسلة ليست بصيغة base64 صحيحة.');
+        }
+
+        $mimeType = $matches[1];
+        $encodedData = $matches[2];
+
+        $extension = self::extensionFromMime($mimeType);
+        if (!$extension) {
+            throw new \InvalidArgumentException('نوع الصورة غير مدعوم.');
+        }
+
+        $binaryData = base64_decode($encodedData, true);
+        if ($binaryData === false) {
+            throw new \InvalidArgumentException('تعذر فك تشفير الصورة.');
+        }
+
+        $directory = trim($directory, '/');
+        $filename = Str::uuid() . '.' . $extension;
+        $path = $directory ? "{$directory}/{$filename}" : $filename;
+
+        Storage::disk('public')->put($path, $binaryData);
+
+        return $path;
+    }
+
+    /**
+     * الحصول على رابط الصورة.
      */
     public static function getImageUrl($imagePath = null, $imageUrl = null, $defaultImage = 'images/default-placeholder.jpg')
     {
-        // إذا كان هناك مسار صورة محفوظة محلياً
+        $imagePath = self::normalizePath($imagePath);
+
+        if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+            return Storage::disk('public')->url($imagePath);
+        }
+
         if ($imagePath && file_exists(public_path($imagePath))) {
             return asset($imagePath);
         }
-        
-        // إذا كان هناك مسار صورة في storage (للتوافق مع النظام القديم)
+
         if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
             return asset('storage/' . $imagePath);
         }
-        
-        // إذا كان هناك رابط صورة خارجي
+
         if ($imageUrl && filter_var($imageUrl, FILTER_VALIDATE_URL)) {
-            // تصحيح URL إذا كان يحتوي على localhost
-            $correctedUrl = self::correctImageUrl($imageUrl);
-            return $correctedUrl;
+            return self::correctImageUrl($imageUrl);
         }
-        
-        // إرجاع الصورة الافتراضية
+
         return asset($defaultImage);
     }
-    
+
     /**
-     * تصحيح URL الصورة
-     *
-     * @param string $imageUrl
-     * @return string
+     * تصحيح رابط الصورة الخارجي.
      */
     public static function correctImageUrl($imageUrl)
     {
-        // إذا كان URL يحتوي على localhost أو 127.0.0.1، نستخرج المسار النسبي
         if (strpos($imageUrl, 'localhost') !== false || strpos($imageUrl, '127.0.0.1') !== false) {
-            // البحث عن /storage/ في URL
             if (preg_match('/\/storage\/(.+)$/', $imageUrl, $matches)) {
                 return asset('storage/' . $matches[1]);
             }
         }
-        
-        // استخراج المسار النسبي من URL
+
         $parsedUrl = parse_url($imageUrl);
-        
+
         if (isset($parsedUrl['path'])) {
-            // إزالة /storage/ من البداية إذا كان موجوداً
             $path = ltrim($parsedUrl['path'], '/');
             if (strpos($path, 'storage/') === 0) {
-                $path = substr($path, 8); // إزالة 'storage/'
+                $path = substr($path, 8);
             }
-            
-            // إنشاء URL جديد باستخدام asset()
+
             return asset('storage/' . $path);
         }
-        
+
         return $imageUrl;
     }
-    
+
     /**
-     * التحقق من وجود الصورة
-     *
-     * @param string|null $imagePath
-     * @param string|null $imageUrl
-     * @return bool
+     * التحقق من وجود الصورة.
      */
     public static function hasImage($imagePath = null, $imageUrl = null)
     {
+        $imagePath = self::normalizePath($imagePath);
+
+        if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+            return true;
+        }
+
         if ($imagePath && file_exists(public_path($imagePath))) {
             return true;
         }
-        
+
         if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
             return true;
         }
-        
+
         if ($imageUrl && filter_var($imageUrl, FILTER_VALIDATE_URL)) {
-            // التحقق من وجود الملف في storage
-            $parsedUrl = parse_url($imageUrl);
-            if (isset($parsedUrl['path'])) {
-                $path = ltrim($parsedUrl['path'], '/');
-                if (strpos($path, 'storage/') === 0) {
-                    $relativePath = substr($path, 8); // إزالة 'storage/'
-                    return file_exists(storage_path('app/public/' . $relativePath));
-                }
-            }
-            return true; // افتراض وجود الصورة إذا كان URL صحيح
+            return true;
         }
-        
+
         return false;
     }
-    
+
     /**
-     * الحصول على معلومات الصورة
-     *
-     * @param string|null $imagePath
-     * @param string|null $imageUrl
-     * @return array
+     * الحصول على معلومات الصورة.
      */
     public static function getImageInfo($imagePath = null, $imageUrl = null)
     {
+        $imagePath = self::normalizePath($imagePath);
+
         $info = [
             'url' => self::getImageUrl($imagePath, $imageUrl),
             'has_image' => self::hasImage($imagePath, $imageUrl),
             'type' => null,
             'size' => null,
-            'alt' => 'صورة المحافظة'
+            'alt' => 'صورة المحافظة',
         ];
-        
-        if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
+
+        if ($imagePath && Storage::disk('public')->exists($imagePath)) {
             $info['type'] = 'local';
-            $info['size'] = filesize(storage_path('app/public/' . $imagePath));
+            $info['size'] = Storage::disk('public')->size($imagePath);
         } elseif ($imageUrl) {
             $info['type'] = 'external';
         }
-        
+
         return $info;
     }
-    
+
     /**
-     * حذف الصورة المحلية
-     *
-     * @param string $imagePath
-     * @return bool
+     * حذف الصورة من التخزين.
      */
-    public static function deleteImage($imagePath)
+    public static function deleteImage(?string $imagePath): bool
     {
-        if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
-            return unlink(storage_path('app/public/' . $imagePath));
+        $imagePath = self::normalizePath($imagePath);
+
+        $deleted = false;
+
+        if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+            $deleted = Storage::disk('public')->delete($imagePath) || $deleted;
         }
-        
-        return false;
+
+        if ($imagePath && file_exists(public_path($imagePath))) {
+            $deleted = @unlink(public_path($imagePath)) || $deleted;
+        }
+
+        if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
+            $deleted = @unlink(storage_path('app/public/' . $imagePath)) || $deleted;
+        }
+
+        return $deleted;
     }
-    
+
     /**
-     * إنشاء صورة افتراضية
-     *
-     * @param string $text
-     * @param int $width
-     * @param int $height
-     * @return string
+     * إنشاء صورة افتراضية.
      */
-    public static function createDefaultImage($text = 'صورة غير متوفرة', $width = 300, $height = 200)
+    public static function createDefaultImage($text = 'صورة غير متوفرة', $width = 300, $height = 200): string
     {
-        // إنشاء صورة افتراضية باستخدام GD
         $image = imagecreate($width, $height);
         $bgColor = imagecolorallocate($image, 240, 240, 240);
         $textColor = imagecolorallocate($image, 100, 100, 100);
-        
-        // إضافة النص
-        $font = 5; // خط افتراضي
+
+        $font = 5;
         $textWidth = imagefontwidth($font) * strlen($text);
         $textHeight = imagefontheight($font);
         $x = ($width - $textWidth) / 2;
         $y = ($height - $textHeight) / 2;
-        
+
         imagestring($image, $font, $x, $y, $text, $textColor);
-        
-        // حفظ الصورة
-        $filename = 'default_' . time() . '.png';
-        $path = storage_path('app/public/images/defaults/' . $filename);
-        
-        // إنشاء المجلد إذا لم يكن موجوداً
-        if (!file_exists(dirname($path))) {
-            mkdir(dirname($path), 0755, true);
+
+        $filename = 'defaults/default_' . time() . '.png';
+        $fullPath = storage_path('app/public/' . $filename);
+
+        if (!is_dir(dirname($fullPath))) {
+            mkdir(dirname($fullPath), 0755, true);
         }
-        
-        imagepng($image, $path);
+
+        imagepng($image, $fullPath);
         imagedestroy($image);
-        
-        return 'images/defaults/' . $filename;
+
+        return $filename;
+    }
+
+    /**
+     * تطبيع المسار ليتوافق مع التخزين العام.
+     */
+    public static function normalizePath(?string $path): ?string
+    {
+        if (!$path) {
+            return null;
+        }
+
+        $path = ltrim($path, '/');
+
+        if (strpos($path, 'storage/') === 0) {
+            $path = substr($path, 8);
+        }
+
+        return $path;
+    }
+
+    protected static function extensionFromMime(string $mimeType): ?string
+    {
+        return match ($mimeType) {
+            'image/jpeg', 'image/jpg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
+            default => null,
+        };
     }
 }

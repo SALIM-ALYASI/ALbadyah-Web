@@ -71,6 +71,69 @@ class GovernorateApiController extends Controller
     }
 
     /**
+     * هيكل كامل للمحافظات مع ولاياتها والمواقع السياحية.
+     */
+    public function hierarchy()
+    {
+        try {
+            $governorates = Governorate::with([
+                'touristSites.images',
+                'wilayats.touristSites.images',
+            ])->get()->map(function (Governorate $governorate) {
+                return [
+                    'id' => $governorate->id,
+                    'name_ar' => $governorate->name_ar,
+                    'name_en' => $governorate->name_en,
+                    'slug' => $governorate->slug,
+                    'description_ar' => $governorate->description_ar,
+                    'description_en' => $governorate->description_en,
+                    'tourist_sites' => $governorate->touristSites->map(function ($site) {
+                        return [
+                            'id' => $site->id,
+                            'name_ar' => $site->name_ar,
+                            'name_en' => $site->name_en,
+                            'slug' => $site->slug,
+                            'description_ar' => $site->description_ar,
+                            'description_en' => $site->description_en,
+                            'featured_image' => $site->featured_image,
+                        ];
+                    }),
+                    'wilayats' => $governorate->wilayats->map(function ($wilayat) {
+                        return [
+                            'id' => $wilayat->id,
+                            'name_ar' => $wilayat->name_ar,
+                            'name_en' => $wilayat->name_en,
+                            'slug' => $wilayat->slug,
+                            'tourist_sites' => $wilayat->touristSites->map(function ($site) {
+                                return [
+                                    'id' => $site->id,
+                                    'name_ar' => $site->name_ar,
+                                    'name_en' => $site->name_en,
+                                    'slug' => $site->slug,
+                                    'description_ar' => $site->description_ar,
+                                    'description_en' => $site->description_en,
+                                    'featured_image' => $site->featured_image,
+                                ];
+                            }),
+                        ];
+                    }),
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $governorates,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ في جلب البيانات',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * عرض محافظة محددة
      */
     public function show($identifier)

@@ -17,27 +17,53 @@ class SearchApiController extends Controller
     public function search(Request $request)
     {
         try {
-            $query = $request->get('q', '');
+            $query = trim($request->get('q', ''));
             $type = $request->get('type', 'all'); // all, sites, services
             $governorate_id = $request->get('governorate_id');
             $wilayat_id = $request->get('wilayat_id');
-            $perPage = $request->get('per_page', 15);
+            $perPage = (int) $request->get('per_page', 15);
 
             $results = [
-                'sites' => collect(),
-                'services' => collect(),
-                'total_results' => 0
+                'sites' => [
+                    'data' => [],
+                    'pagination' => null,
+                ],
+                'services' => [
+                    'data' => [],
+                    'pagination' => null,
+                ],
+                'total_results' => 0,
             ];
 
-            if ($query) {
+            $transformPaginated = function ($paginator, string $resourceClass) use ($request) {
+                if (!$paginator) {
+                    return ['data' => [], 'pagination' => null];
+                }
+
+                $data = collect($paginator->items())->map(
+                    fn ($item) => (new $resourceClass($item))->toArray($request)
+                );
+
+                return [
+                    'data' => $data,
+                    'pagination' => [
+                        'total' => $paginator->total(),
+                        'per_page' => $paginator->perPage(),
+                        'current_page' => $paginator->currentPage(),
+                        'last_page' => $paginator->lastPage(),
+                    ],
+                ];
+            };
+
+            if ($query !== '') {
                 // البحث في المواقع السياحية
                 if ($type === 'all' || $type === 'sites') {
                     $sitesQuery = TouristSite::with(['governorate', 'wilayat', 'images'])
                         ->where(function ($q) use ($query) {
-                            $q->where('name_ar', 'like', "%$query%")
-                               ->orWhere('name_en', 'like', "%$query%")
-                               ->orWhere('description_ar', 'like', "%$query%")
-                               ->orWhere('description_en', 'like', "%$query%");
+                            $q->where('name_ar', 'like', "%{$query}%")
+                               ->orWhere('name_en', 'like', "%{$query}%")
+                               ->orWhere('description_ar', 'like', "%{$query}%")
+                               ->orWhere('description_en', 'like', "%{$query}%");
                         });
 
                     if ($governorate_id) {
@@ -49,15 +75,15 @@ class SearchApiController extends Controller
                     }
 
                     $sites = $sitesQuery->paginate($perPage);
-                    $results['sites'] = TouristSiteResource::collection($sites);
+                    $results['sites'] = $transformPaginated($sites, TouristSiteResource::class);
                 }
 
                 // البحث في الخدمات السياحية
                 if ($type === 'all' || $type === 'services') {
                     $servicesQuery = TouristService::with(['serviceType', 'governorate', 'wilayat'])
                         ->where(function ($q) use ($query) {
-                            $q->where('name_ar', 'like', "%$query%")
-                               ->orWhere('name_en', 'like', "%$query%");
+                            $q->where('name_ar', 'like', "%{$query}%")
+                               ->orWhere('name_en', 'like', "%{$query}%");
                         });
 
                     if ($governorate_id) {
@@ -69,10 +95,12 @@ class SearchApiController extends Controller
                     }
 
                     $services = $servicesQuery->paginate($perPage);
-                    $results['services'] = TouristServiceResource::collection($services);
+                    $results['services'] = $transformPaginated($services, TouristServiceResource::class);
                 }
 
-                $results['total_results'] = $results['sites']->count() + $results['services']->count();
+                $totalSites = $results['sites']['pagination']['total'] ?? 0;
+                $totalServices = $results['services']['pagination']['total'] ?? 0;
+                $results['total_results'] = $totalSites + $totalServices;
             }
 
             return response()->json([
@@ -83,7 +111,7 @@ class SearchApiController extends Controller
                     'type' => $type,
                     'governorate_id' => $governorate_id,
                     'wilayat_id' => $wilayat_id,
-                ]
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json([

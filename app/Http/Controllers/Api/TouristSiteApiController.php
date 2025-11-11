@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TouristSiteResource;
 use App\Models\TouristSite;
@@ -163,7 +164,16 @@ class TouristSiteApiController extends Controller
                 'website' => 'nullable|url',
                 'opening_hours' => 'nullable|string',
                 'entry_fee' => 'nullable|numeric',
+                'featured_image_base64' => 'nullable|string',
             ]);
+
+            if (!empty($validated['featured_image_base64'])) {
+                $validated['featured_image'] = ImageHelper::storeBase64Image(
+                    $validated['featured_image_base64'],
+                    'tourist-sites/featured'
+                );
+                unset($validated['featured_image_base64']);
+            }
 
             $site = TouristSite::create($validated);
 
@@ -205,7 +215,17 @@ class TouristSiteApiController extends Controller
                 'website' => 'nullable|url',
                 'opening_hours' => 'nullable|string',
                 'entry_fee' => 'nullable|numeric',
+                'featured_image_base64' => 'nullable|string',
             ]);
+
+            if (!empty($validated['featured_image_base64'])) {
+                $validated['featured_image'] = ImageHelper::storeBase64Image(
+                    $validated['featured_image_base64'],
+                    'tourist-sites/featured',
+                    $site->getRawOriginal('featured_image')
+                );
+                unset($validated['featured_image_base64']);
+            }
 
             $site->update($validated);
 

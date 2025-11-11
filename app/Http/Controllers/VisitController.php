@@ -2,53 +2,62 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\VisitAggregate;
+use App\Models\VisitLog;
+use App\Services\VisitTracker;
 use Illuminate\Http\Request;
-use App\Models\SaveVisit;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Cookie;
 
 class VisitController extends Controller
 {
+    public function __construct(
+        private readonly VisitTracker $visitTracker
+    ) {
+        //
+    }
+
     /**
      * حفظ زيارة جديدة
      */
     public function saveVisit(Request $request)
     {
         try {
-            // التحقق من وجود session لتجنب العد المكرر
-            if (session()->has('visit_recorded_' . $request->ip())) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Visit already recorded for this session'
-                ]);
-            }
+            $result = $this->visitTracker->track($request);
 
-            // جلب معلومات الموقع من الطلب
-            $country = $request->input('country', 'Unknown');
-            $city = $request->input('city', 'Unknown');
-            
-            // حفظ الزيارة
-            $visit = SaveVisit::create([
-                'country' => $country,
-                'city' => $city
-            ]);
-
-            // تسجيل session لتجنب العد المكرر
-            session(['visit_recorded_' . $request->ip() => true]);
-
-            // تسجيل في اللوج
             Log::info('New visit recorded', [
-                'id' => $visit->id,
-                'country' => $country,
-                'city' => $city,
-                'ip' => $request->ip(),
-                'user_agent' => $request->userAgent()
+                'id' => $result['log']->id,
+                'country' => $result['log']->country,
+                'city' => $result['log']->city,
+                'path' => $result['log']->path,
+                'ip_hash' => $result['log']->ip_hash,
+                'session_id' => $result['log']->session_id,
+                'is_unique' => $result['is_unique'],
             ]);
 
-            return response()->json([
+            $response = response()->json([
                 'success' => true,
                 'message' => 'Visit recorded successfully',
-                'visit_id' => $visit->id
+                'visit_id' => $result['log']->id,
+                'is_unique' => $result['is_unique'],
             ]);
+
+            if ($result['is_new_session']) {
+                $cookie = new Cookie(
+                    name: 'visit_session',
+                    value: $result['session_id'],
+                    expire: now()->addDays(30),
+                    path: '/',
+                    secure: false,
+                    httpOnly: false,
+                    raw: false,
+                    sameSite: Cookie::SAMESITE_LAX
+                );
+
+                $response->headers->setCookie($cookie);
+            }
+
+            return $response;
 
         } catch (\Exception $e) {
             Log::error('Error recording visit', [
@@ -69,22 +78,24 @@ class VisitController extends Controller
     public function getStats()
     {
         try {
-            $totalVisits = SaveVisit::count();
-            
-            $visitsByCountry = SaveVisit::selectRaw('country, COUNT(*) as count')
+            $totalVisits = VisitLog::count();
+            $visitsByCountry = VisitAggregate::selectRaw('country, SUM(visits_count) as count')
+                ->whereNotNull('country')
                 ->groupBy('country')
-                ->orderBy('count', 'desc')
+                ->orderByDesc('count')
+                ->limit(10)
                 ->get();
 
-            $visitsByCity = SaveVisit::selectRaw('city, COUNT(*) as count')
+            $visitsByCity = VisitAggregate::selectRaw('city, SUM(visits_count) as count')
+                ->whereNotNull('city')
                 ->groupBy('city')
-                ->orderBy('count', 'desc')
+                ->orderByDesc('count')
                 ->limit(10)
                 ->get();
 
-            $recentVisits = SaveVisit::latest()
+            $recentVisits = VisitLog::latest('visited_at')
                 ->limit(10)
-                ->get();
+                ->get(['id', 'country', 'city', 'path', 'visited_at', 'is_unique']);
 
             return response()->json([
                 'success' => true,
@@ -114,7 +125,7 @@ class VisitController extends Controller
     public function getTotalVisits()
     {
         try {
-            $totalVisits = SaveVisit::count();
+            $totalVisits = VisitAggregate::sum('visits_count');
             
             return response()->json([
                 'success' => true,
@@ -124,7 +135,7 @@ class VisitController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'total_visits' => 0
+                'total_visits' => VisitAggregate::sum('visits_count')
             ]);
         }
     }
