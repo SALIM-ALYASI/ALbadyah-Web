@@ -16,7 +16,8 @@
     .needs_review { background:#fff4e5; color:#9a3412; }
     .rejected { background:#fef3f2; color:#b42318; }
     label.field { display:block; font-size:13px; color:#344054; margin:14px 0 4px; }
-    textarea { width:100%; box-sizing:border-box; border:1px solid #d0d5dd; border-radius:6px; padding:8px; font-family:inherit; font-size:13px; }
+    textarea, select { width:100%; box-sizing:border-box; border:1px solid #d0d5dd; border-radius:6px; padding:8px; font-family:inherit; font-size:13px; }
+    .wilayat-hint { color:#98a2b3; font-size:12px; margin-top:4px; }
     .checkbox-row { display:flex; align-items:flex-start; gap:8px; margin-top:14px; font-size:13px; color:#344054; }
     .expiry { color:#98a2b3; font-size:12px; margin-top:16px; }
     button.confirm { margin-top:18px; width:100%; padding:12px; border:0; border-radius:6px; background:#0b1f3a; color:#fff; font-size:15px; font-weight:bold; cursor:pointer; }
@@ -37,6 +38,17 @@
 
     <form method="POST" action="{{ $confirmUrl }}">
         @csrf
+
+        @if (!$record->wilayat_id && $wilayatOptions->isNotEmpty())
+            <label class="field" for="wilayat_id">الولاية (غير معروفة من المصدر — حدّدها فقط لو تعرفها فعليًا)</label>
+            <select id="wilayat_id" name="wilayat_id">
+                <option value="">— بدون تحديد (يبقى needs_review) —</option>
+                @foreach ($wilayatOptions as $wilayat)
+                    <option value="{{ $wilayat->id }}">{{ $wilayat->name_ar }} / {{ $wilayat->name_en }}</option>
+                @endforeach
+            </select>
+            <p class="wilayat-hint">لا تخمّن — اختر فقط لو متأكد من الموقع الجغرافي الفعلي.</p>
+        @endif
 
         @if ($record->name_ar_source !== 'official')
             <div class="checkbox-row">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TouristService;
 use App\Models\TouristSite;
 use App\Models\VerificationLog;
+use App\Models\Wilayat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
@@ -53,11 +54,18 @@ class BadyahReviewController extends Controller
             'intent' => $intent,
         ]);
 
+        // الولاية غير معروفة من المصدر لهذه السجلات — نعرض قائمة ولايات نفس
+        // المحافظة حتى يحددها المراجع البشري بمعرفته الفعلية (مو تخمين AI).
+        $wilayatOptions = $record->wilayat_id
+            ? collect()
+            : Wilayat::where('governorate_id', $record->governorate_id)->orderBy('name_ar')->get();
+
         return view('badyah.review-confirm', [
             'record' => $record,
             'intent' => $intent,
             'confirmUrl' => $confirmUrl,
             'expiresAt' => $expires,
+            'wilayatOptions' => $wilayatOptions,
         ]);
     }
 
@@ -82,6 +90,23 @@ class BadyahReviewController extends Controller
         $record->verification_status = $intent;
         $record->reviewed_by = $reviewer;
         $record->reviewed_at = now();
+
+        // الولاية: يُقبل فقط إذا اختارها المراجع صراحة من قائمة ولايات نفس
+        // المحافظة (لا قيمة حرة، لا تخمين) — تصحيح معرفة بشرية حقيقية.
+        $selectedWilayatId = $request->input('wilayat_id');
+        if (!$record->wilayat_id && $selectedWilayatId) {
+            $validWilayat = Wilayat::where('id', $selectedWilayatId)
+                ->where('governorate_id', $record->governorate_id)
+                ->exists();
+
+            if ($validWilayat) {
+                $record->wilayat_id = $selectedWilayatId;
+                $record->needs_review_fields = collect($record->needs_review_fields)
+                    ->reject(fn ($f) => $f === 'wilayat_id')
+                    ->values()
+                    ->all();
+            }
+        }
 
         // الاعتماد العام للسجل شيء، وتأكيد صحة الاسم العربي الرسمي شيء آخر تمامًا.
         // name_ar_verified لا يتغيّر تلقائيًا لمجرد approved — فقط إذا أكّده المراجع صراحة.
