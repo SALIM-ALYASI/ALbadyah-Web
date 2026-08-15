@@ -59,6 +59,7 @@ class SearchApiController extends Controller
                 // البحث في المواقع السياحية
                 if ($type === 'all' || $type === 'sites') {
                     $sitesQuery = TouristSite::with(['governorate', 'wilayat', 'images'])
+                        ->publiclyVisible()
                         ->where(function ($q) use ($query) {
                             $q->where('name_ar', 'like', "%{$query}%")
                                ->orWhere('name_en', 'like', "%{$query}%")
@@ -81,6 +82,7 @@ class SearchApiController extends Controller
                 // البحث في الخدمات السياحية
                 if ($type === 'all' || $type === 'services') {
                     $servicesQuery = TouristService::with(['serviceType', 'governorate', 'wilayat'])
+                        ->publiclyVisible()
                         ->where(function ($q) use ($query) {
                             $q->where('name_ar', 'like', "%{$query}%")
                                ->orWhere('name_en', 'like', "%{$query}%");
@@ -133,7 +135,7 @@ class SearchApiController extends Controller
             $wilayat_id = $request->get('wilayat_id');
             $perPage = $request->get('per_page', 15);
 
-            $sitesQuery = TouristSite::with(['governorate', 'wilayat', 'images']);
+            $sitesQuery = TouristSite::with(['governorate', 'wilayat', 'images'])->publiclyVisible();
 
             if ($query) {
                 $sitesQuery->where(function ($q) use ($query) {
@@ -190,7 +192,7 @@ class SearchApiController extends Controller
             $wilayat_id = $request->get('wilayat_id');
             $perPage = $request->get('per_page', 15);
 
-            $servicesQuery = TouristService::with(['serviceType', 'governorate', 'wilayat']);
+            $servicesQuery = TouristService::with(['serviceType', 'governorate', 'wilayat'])->publiclyVisible();
 
             if ($query) {
                 $servicesQuery->where(function ($q) use ($query) {

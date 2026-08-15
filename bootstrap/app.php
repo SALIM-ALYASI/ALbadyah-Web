@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin.auth' => \App\Http\Middleware\AdminAuthMiddleware::class,
             'cors' => \App\Http\Middleware\CorsMiddleware::class,
+            'badyah.bot' => \App\Http\Middleware\BadyahBotAuthMiddleware::class,
         ]);
         
         // Apply CORS middleware to API routes

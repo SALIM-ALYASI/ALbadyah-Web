@@ -109,7 +109,7 @@ class WilayatApiController extends Controller
                       ->orWhere('slug', $identifier);
             })->firstOrFail();
             
-            $query = $wilayat->touristSites()->with(['governorate', 'images']);
+            $query = $wilayat->visibleTouristSites()->with(['governorate', 'images']);
 
             // البحث
             if ($request->filled('search')) {
@@ -154,7 +154,7 @@ class WilayatApiController extends Controller
                       ->orWhere('slug', $identifier);
             })->firstOrFail();
             
-            $query = $wilayat->touristServices()->with(['serviceType', 'governorate']);
+            $query = $wilayat->visibleTouristServices()->with(['serviceType', 'governorate']);
 
             // البحث
             if ($request->filled('search')) {

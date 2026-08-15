@@ -18,7 +18,7 @@ class TouristSiteApiController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = TouristSite::with(['governorate', 'wilayat', 'images']);
+            $query = TouristSite::with(['governorate', 'wilayat', 'images'])->publiclyVisible();
 
             // فلترة حسب المحافظة
             if ($request->filled('governorate_id')) {
@@ -88,6 +88,7 @@ class TouristSiteApiController extends Controller
     {
         try {
             $site = TouristSite::with(['governorate', 'wilayat', 'images'])
+                ->publiclyVisible()
                 ->where(function($query) use ($identifier) {
                     $query->where('id', $identifier)
                           ->orWhere('slug', $identifier);
@@ -114,12 +115,13 @@ class TouristSiteApiController extends Controller
     {
         try {
             $site = TouristSite::with('images')
+                ->publiclyVisible()
                 ->where(function($query) use ($identifier) {
                     $query->where('id', $identifier)
                           ->orWhere('slug', $identifier);
                 })
                 ->firstOrFail();
-            
+
             $images = $site->images->map(function($image) use ($site) {
                 return [
                     'id' => $image->id,

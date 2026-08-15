@@ -15,7 +15,7 @@ class TouristServiceApiController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = TouristService::with(['serviceType', 'governorate', 'wilayat']);
+            $query = TouristService::with(['serviceType', 'governorate', 'wilayat'])->publiclyVisible();
 
             // فلترة حسب نوع الخدمة
             if ($request->filled('service_type_id')) {
@@ -90,6 +90,7 @@ class TouristServiceApiController extends Controller
     {
         try {
             $service = TouristService::with(['serviceType', 'governorate', 'wilayat'])
+                ->publiclyVisible()
                 ->where(function($query) use ($identifier) {
                     $query->where('id', $identifier)
                           ->orWhere('slug', $identifier);

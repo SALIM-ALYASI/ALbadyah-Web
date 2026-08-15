@@ -216,7 +216,7 @@ class GovernorateApiController extends Controller
                       ->orWhere('slug', $identifier);
             })->firstOrFail();
             
-            $query = $governorate->touristSites()->with(['wilayat', 'images']);
+            $query = $governorate->visibleTouristSites()->with(['wilayat', 'images']);
 
             // البحث
             if ($request->filled('search')) {
@@ -261,7 +261,7 @@ class GovernorateApiController extends Controller
                       ->orWhere('slug', $identifier);
             })->firstOrFail();
             
-            $query = $governorate->touristServices()->with(['serviceType', 'wilayat']);
+            $query = $governorate->visibleTouristServices()->with(['serviceType', 'wilayat']);
 
             // البحث
             if ($request->filled('search')) {

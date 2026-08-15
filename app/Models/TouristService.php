@@ -21,12 +21,108 @@ class TouristService extends Model
         'governorate_id',
         'wilayat_id',
         'service_type_id',
+        'data_source_id',
+        'source_url',
+        'source_name',
+        'source_type',
+        'external_id',
+        'latitude',
+        'longitude',
+        'phone',
+        'whatsapp',
+        'description_ar',
+        'description_en',
+        'verification_status',
+        'needs_review_fields',
+        'last_verified_at',
+        'ai_generated',
+        'confidence_score',
+        'source_trust_score',
+        'ai_confidence',
+        'name_ar_verified',
+        'description_ar_generated',
+        'name_ar_source',
+        'coordinates_source',
+        'is_tourism_candidate',
+        'excluded_reason',
+        'collected_at',
+        'source_last_checked_at',
+        'review_requested_at',
+        'collector_name',
+        'collector_version',
+        'is_active',
+        'reviewed_by',
+        'reviewed_at',
+        'rejection_reason',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'ai_generated' => 'boolean',
+        'is_tourism_candidate' => 'boolean',
+        'name_ar_verified' => 'boolean',
+        'description_ar_generated' => 'boolean',
+        'latitude' => 'decimal:7',
+        'longitude' => 'decimal:7',
+        'confidence_score' => 'decimal:2',
+        'source_trust_score' => 'decimal:2',
+        'ai_confidence' => 'decimal:2',
+        'needs_review_fields' => 'array',
+        'last_verified_at' => 'datetime',
+        'review_requested_at' => 'datetime',
+        'collected_at' => 'datetime',
+        'source_last_checked_at' => 'datetime',
+        'reviewed_at' => 'datetime',
+    ];
+
+    protected $attributes = [
+        'is_active' => true,
+        'ai_generated' => false,
+        'verification_status' => 'approved',
+        'is_tourism_candidate' => true,
     ];
 
     // نوع الخدمة (من جدول service_types)
     public function serviceType()
     {
         return $this->belongsTo(ServiceType::class, 'service_type_id');
+    }
+
+    public function dataSource()
+    {
+        return $this->belongsTo(DataSource::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(TouristServiceImage::class);
+    }
+
+    public function verificationLogs()
+    {
+        return $this->morphMany(VerificationLog::class, 'recordable');
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('verification_status', 'approved');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('verification_status', 'pending');
+    }
+
+    public function scopeNeedsReview($query)
+    {
+        return $query->where('verification_status', 'needs_review');
+    }
+
+    public function scopePubliclyVisible($query)
+    {
+        return $query->where('is_active', true)
+            ->where('verification_status', 'approved')
+            ->where('is_tourism_candidate', true);
     }
 
     // المحافظة (اختياري)

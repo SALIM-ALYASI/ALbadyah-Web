@@ -17,21 +17,25 @@ class TourismWebsiteController extends Controller
     public function index()
     {
         try {
-            // جلب البيانات المميزة للعرض في الصفحة الرئيسية
+            // جلب البيانات المميزة للعرض في الصفحة الرئيسية (المعتمدة فقط)
             $featuredSites = TouristSite::with(['governorate', 'wilayat', 'images'])
+                ->publiclyVisible()
                 ->latest()
                 ->take(6)
                 ->get();
 
-            $governorates = Governorate::withCount(['touristSites', 'touristServices'])
+            $governorates = Governorate::withCount([
+                    'touristSites as tourist_sites_count' => fn ($q) => $q->publiclyVisible(),
+                    'touristServices as tourist_services_count' => fn ($q) => $q->publiclyVisible(),
+                ])
                 ->orderBy('name_ar', 'desc')
                 ->get();
 
             $stats = [
                 'total_governorates' => Governorate::count(),
                 'total_wilayats' => Wilayat::count(),
-                'total_tourist_sites' => TouristSite::count(),
-                'total_tourist_services' => TouristService::count(),
+                'total_tourist_sites' => TouristSite::publiclyVisible()->count(),
+                'total_tourist_services' => TouristService::publiclyVisible()->count(),
             ];
 
             return view('tourism.index', compact('featuredSites', 'governorates', 'stats'));
@@ -55,8 +59,12 @@ class TourismWebsiteController extends Controller
      */
     public function governorates()
     {
-        $governorates = Governorate::with(['wilayats', 'touristSites', 'touristServices'])
-            ->withCount(['wilayats', 'touristSites', 'touristServices'])
+        $governorates = Governorate::with(['wilayats'])
+            ->withCount([
+                'wilayats',
+                'touristSites as tourist_sites_count' => fn ($q) => $q->publiclyVisible(),
+                'touristServices as tourist_services_count' => fn ($q) => $q->publiclyVisible(),
+            ])
             ->orderBy('name_ar', 'desc')
             ->get();
 
@@ -68,15 +76,19 @@ class TourismWebsiteController extends Controller
      */
     public function governorate($identifier)
     {
-        $governorate = Governorate::with(['wilayats', 'touristSites', 'touristServices'])
-            ->withCount(['wilayats', 'touristSites', 'touristServices'])
+        $governorate = Governorate::with(['wilayats'])
+            ->withCount([
+                'wilayats',
+                'touristSites as tourist_sites_count' => fn ($q) => $q->publiclyVisible(),
+                'touristServices as tourist_services_count' => fn ($q) => $q->publiclyVisible(),
+            ])
             ->where(function($query) use ($identifier) {
                 $query->where('id', $identifier)
                       ->orWhere('slug', $identifier);
             })
             ->firstOrFail();
 
-        $featuredSites = $governorate->touristSites()
+        $featuredSites = $governorate->visibleTouristSites()
             ->with(['images'])
             ->whereHas('images')
             ->take(4)
@@ -132,12 +144,19 @@ class TourismWebsiteController extends Controller
      */
     public function wilayat($identifier)
     {
-        $wilayat = Wilayat::with(['governorate', 'touristSites', 'touristServices'])
+        $wilayat = Wilayat::with(['governorate'])
+            ->withCount([
+                'touristSites as tourist_sites_count' => fn ($q) => $q->publiclyVisible(),
+                'touristServices as tourist_services_count' => fn ($q) => $q->publiclyVisible(),
+            ])
             ->where(function($query) use ($identifier) {
                 $query->where('id', $identifier)
                       ->orWhere('slug', $identifier);
             })
             ->firstOrFail();
+
+        $wilayat->setRelation('touristSites', $wilayat->visibleTouristSites()->with('images')->get());
+        $wilayat->setRelation('touristServices', $wilayat->visibleTouristServices()->with('serviceType')->get());
 
         return view('tourism.wilayat', compact('wilayat'));
     }
@@ -147,7 +166,7 @@ class TourismWebsiteController extends Controller
      */
     public function touristSites(Request $request)
     {
-        $query = TouristSite::with(['governorate', 'wilayat', 'images']);
+        $query = TouristSite::with(['governorate', 'wilayat', 'images'])->publiclyVisible();
 
         // فلترة حسب المحافظة
         if ($request->has('governorate_id') && $request->governorate_id) {
@@ -184,6 +203,7 @@ class TourismWebsiteController extends Controller
     public function touristSite($identifier)
     {
         $touristSite = TouristSite::with(['governorate', 'wilayat', 'images'])
+            ->publiclyVisible()
             ->where(function($query) use ($identifier) {
                 $query->where('id', $identifier)
                       ->orWhere('slug', $identifier);
@@ -192,6 +212,7 @@ class TourismWebsiteController extends Controller
 
         // مواقع مماثلة في نفس المحافظة
         $relatedSites = TouristSite::with(['images'])
+            ->publiclyVisible()
             ->where('governorate_id', $touristSite->governorate_id)
             ->where('id', '!=', $touristSite->id)
             ->take(4)
@@ -205,7 +226,7 @@ class TourismWebsiteController extends Controller
      */
     public function touristServices(Request $request)
     {
-        $query = TouristService::with(['serviceType', 'governorate', 'wilayat']);
+        $query = TouristService::with(['serviceType', 'governorate', 'wilayat'])->publiclyVisible();
 
         // فلترة حسب نوع الخدمة
         if ($request->has('service_type_id') && $request->service_type_id) {
@@ -229,8 +250,8 @@ class TourismWebsiteController extends Controller
         $touristServices = $query->latest()->paginate(12);
 
         // للحصول على قوائم الفلترة - فقط الأنواع التي تحتوي على خدمات
-        $serviceTypes = ServiceType::whereHas('touristServices')->orderBy('name_ar')->get();
-        $governorates = Governorate::whereHas('touristServices')->orderBy('name_ar')->get();
+        $serviceTypes = ServiceType::whereHas('touristServices', fn ($q) => $q->publiclyVisible())->orderBy('name_ar')->get();
+        $governorates = Governorate::whereHas('touristServices', fn ($q) => $q->publiclyVisible())->orderBy('name_ar')->get();
 
         return view('tourism.tourist-services', compact('touristServices', 'serviceTypes', 'governorates'));
     }
@@ -241,6 +262,7 @@ class TourismWebsiteController extends Controller
     public function touristService($identifier)
     {
         $touristService = TouristService::with(['serviceType', 'governorate', 'wilayat'])
+            ->publiclyVisible()
             ->where(function($query) use ($identifier) {
                 $query->where('id', $identifier)
                       ->orWhere('slug', $identifier);
@@ -249,6 +271,7 @@ class TourismWebsiteController extends Controller
 
         // خدمات مماثلة من نفس النوع
         $relatedServices = TouristService::with(['serviceType'])
+            ->publiclyVisible()
             ->where('service_type_id', $touristService->service_type_id)
             ->where('id', '!=', $touristService->id)
             ->take(4)
@@ -263,9 +286,14 @@ class TourismWebsiteController extends Controller
      */
     public function wilayatDetails($governorate_id)
     {
-        $governorate = \App\Models\Governorate::with(['wilayats.touristSites', 'wilayats.touristServices'])
+        $governorate = \App\Models\Governorate::with(['wilayats'])
             ->findOrFail($governorate_id);
-            
+
+        $governorate->wilayats->each(function ($wilayat) {
+            $wilayat->setRelation('touristSites', $wilayat->visibleTouristSites()->get());
+            $wilayat->setRelation('touristServices', $wilayat->visibleTouristServices()->get());
+        });
+
         return view('tourism.wilayat-details', compact('governorate'));
     }
 
@@ -290,6 +318,7 @@ class TourismWebsiteController extends Controller
         if ($query) {
             // البحث في المواقع السياحية
             $touristSites = TouristSite::with(['governorate', 'wilayat', 'images'])
+                ->publiclyVisible()
                 ->where(function ($q) use ($query) {
                     $q->where('name_ar', 'like', "%$query%")
                        ->orWhere('name_en', 'like', "%$query%")
@@ -302,6 +331,7 @@ class TourismWebsiteController extends Controller
 
             // البحث في الخدمات السياحية
             $touristServices = TouristService::with(['serviceType', 'governorate', 'wilayat'])
+                ->publiclyVisible()
                 ->where(function ($q) use ($query) {
                     $q->where('name_ar', 'like', "%$query%")
                        ->orWhere('name_en', 'like', "%$query%")
@@ -324,8 +354,8 @@ class TourismWebsiteController extends Controller
         $stats = [
             'total_governorates' => Governorate::count(),
             'total_wilayats' => Wilayat::count(),
-            'total_tourist_sites' => TouristSite::count(),
-            'total_tourist_services' => TouristService::count(),
+            'total_tourist_sites' => TouristSite::publiclyVisible()->count(),
+            'total_tourist_services' => TouristService::publiclyVisible()->count(),
         ];
 
         return view('tourism.about', compact('stats'));

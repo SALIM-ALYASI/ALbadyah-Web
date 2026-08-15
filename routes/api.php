@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\TouristSiteApiController;
 use App\Http\Controllers\Api\TouristServiceApiController;
 use App\Http\Controllers\Api\VisitApiController;
 use App\Http\Controllers\Api\SearchApiController;
+use App\Http\Controllers\Api\Badyah\IngestController;
 use App\Http\Controllers\AuthController;
 
 /*
@@ -69,8 +70,8 @@ Route::prefix('v1')->group(function () {
             'data' => [
                 'total_governorates' => \App\Models\Governorate::count(),
                 'total_wilayats' => \App\Models\Wilayat::count(),
-                'total_tourist_sites' => \App\Models\TouristSite::count(),
-                'total_tourist_services' => \App\Models\TouristService::count(),
+                'total_tourist_sites' => \App\Models\TouristSite::publiclyVisible()->count(),
+                'total_tourist_services' => \App\Models\TouristService::publiclyVisible()->count(),
             ]
         ]);
     });
@@ -96,4 +97,19 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum'])->group(function () {
     // Admin Visit Statistics
     Route::get('/visits/stats', [VisitApiController::class, 'adminStats']);
     Route::get('/visits/export', [VisitApiController::class, 'export']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Badyah Smart Engine — Ingest API (n8n / البوت فقط)
+|--------------------------------------------------------------------------
+|
+| مستقل تمامًا عن أي مشروع آخر. يستخدم توثيق خاص به (badyah.bot middleware
+| + BADYAH_BOT_TOKEN). كل ما يدخل من هنا يُحفظ كـ Pending فقط ولا يُنشر
+| تلقائيًا مهما كانت الحالة — الاعتماد يتم يدويًا من لوحة المراجعة فقط.
+|
+*/
+Route::prefix('badyah/v1')->middleware(['badyah.bot'])->group(function () {
+    Route::post('/ingest/tourist-sites', [IngestController::class, 'touristSites']);
+    Route::post('/ingest/tourist-services', [IngestController::class, 'touristServices']);
 });

@@ -37,6 +37,22 @@ class Governorate extends Model
     }
 
     /**
+     * فقط المواقع المعتمدة والنشِطة (للاستخدام في الصفحات العامة).
+     */
+    public function visibleTouristSites()
+    {
+        return $this->touristSites()->publiclyVisible();
+    }
+
+    /**
+     * فقط الخدمات المعتمدة والنشِطة (للاستخدام في الصفحات العامة).
+     */
+    public function visibleTouristServices()
+    {
+        return $this->touristServices()->publiclyVisible();
+    }
+
+    /**
      * الحصول على رابط الصورة
      */
     public function getImageUrlAttribute()
