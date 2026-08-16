@@ -9,27 +9,9 @@ use App\Http\Controllers\TouristServiceController;
 use App\Http\Controllers\TourismWebsiteController;
 use App\Http\Controllers\VisitController;
 use App\Http\Controllers\VisitStatsController;
-use App\Http\Controllers\BadyahReviewController;
 
 // الصفحة الرئيسية للموقع السياحي
 Route::get('/', [TourismWebsiteController::class, 'index'])->name('tourism.index');
-
-/*
-|--------------------------------------------------------------------------
-| Badyah — دورة مراجعة البريد (روابط موقّعة signed + محدودة الصلاحية)
-|--------------------------------------------------------------------------
-|
-| GET = معاينة فقط، لا يغيّر أي شيء (آمن ضد فتح تلقائي من فاحص بريد/معاينة).
-| POST = التغيير الفعلي الوحيد، عبر زر تأكيد يضغطه المراجع + CSRF.
-|
-*/
-Route::get('/badyah/review/{recordType}/{recordId}/decision', [BadyahReviewController::class, 'preview'])
-    ->name('badyah.review.preview')
-    ->middleware('signed');
-
-Route::post('/badyah/review/{recordType}/{recordId}/decision', [BadyahReviewController::class, 'confirm'])
-    ->name('badyah.review.confirm')
-    ->middleware('signed');
 
 // روابط الزيارات
 Route::post('/save-visit', [VisitController::class, 'saveVisit'])->name('visit.save');

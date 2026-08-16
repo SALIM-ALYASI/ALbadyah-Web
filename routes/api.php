@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\TouristSiteApiController;
 use App\Http\Controllers\Api\TouristServiceApiController;
 use App\Http\Controllers\Api\VisitApiController;
 use App\Http\Controllers\Api\SearchApiController;
-use App\Http\Controllers\Api\Badyah\IngestController;
+use App\Http\Controllers\Api\BadyahBotItemController;
 use App\Http\Controllers\AuthController;
 
 /*
@@ -101,15 +101,13 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Badyah Smart Engine — Ingest API (n8n / البوت فقط)
+| بوت البادية المستقل (تلجرام + OSM) — API منفصل ومحدود الصلاحية
 |--------------------------------------------------------------------------
 |
-| مستقل تمامًا عن أي مشروع آخر. يستخدم توثيق خاص به (badyah.bot middleware
-| + BADYAH_BOT_TOKEN). كل ما يدخل من هنا يُحفظ كـ Pending فقط ولا يُنشر
-| تلقائيًا مهما كانت الحالة — الاعتماد يتم يدويًا من لوحة المراجعة فقط.
+| توثيق مستقل عبر BADYAH_BOT_API_TOKEN فقط (لا Sanctum ولا admin.auth).
+| كل عنصر يُحفظ pending + is_active=false دائمًا — لا نشر مباشر من هنا.
 |
 */
-Route::prefix('badyah/v1')->middleware(['badyah.bot'])->group(function () {
-    Route::post('/ingest/tourist-sites', [IngestController::class, 'touristSites']);
-    Route::post('/ingest/tourist-services', [IngestController::class, 'touristServices']);
+Route::prefix('badyah-bot')->middleware(['badyah-bot.auth', 'throttle:20,1'])->group(function () {
+    Route::post('/items', [BadyahBotItemController::class, 'store']);
 });
