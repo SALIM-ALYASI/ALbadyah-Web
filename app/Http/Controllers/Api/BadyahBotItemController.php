@@ -23,6 +23,73 @@ class BadyahBotItemController extends Controller
 {
     private const DATA_SOURCE_SLUG = 'badyah-telegram-bot-osm';
 
+    /**
+     * قراءة فقط: يرجّع العناصر اللي جاية من هذا البوت تحديدًا (collector_name)
+     * عشان التأكد إنها وصلت فعليًا للقاعدة، بدون الحاجة للوحة التحكم أو phpMyAdmin.
+     *
+     * فلاتر اختيارية: ?type=site|service  ?status=pending|approved|rejected|needs_review
+     */
+    public function index(Request $request)
+    {
+        $type = $request->query('type');
+        $status = $request->query('status');
+        $limit = min((int) $request->query('limit', 100), 200);
+
+        $columns = [
+            'id', 'name_ar', 'name_en', 'wilayat_id', 'governorate_id',
+            'verification_status', 'is_active', 'external_id', 'created_at',
+        ];
+
+        $sites = collect();
+        if ($type !== 'service') {
+            $q = TouristSite::with(['wilayat:id,name_ar', 'governorate:id,name_ar'])
+                ->where('collector_name', 'AlBadyahTelegramBot');
+            if ($status) {
+                $q->where('verification_status', $status);
+            }
+            $sites = $q->orderByDesc('id')->limit($limit)->get($columns)->map(fn ($s) => [
+                'type' => 'site',
+                'id' => $s->id,
+                'name_ar' => $s->name_ar,
+                'name_en' => $s->name_en,
+                'wilayat' => $s->wilayat?->name_ar,
+                'governorate' => $s->governorate?->name_ar,
+                'verification_status' => $s->verification_status,
+                'is_active' => (bool) $s->is_active,
+                'external_id' => $s->external_id,
+                'created_at' => $s->created_at,
+            ]);
+        }
+
+        $services = collect();
+        if ($type !== 'site') {
+            $q = TouristService::with(['wilayat:id,name_ar', 'governorate:id,name_ar'])
+                ->where('collector_name', 'AlBadyahTelegramBot');
+            if ($status) {
+                $q->where('verification_status', $status);
+            }
+            $services = $q->orderByDesc('id')->limit($limit)->get($columns)->map(fn ($s) => [
+                'type' => 'service',
+                'id' => $s->id,
+                'name_ar' => $s->name_ar,
+                'name_en' => $s->name_en,
+                'wilayat' => $s->wilayat?->name_ar,
+                'governorate' => $s->governorate?->name_ar,
+                'verification_status' => $s->verification_status,
+                'is_active' => (bool) $s->is_active,
+                'external_id' => $s->external_id,
+                'created_at' => $s->created_at,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'counts' => ['sites' => $sites->count(), 'services' => $services->count()],
+            'sites' => $sites->values(),
+            'services' => $services->values(),
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [

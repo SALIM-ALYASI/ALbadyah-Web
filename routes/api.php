@@ -110,4 +110,5 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum'])->group(function () {
 */
 Route::prefix('badyah-bot')->middleware(['badyah-bot.auth', 'throttle:20,1'])->group(function () {
     Route::post('/items', [BadyahBotItemController::class, 'store']);
+    Route::get('/items', [BadyahBotItemController::class, 'index']);
 });
