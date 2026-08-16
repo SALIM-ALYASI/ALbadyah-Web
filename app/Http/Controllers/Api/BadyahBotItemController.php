@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\DataSource;
+use App\Models\Governorate;
 use App\Models\ServiceType;
 use App\Models\TouristService;
 use App\Models\TouristSite;
@@ -17,9 +18,10 @@ use Illuminate\Support\Str;
  * نقطة استقبال واحدة لبوت البادية المستقل (تلجرام + OSM). لا علاقة لها
  * بلوحة الإدمن ولا بـ Sanctum — توثيق مستقل عبر BadyahBotApiAuth فقط.
  *
- * كل عنصر يُوافَق عليه بتلجرام يصل هنا ويُحفظ pending + is_active=false
- * دائمًا. لا يوجد أي مسار هنا ينشر عنصرًا مباشرة؛ الأدمن يكمل البيانات
- * وينشرها يدويًا من لوحة التحكم.
+ * كل عنصر يُوافَق عليه بتلجرام (بعد إثراء AI بالبوت نفسه) يصل هنا ويُحفظ
+ * approved + is_active=true فورًا - ينشر مباشرة بالموقع العام بدون خطوة
+ * يدوية إضافية باللوحة. الأدمن يقدر يعدّل أو يخفي أي سجل لاحقًا من اللوحة
+ * لو احتاج.
  */
 class BadyahBotItemController extends Controller
 {
@@ -106,6 +108,92 @@ class BadyahBotItemController extends Controller
         ]);
     }
 
+    /**
+     * قراءة فقط: كل محافظات عُمان مع ولاياتها، عشان البوت يبني أزرار اختيار
+     * بدل ما الأدمن يكتب اسم المحافظة/الولاية يدويًا (يمنع أخطاء المطابقة).
+     * تُجلب مرة وحدة وتُخزَّن بذاكرة البوت (نفس نمط /categories).
+     */
+    public function areas()
+    {
+        $governorates = Governorate::with(['wilayats' => function ($q) {
+            $q->orderBy('name_ar')->select('id', 'name_ar', 'name_en', 'governorate_id');
+        }])->orderBy('name_ar')->get(['id', 'name_ar', 'name_en']);
+
+        return response()->json([
+            'success' => true,
+            'governorates' => $governorates,
+        ]);
+    }
+
+    /**
+     * قراءة فقط: إحصائية ولاية محددة (مواقع/خدمات محفوظة + بانتظار المراجعة)
+     * تُعرض للأدمن بتلجرام بعد اختيار الولاية بالزر.
+     */
+    public function wilayatStats(int $wilayatId)
+    {
+        // ملاحظة: لا نعتمد على implicit route-model-binding هنا لأن
+        // middleware group 'api' بهذا المشروع (bootstrap/app.php) أُعيد
+        // تعريفه بدون SubstituteBindings::class - نفس نمط باقي هذا الملف
+        // (WilayatApiController يستخدم {identifier} + بحث يدوي لنفس السبب).
+        $wilayat = Wilayat::find($wilayatId);
+        if (!$wilayat) {
+            return response()->json(['success' => false, 'message' => 'ولاية غير موجودة.'], 404);
+        }
+
+        $pendingStatuses = ['pending', 'needs_review'];
+
+        $sitesTotal = TouristSite::where('wilayat_id', $wilayat->id)->count();
+        $sitesPending = TouristSite::where('wilayat_id', $wilayat->id)
+            ->whereIn('verification_status', $pendingStatuses)->count();
+        $servicesTotal = TouristService::where('wilayat_id', $wilayat->id)->count();
+        $servicesPending = TouristService::where('wilayat_id', $wilayat->id)
+            ->whereIn('verification_status', $pendingStatuses)->count();
+
+        return response()->json([
+            'success' => true,
+            'wilayat_id' => $wilayat->id,
+            'sites_total' => $sitesTotal,
+            'sites_pending' => $sitesPending,
+            'services_total' => $servicesTotal,
+            'services_pending' => $servicesPending,
+            'pending_total' => $sitesPending + $servicesPending,
+        ]);
+    }
+
+    /**
+     * قراءة فقط: كل عناصر ولاية محددة، من أي مصدر (مو بس هذا البوت) —
+     * يخدم غرضين: فحص التكرار قبل عرض نتيجة جديدة على الأدمن، وشاشة
+     * "عرض البيانات الموجودة" بتلجرام. فلتر اختياري ?type=site|service.
+     */
+    public function wilayatItems(int $wilayatId, Request $request)
+    {
+        $wilayat = Wilayat::find($wilayatId);
+        if (!$wilayat) {
+            return response()->json(['success' => false, 'message' => 'ولاية غير موجودة.'], 404);
+        }
+
+        $type = $request->query('type');
+        $columns = [
+            'id', 'name_ar', 'name_en', 'latitude', 'longitude',
+            'source_url', 'external_id', 'verification_status', 'is_active', 'collector_name',
+        ];
+
+        $sites = $type !== 'service'
+            ? TouristSite::where('wilayat_id', $wilayat->id)->get($columns)->values()
+            : collect();
+
+        $services = $type !== 'site'
+            ? TouristService::where('wilayat_id', $wilayat->id)->get($columns)->values()
+            : collect();
+
+        return response()->json([
+            'success' => true,
+            'wilayat_id' => $wilayat->id,
+            'sites' => $sites,
+            'services' => $services,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -116,7 +204,8 @@ class BadyahBotItemController extends Controller
             'subtype' => ['nullable', 'string', 'max:100'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
-            'wilayat_name' => ['required', 'string', 'max:100'],
+            'wilayat_id' => ['nullable', 'integer', 'exists:wilayats,id'],
+            'wilayat_name' => ['nullable', 'string', 'max:100'],
             'phone' => ['nullable', 'string', 'max:60'],
             'website' => ['nullable', 'string', 'max:255'],
             'source_url' => ['nullable', 'string', 'max:255'],
@@ -132,6 +221,9 @@ class BadyahBotItemController extends Controller
             if (!$request->filled('name_ar') && !$request->filled('name_en')) {
                 $validator->errors()->add('name_ar', 'لازم اسم عربي أو إنجليزي على الأقل.');
             }
+            if (!$request->filled('wilayat_id') && !$request->filled('wilayat_name')) {
+                $validator->errors()->add('wilayat_id', 'لازم wilayat_id أو wilayat_name على الأقل.');
+            }
         });
 
         if ($validator->fails()) {
@@ -144,12 +236,22 @@ class BadyahBotItemController extends Controller
 
         $data = $validator->validated();
 
-        $wilayat = Wilayat::where('name_ar', 'like', "%{$data['wilayat_name']}%")->first();
+        // المصدر الأساسي الآن: wilayat_id (البوت يختاره من زر حقيقي، بدون
+        // كتابة اسم يدويًا). wilayat_name يبقى فقط لتوافق خلفي (اختبار
+        // يدوي بـ curl أو بوت قديم لم يُحدَّث بعد).
+        if (!empty($data['wilayat_id'])) {
+            $wilayat = Wilayat::find($data['wilayat_id']);
+        } else {
+            // البوت أحيانًا يجيب اسم الولاية من Nominatim ببادئة "ولاية"/"محافظة"
+            // بينما المخزّن بقاعدة البيانات بدون بادئة، فنشيلها قبل المطابقة.
+            $wilayatName = trim(preg_replace('/^(محافظة|ولاية)\s+/u', '', trim($data['wilayat_name'])));
+            $wilayat = Wilayat::where('name_ar', 'like', "%{$wilayatName}%")->first();
+        }
 
         if (!$wilayat) {
             return response()->json([
                 'success' => false,
-                'message' => "ولاية غير معروفة: {$data['wilayat_name']}",
+                'message' => 'ولاية غير معروفة: '.($data['wilayat_id'] ?? $data['wilayat_name'] ?? '—'),
             ], 422);
         }
 
@@ -220,10 +322,10 @@ class BadyahBotItemController extends Controller
             'latitude' => $data['latitude'],
             'longitude' => $data['longitude'],
             'coordinates_source' => 'osm',
-            // pending + غير نشط دائمًا: الأدمن يكمل الصورة/الوصف/التصنيف وينشر يدويًا
-            'verification_status' => 'pending',
-            'is_active' => false,
-            'ai_generated' => false,
+            // موافقة تلجرام = نشر فوري مباشرة على الموقع العام، بدون خطوة يدوية إضافية باللوحة
+            'verification_status' => 'approved',
+            'is_active' => true,
+            'ai_generated' => true,
             'name_ar_source' => isset($data['name_ar']) ? 'untranslated' : 'ai_translation',
             'collector_name' => 'AlBadyahTelegramBot',
             'collected_at' => now(),
@@ -248,7 +350,7 @@ class BadyahBotItemController extends Controller
             return response()->json([
                 'success' => true,
                 'duplicate' => false,
-                'message' => 'تم حفظ الخدمة كـ pending، بانتظار استكمال البيانات من لوحة التحكم.',
+                'message' => 'تم حفظ الخدمة ونشرها مباشرة بالموقع.',
                 'data' => ['id' => $service->id, 'type' => 'service'],
             ], 201);
         }
@@ -274,7 +376,7 @@ class BadyahBotItemController extends Controller
         return response()->json([
             'success' => true,
             'duplicate' => false,
-            'message' => 'تم حفظ الموقع كـ pending، بانتظار استكمال البيانات من لوحة التحكم.',
+            'message' => 'تم حفظ الموقع ونشره مباشرة بالموقع.',
             'data' => ['id' => $site->id, 'type' => 'site'],
         ], 201);
     }

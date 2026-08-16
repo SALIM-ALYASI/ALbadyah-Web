@@ -8,63 +8,31 @@ use App\Models\Governorate;
 class GovernorateSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * المحافظات الإحدى عشرة الرسمية لسلطنة عُمان.
+     * idempotent: يطابق بالاسم العربي فقط، فيحدّث الموجود بدل تكراره
+     * (مهم لمحافظة مسقط الموجودة أصلاً بقاعدة بيانات الإنتاج).
      */
     public function run(): void
     {
         $governorates = [
-            [
-                'name_ar' => 'مسقط',
-                'name_en' => 'Muscat',
-                'website_url' => 'https://www.muscat.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&h=600&fit=crop'
-            ],
-            [
-                'name_ar' => 'الداخلية',
-                'name_en' => 'Ad Dakhiliyah',
-                'website_url' => 'https://www.dakhiliyah.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
-            ],
-            [
-                'name_ar' => 'ظفار',
-                'name_en' => 'Dhofar',
-                'website_url' => 'https://www.dhofar.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=600&fit=crop'
-            ],
-            [
-                'name_ar' => 'الباطنة',
-                'name_en' => 'Al Batinah',
-                'website_url' => 'https://www.batinah.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop'
-            ],
-            [
-                'name_ar' => 'الشرقية',
-                'name_en' => 'Ash Sharqiyah',
-                'website_url' => 'https://www.sharqiyah.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop'
-            ],
-            [
-                'name_ar' => 'الوسطى',
-                'name_en' => 'Al Wusta',
-                'website_url' => 'https://www.wusta.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop'
-            ],
-            [
-                'name_ar' => 'البريمي',
-                'name_en' => 'Al Buraymi',
-                'website_url' => 'https://www.buraymi.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
-            ],
-            [
-                'name_ar' => 'مسندم',
-                'name_en' => 'Musandam',
-                'website_url' => 'https://www.musandam.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop'
-            ]
+            ['name_ar' => 'مسقط', 'name_en' => 'Muscat'],
+            ['name_ar' => 'الداخلية', 'name_en' => 'Ad Dakhiliyah'],
+            ['name_ar' => 'شمال الباطنة', 'name_en' => 'North Al Batinah'],
+            ['name_ar' => 'جنوب الباطنة', 'name_en' => 'South Al Batinah'],
+            ['name_ar' => 'الوسطى', 'name_en' => 'Al Wusta'],
+            ['name_ar' => 'شمال الشرقية', 'name_en' => 'North Ash Sharqiyah'],
+            ['name_ar' => 'جنوب الشرقية', 'name_en' => 'South Ash Sharqiyah'],
+            ['name_ar' => 'الظاهرة', 'name_en' => 'Ad Dhahirah'],
+            ['name_ar' => 'مسندم', 'name_en' => 'Musandam'],
+            ['name_ar' => 'ظفار', 'name_en' => 'Dhofar'],
+            ['name_ar' => 'البريمي', 'name_en' => 'Al Buraimi'],
         ];
 
         foreach ($governorates as $governorate) {
-            Governorate::create($governorate);
+            Governorate::updateOrCreate(
+                ['name_ar' => $governorate['name_ar']],
+                ['name_en' => $governorate['name_en']]
+            );
         }
     }
 }

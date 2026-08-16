@@ -9,114 +9,120 @@ use App\Models\Governorate;
 class WilayatSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * الـ63 ولاية الرسمية لسلطنة عُمان، موزّعة على محافظاتها الإحدى عشرة.
+     * idempotent: يطابق بالاسم العربي فقط، فيحدّث الموجود بدل تكراره
+     * (مهم للولايات الست الموجودة أصلاً تحت محافظة مسقط بقاعدة بيانات الإنتاج).
      */
     public function run(): void
     {
-        // الحصول على المحافظات
-        $governorates = Governorate::all();
-        
+        $governorates = Governorate::all()->keyBy('name_ar');
+
         if ($governorates->isEmpty()) {
             $this->command->warn('No governorates found. Please run GovernorateSeeder first.');
             return;
         }
 
-        $wilayats = [
-            // مسقط
-            [
-                'name_ar' => 'مسقط',
-                'name_en' => 'Muscat',
-                'website_url' => 'https://www.muscat.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&h=600&fit=crop',
-                'governorate_id' => $governorates->where('name_ar', 'مسقط')->first()->id ?? 1
+        $wilayatsByGovernorate = [
+            'مسقط' => [
+                ['name_ar' => 'مسقط', 'name_en' => 'Muscat'],
+                ['name_ar' => 'مطرح', 'name_en' => 'Muttrah'],
+                ['name_ar' => 'العامرات', 'name_en' => 'Al Amerat'],
+                ['name_ar' => 'بوشر', 'name_en' => 'Bawshar'],
+                ['name_ar' => 'السيب', 'name_en' => 'Seeb'],
+                ['name_ar' => 'قريات', 'name_en' => 'Quriyat'],
             ],
-            [
-                'name_ar' => 'مطرح',
-                'name_en' => 'Muttrah',
-                'website_url' => 'https://www.muttrah.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
-                'governorate_id' => $governorates->where('name_ar', 'مسقط')->first()->id ?? 1
+            'الداخلية' => [
+                ['name_ar' => 'نزوى', 'name_en' => 'Nizwa'],
+                ['name_ar' => 'بهلا', 'name_en' => 'Bahla'],
+                ['name_ar' => 'منح', 'name_en' => 'Manah'],
+                ['name_ar' => 'الحمراء', 'name_en' => 'Al Hamra'],
+                ['name_ar' => 'أدم', 'name_en' => 'Adam'],
+                ['name_ar' => 'إزكي', 'name_en' => 'Izki'],
+                ['name_ar' => 'سمائل', 'name_en' => 'Samail'],
+                ['name_ar' => 'بدبد', 'name_en' => 'Bidbid'],
+                ['name_ar' => 'الجبل الأخضر', 'name_en' => 'Jabal Akhdar'],
             ],
-            [
-                'name_ar' => 'السيب',
-                'name_en' => 'Seeb',
-                'website_url' => 'https://www.seeb.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=600&fit=crop',
-                'governorate_id' => $governorates->where('name_ar', 'مسقط')->first()->id ?? 1
+            'شمال الباطنة' => [
+                ['name_ar' => 'صحار', 'name_en' => 'Sohar'],
+                ['name_ar' => 'شناص', 'name_en' => 'Shinas'],
+                ['name_ar' => 'لوى', 'name_en' => 'Liwa'],
+                ['name_ar' => 'صحم', 'name_en' => 'Saham'],
+                ['name_ar' => 'الخابورة', 'name_en' => 'Khaburah'],
+                ['name_ar' => 'السويق', 'name_en' => 'Suwaiq'],
             ],
-
-            // الداخلية
-            [
-                'name_ar' => 'نزوى',
-                'name_en' => 'Nizwa',
-                'website_url' => 'https://www.nizwa.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop',
-                'governorate_id' => $governorates->where('name_ar', 'الداخلية')->first()->id ?? 2
+            'جنوب الباطنة' => [
+                ['name_ar' => 'الرستاق', 'name_en' => 'Rustaq'],
+                ['name_ar' => 'العوابي', 'name_en' => 'Awabi'],
+                ['name_ar' => 'نخل', 'name_en' => 'Nakhal'],
+                ['name_ar' => 'وادي المعاول', 'name_en' => 'Wadi Al Maawil'],
+                ['name_ar' => 'بركاء', 'name_en' => 'Barka'],
+                ['name_ar' => 'المصنعة', 'name_en' => 'Musanaah'],
             ],
-            [
-                'name_ar' => 'بهلا',
-                'name_en' => 'Bahla',
-                'website_url' => 'https://www.bahla.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop',
-                'governorate_id' => $governorates->where('name_ar', 'الداخلية')->first()->id ?? 2
+            'الوسطى' => [
+                ['name_ar' => 'هيما', 'name_en' => 'Haima'],
+                ['name_ar' => 'محوت', 'name_en' => 'Mahoot'],
+                ['name_ar' => 'الدقم', 'name_en' => 'Duqm'],
+                ['name_ar' => 'الجازر', 'name_en' => 'Al Jazir'],
             ],
-            [
-                'name_ar' => 'الحمراء',
-                'name_en' => 'Al Hamra',
-                'website_url' => 'https://www.alhamra.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop',
-                'governorate_id' => $governorates->where('name_ar', 'الداخلية')->first()->id ?? 2
+            'شمال الشرقية' => [
+                ['name_ar' => 'إبراء', 'name_en' => 'Ibra'],
+                ['name_ar' => 'المضيبي', 'name_en' => 'Mudhaibi'],
+                ['name_ar' => 'بدية', 'name_en' => 'Bidiyah'],
+                ['name_ar' => 'القابل', 'name_en' => 'Al Qabil'],
+                ['name_ar' => 'وادي بني خالد', 'name_en' => 'Wadi Bani Khalid'],
+                ['name_ar' => 'دماء الطائيين', 'name_en' => 'Dama Wa Al Taiyin'],
+                ['name_ar' => 'سناو', 'name_en' => 'Sinaw'],
             ],
-
-            // ظفار
-            [
-                'name_ar' => 'صلالة',
-                'name_en' => 'Salalah',
-                'website_url' => 'https://www.salalah.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
-                'governorate_id' => $governorates->where('name_ar', 'ظفار')->first()->id ?? 3
+            'جنوب الشرقية' => [
+                ['name_ar' => 'صور', 'name_en' => 'Sur'],
+                ['name_ar' => 'الكامل والوافي', 'name_en' => 'Al Kamil Wal Wafi'],
+                ['name_ar' => 'جعلان بني بوحسن', 'name_en' => 'Jalan Bani Bu Hassan'],
+                ['name_ar' => 'جعلان بني بوعلي', 'name_en' => 'Jalan Bani Bu Ali'],
+                ['name_ar' => 'مصيرة', 'name_en' => 'Masirah'],
             ],
-            [
-                'name_ar' => 'طاقة',
-                'name_en' => 'Taqah',
-                'website_url' => 'https://www.taqah.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop',
-                'governorate_id' => $governorates->where('name_ar', 'ظفار')->first()->id ?? 3
+            'الظاهرة' => [
+                ['name_ar' => 'عبري', 'name_en' => 'Ibri'],
+                ['name_ar' => 'ينقل', 'name_en' => 'Yanqul'],
+                ['name_ar' => 'ضنك', 'name_en' => 'Dank'],
             ],
-            [
-                'name_ar' => 'مرباط',
-                'name_en' => 'Mirbat',
-                'website_url' => 'https://www.mirbat.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop',
-                'governorate_id' => $governorates->where('name_ar', 'ظفار')->first()->id ?? 3
+            'مسندم' => [
+                ['name_ar' => 'خصب', 'name_en' => 'Khasab'],
+                ['name_ar' => 'دبا', 'name_en' => 'Dibba'],
+                ['name_ar' => 'بخا', 'name_en' => 'Bukha'],
+                ['name_ar' => 'مدحاء', 'name_en' => 'Madha'],
             ],
-
-            // الباطنة
-            [
-                'name_ar' => 'صحار',
-                'name_en' => 'Sohar',
-                'website_url' => 'https://www.sohar.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop',
-                'governorate_id' => $governorates->where('name_ar', 'الباطنة')->first()->id ?? 4
+            'ظفار' => [
+                ['name_ar' => 'صلالة', 'name_en' => 'Salalah'],
+                ['name_ar' => 'طاقة', 'name_en' => 'Taqah'],
+                ['name_ar' => 'مرباط', 'name_en' => 'Mirbat'],
+                ['name_ar' => 'رخيوت', 'name_en' => 'Rakhyut'],
+                ['name_ar' => 'ثمريت', 'name_en' => 'Thumrait'],
+                ['name_ar' => 'ضلكوت', 'name_en' => 'Dhalkut'],
+                ['name_ar' => 'المزيونة', 'name_en' => 'Al Mazyona'],
+                ['name_ar' => 'مقشن', 'name_en' => 'Muqshin'],
+                ['name_ar' => 'شليم وجزر الحلانيات', 'name_en' => 'Shalim and the Hallaniyat Islands'],
+                ['name_ar' => 'سدح', 'name_en' => 'Sadah'],
             ],
-            [
-                'name_ar' => 'الرستاق',
-                'name_en' => 'Rustaq',
-                'website_url' => 'https://www.rustaq.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
-                'governorate_id' => $governorates->where('name_ar', 'الباطنة')->first()->id ?? 4
+            'البريمي' => [
+                ['name_ar' => 'البريمي', 'name_en' => 'Al Buraimi'],
+                ['name_ar' => 'محضة', 'name_en' => 'Mahdah'],
+                ['name_ar' => 'السنينة', 'name_en' => 'As-Sunaynah'],
             ],
-            [
-                'name_ar' => 'شناص',
-                'name_en' => 'Shinas',
-                'website_url' => 'https://www.shinas.gov.om',
-                'image_url' => 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop',
-                'governorate_id' => $governorates->where('name_ar', 'الباطنة')->first()->id ?? 4
-            ]
         ];
 
-        foreach ($wilayats as $wilayat) {
-            Wilayat::create($wilayat);
+        foreach ($wilayatsByGovernorate as $governorateNameAr => $wilayats) {
+            $governorate = $governorates->get($governorateNameAr);
+            if (!$governorate) {
+                $this->command->warn("Governorate not found: {$governorateNameAr} — skipping its wilayats.");
+                continue;
+            }
+
+            foreach ($wilayats as $wilayat) {
+                Wilayat::updateOrCreate(
+                    ['name_ar' => $wilayat['name_ar']],
+                    ['name_en' => $wilayat['name_en'], 'governorate_id' => $governorate->id]
+                );
+            }
         }
     }
 }

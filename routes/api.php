@@ -112,4 +112,7 @@ Route::prefix('badyah-bot')->middleware(['badyah-bot.auth', 'throttle:20,1'])->g
     Route::post('/items', [BadyahBotItemController::class, 'store']);
     Route::get('/items', [BadyahBotItemController::class, 'index']);
     Route::get('/categories', [BadyahBotItemController::class, 'categories']);
+    Route::get('/areas', [BadyahBotItemController::class, 'areas']);
+    Route::get('/wilayats/{wilayat}/stats', [BadyahBotItemController::class, 'wilayatStats']);
+    Route::get('/wilayats/{wilayat}/items', [BadyahBotItemController::class, 'wilayatItems']);
 });
