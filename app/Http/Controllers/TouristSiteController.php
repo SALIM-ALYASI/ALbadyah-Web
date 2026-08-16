@@ -193,6 +193,13 @@ class TouristSiteController extends Controller
                 'wilayat_id'     => 'nullable|integer|exists:wilayats,id',
             ]);
 
+            // النشر: checkbox غير موجود بالطلب أصلاً لو غير محدد، فنعتمد boolean() صراحة
+            $data['is_active'] = $request->boolean('is_active');
+            if ($data['is_active']) {
+                // تفعيل الموقع من لوحة التحكم = اعتماد الأدمن له
+                $data['verification_status'] = 'approved';
+            }
+
             $site->update($data);
 
             return redirect()->route('tourist-sites.index')

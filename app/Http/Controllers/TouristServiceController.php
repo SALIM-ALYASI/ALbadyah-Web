@@ -252,6 +252,13 @@ class TouristServiceController extends Controller
             'service_type_id' => 'nullable|integer|exists:service_types,id',
         ]);
 
+        // النشر: checkbox غير موجود بالطلب أصلاً لو غير محدد، فنعتمد boolean() صراحة
+        $data['is_active'] = $request->boolean('is_active');
+        if ($data['is_active']) {
+            // تفعيل الخدمة من لوحة التحكم = اعتماد الأدمن لها
+            $data['verification_status'] = 'approved';
+        }
+
         // رفع الصورة الجديدة إذا تم اختيارها
         if ($request->hasFile('image')) {
             // حذف الصورة القديمة إذا كانت موجودة

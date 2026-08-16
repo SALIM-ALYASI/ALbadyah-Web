@@ -202,6 +202,24 @@
                         @enderror
                     </div>
                     
+                    <div class="mb-4 p-3 border rounded {{ $touristSite->is_active ? 'border-success bg-success bg-opacity-10' : 'border-warning bg-warning bg-opacity-10' }}">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox"
+                                   id="is_active" name="is_active" value="1"
+                                   {{ old('is_active', $touristSite->is_active) ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold" for="is_active">
+                                <i class="fas fa-globe me-1"></i>
+                                نشر الموقع (يظهر بالموقع العام)
+                            </label>
+                        </div>
+                        <small class="text-muted d-block mt-1">
+                            الحالة الحالية:
+                            {{ $touristSite->is_active ? 'منشور' : 'غير منشور' }} —
+                            {{ $touristSite->verification_status === 'approved' ? 'معتمد' : 'قيد المراجعة (' . $touristSite->verification_status . ')' }}.
+                            تفعيل هذا الخيار يعتمد الموقع تلقائيًا وينشره فورًا.
+                        </small>
+                    </div>
+
                     <!-- Form Actions -->
                     <div class="d-flex gap-3 justify-content-end pt-3 border-top">
                         <a href="{{ route('tourist-sitesController.show', $touristSite->id) }}" class="btn btn-secondary">
