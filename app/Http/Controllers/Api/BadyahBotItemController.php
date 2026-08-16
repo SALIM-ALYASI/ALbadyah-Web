@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\DataSource;
+use App\Models\ServiceType;
 use App\Models\TouristService;
 use App\Models\TouristSite;
+use App\Models\TouristSiteCategory;
 use App\Models\Wilayat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -90,6 +92,20 @@ class BadyahBotItemController extends Controller
         ]);
     }
 
+    /**
+     * قراءة فقط: قائمة التصنيفات الحقيقية (تصنيفات المواقع + أنواع الخدمات)
+     * عشان البوت (أو أي إثراء بالذكاء الاصطناعي قبل الإرسال) يختار من تصنيفات
+     * موجودة فعليًا بدل ما يخترع تصنيف جديد.
+     */
+    public function categories()
+    {
+        return response()->json([
+            'success' => true,
+            'site_categories' => TouristSiteCategory::orderBy('name_ar')->get(['id', 'name_ar', 'name_en']),
+            'service_types' => ServiceType::orderBy('name_ar')->get(['id', 'name_ar', 'name_en']),
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -105,6 +121,11 @@ class BadyahBotItemController extends Controller
             'website' => ['nullable', 'string', 'max:255'],
             'source_url' => ['nullable', 'string', 'max:255'],
             'image_url' => ['nullable', 'url', 'max:500'],
+            'description_ar' => ['nullable', 'string', 'max:2000'],
+            'description_en' => ['nullable', 'string', 'max:2000'],
+            'opening_hours' => ['nullable', 'string', 'max:255'],
+            'tourist_site_category_id' => ['nullable', 'integer', 'exists:tourist_site_categories,id'],
+            'service_type_id' => ['nullable', 'integer', 'exists:service_types,id'],
         ]);
 
         $validator->after(function ($validator) use ($request) {
@@ -208,12 +229,20 @@ class BadyahBotItemController extends Controller
             'collected_at' => now(),
         ];
 
+        // ساعات العمل ما لها عمود مستقل بقاعدة البيانات حاليًا؛ تُلحق بنهاية
+        // الوصف حتى ما تضيع المعلومة، بدل تعديل الشيما لحقل واحد نادر الحاجة.
+        $appendHours = fn (?string $desc) => $desc && !empty($data['opening_hours'])
+            ? rtrim($desc)."\n\nساعات العمل: {$data['opening_hours']}"
+            : $desc;
+
         if ($data['category'] === 'service') {
             $service = TouristService::create($shared + [
                 'slug' => Str::slug($slugSource).'-'.Str::random(6),
                 'phone' => $data['phone'] ?? null,
-                'service_type_id' => null,
+                'service_type_id' => $data['service_type_id'] ?? null,
                 'image_url' => $data['image_url'] ?? null,
+                'description_ar' => $appendHours($data['description_ar'] ?? null),
+                'description_en' => $data['description_en'] ?? null,
             ]);
 
             return response()->json([
@@ -227,9 +256,9 @@ class BadyahBotItemController extends Controller
         $site = TouristSite::create($shared + [
             'slug' => Str::slug($slugSource).'-'.Str::random(6),
             // description_ar/description_en غير قابلة لـ null بقاعدة البيانات
-            'description_ar' => '',
-            'description_en' => '',
-            'tourist_site_category_id' => null,
+            'description_ar' => $appendHours($data['description_ar'] ?? '') ?? '',
+            'description_en' => $data['description_en'] ?? '',
+            'tourist_site_category_id' => $data['tourist_site_category_id'] ?? null,
         ]);
 
         // الموقع يستخدم جدول صور منفصل (tourist_images)، مو عمود مباشر
