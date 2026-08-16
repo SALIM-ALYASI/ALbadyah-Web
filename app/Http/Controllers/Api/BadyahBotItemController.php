@@ -165,6 +165,25 @@ class BadyahBotItemController extends Controller
         $nameEn = $data['name_en'] ?? $data['name_ar'];
         $slugSource = $data['name_en'] ?? $data['name_ar'];
 
+        // منع تكرار أوسع: نفس المكان الحقيقي أحيانًا يوصل بمعرّف OSM مختلف
+        // (عنصر ثاني بنفس الموقع)، أو أصلًا موجود يدويًا من قبل البوت بلا
+        // external_id. نطابق بالاسم + نفس الولاية، ونتأكد بالمسافة إذا
+        // كان عند الطرفين إحداثيات (نتساهل لو أحدهما بلا إحداثيات، زي
+        // السجلات القديمة المدخلة يدويًا).
+        $modelClass = $data['category'] === 'service' ? TouristService::class : TouristSite::class;
+        $likelyDuplicate = $this->findLikelyDuplicate(
+            $modelClass, $nameAr, $nameEn, $wilayat->id, (float) $data['latitude'], (float) $data['longitude']
+        );
+
+        if ($likelyDuplicate) {
+            return response()->json([
+                'success' => true,
+                'duplicate' => true,
+                'message' => 'موجود مسبقًا بنفس الاسم والولاية، ما تكرر.',
+                'data' => ['id' => $likelyDuplicate->id, 'type' => $data['category']],
+            ]);
+        }
+
         $shared = [
             'name_ar' => $nameAr,
             'name_en' => $nameEn,
@@ -217,5 +236,54 @@ class BadyahBotItemController extends Controller
             'message' => 'تم حفظ الموقع كـ pending، بانتظار استكمال البيانات من لوحة التحكم.',
             'data' => ['id' => $site->id, 'type' => 'site'],
         ], 201);
+    }
+
+    /**
+     * يبحث عن سجل موجود مسبقًا (أي مصدر، مو بس البوت) يبدو إنه نفس المكان:
+     * نفس الاسم (عربي أو إنجليزي، تطابق تام بعد التنظيف) + نفس الولاية.
+     * لو عند الطرفين إحداثيات، لازم كمان يكونان قريبين (≤500م) حتى ما
+     * نخلط بين مكانين مختلفين بنفس الاسم العام. لو أحدهما بلا إحداثيات
+     * (زي السجلات القديمة المُدخلة يدويًا)، الاسم + الولاية كافي.
+     */
+    private function findLikelyDuplicate(string $modelClass, ?string $nameAr, ?string $nameEn, int $wilayatId, float $lat, float $lng)
+    {
+        $nameArNorm = $nameAr ? mb_strtolower(trim($nameAr)) : null;
+        $nameEnNorm = $nameEn ? mb_strtolower(trim($nameEn)) : null;
+
+        if (!$nameArNorm && !$nameEnNorm) {
+            return null;
+        }
+
+        $candidates = $modelClass::where('wilayat_id', $wilayatId)
+            ->where(function ($q) use ($nameArNorm, $nameEnNorm) {
+                if ($nameArNorm) {
+                    $q->orWhereRaw('LOWER(TRIM(name_ar)) = ?', [$nameArNorm]);
+                }
+                if ($nameEnNorm) {
+                    $q->orWhereRaw('LOWER(TRIM(name_en)) = ?', [$nameEnNorm]);
+                }
+            })
+            ->get(['id', 'latitude', 'longitude']);
+
+        foreach ($candidates as $candidate) {
+            if ($candidate->latitude === null || $candidate->longitude === null) {
+                return $candidate; // بلا إحداثيات نقارن فيها - الاسم + الولاية كافي
+            }
+            $distance = $this->haversineMeters($lat, $lng, (float) $candidate->latitude, (float) $candidate->longitude);
+            if ($distance <= 500) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
+    private function haversineMeters(float $lat1, float $lon1, float $lat2, float $lon2): float
+    {
+        $earthRadius = 6371000;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+        $a = sin($dLat / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) ** 2;
+        return $earthRadius * 2 * atan2(sqrt($a), sqrt(1 - $a));
     }
 }
