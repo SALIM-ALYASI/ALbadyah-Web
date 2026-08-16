@@ -96,6 +96,14 @@ class ImageHelper
 
         $parsedUrl = parse_url($imageUrl);
 
+        // رابط خارجي كامل وسليم (له scheme وhost فعليين، مثل Wikimedia) —
+        // يرجع كما هو بدون تعديل. التعديل السابق كان يكسر أي رابط خارجي
+        // بأخذ الـ path فقط وإعادة بنائه كملف محلي داخل storage/.
+        if (!empty($parsedUrl['scheme']) && !empty($parsedUrl['host'])) {
+            return $imageUrl;
+        }
+
+        // غير هذا: مسار محلي فقط بدون host — نفترضه ملف داخل storage
         if (isset($parsedUrl['path'])) {
             $path = ltrim($parsedUrl['path'], '/');
             if (strpos($path, 'storage/') === 0) {

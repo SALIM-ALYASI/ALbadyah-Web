@@ -104,6 +104,7 @@ class BadyahBotItemController extends Controller
             'phone' => ['nullable', 'string', 'max:60'],
             'website' => ['nullable', 'string', 'max:255'],
             'source_url' => ['nullable', 'string', 'max:255'],
+            'image_url' => ['nullable', 'url', 'max:500'],
         ]);
 
         $validator->after(function ($validator) use ($request) {
@@ -212,6 +213,7 @@ class BadyahBotItemController extends Controller
                 'slug' => Str::slug($slugSource).'-'.Str::random(6),
                 'phone' => $data['phone'] ?? null,
                 'service_type_id' => null,
+                'image_url' => $data['image_url'] ?? null,
             ]);
 
             return response()->json([
@@ -229,6 +231,16 @@ class BadyahBotItemController extends Controller
             'description_en' => '',
             'tourist_site_category_id' => null,
         ]);
+
+        // الموقع يستخدم جدول صور منفصل (tourist_images)، مو عمود مباشر
+        if (!empty($data['image_url'])) {
+            $site->images()->create([
+                'image_url' => $data['image_url'],
+                'alt_text_ar' => $site->name_ar,
+                'is_featured' => true,
+                'sort_order' => 0,
+            ]);
+        }
 
         return response()->json([
             'success' => true,
