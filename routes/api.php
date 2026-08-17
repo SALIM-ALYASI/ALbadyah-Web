@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\TouristServiceApiController;
 use App\Http\Controllers\Api\VisitApiController;
 use App\Http\Controllers\Api\SearchApiController;
 use App\Http\Controllers\Api\BadyahBotItemController;
+use App\Http\Controllers\Api\MapCandidateController;
 use App\Http\Controllers\AuthController;
 
 /*
@@ -108,11 +109,19 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum'])->group(function () {
 | كل عنصر يُحفظ pending + is_active=false دائمًا — لا نشر مباشر من هنا.
 |
 */
-Route::prefix('badyah-bot')->middleware(['badyah-bot.auth', 'throttle:20,1'])->group(function () {
+// throttle:120,1 بدل 20,1 - v2 يرسل مسودة map_candidates واحدة لكل مرشّح
+// مكتشف (مو بس عند الموافقة زي قبل)، فبحث وحد بولاية فيها عشرات النقاط
+// يحتاج عشرات النداءات بدقيقة وحدة. Endpoint داخلي بتوكن، مو عام.
+Route::prefix('badyah-bot')->middleware(['badyah-bot.auth', 'throttle:120,1'])->group(function () {
     Route::post('/items', [BadyahBotItemController::class, 'store']);
     Route::get('/items', [BadyahBotItemController::class, 'index']);
     Route::get('/categories', [BadyahBotItemController::class, 'categories']);
     Route::get('/areas', [BadyahBotItemController::class, 'areas']);
     Route::get('/wilayats/{wilayat}/stats', [BadyahBotItemController::class, 'wilayatStats']);
     Route::get('/wilayats/{wilayat}/items', [BadyahBotItemController::class, 'wilayatItems']);
+
+    // طابور مسودات (map_candidates) - منفصل تمامًا عن /items، بدون نشر مباشر
+    Route::post('/candidates', [MapCandidateController::class, 'store']);
+    Route::patch('/candidates/{candidateId}', [MapCandidateController::class, 'update']);
+    Route::get('/candidates', [MapCandidateController::class, 'index']);
 });

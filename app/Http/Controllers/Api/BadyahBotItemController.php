@@ -173,17 +173,22 @@ class BadyahBotItemController extends Controller
         }
 
         $type = $request->query('type');
-        $columns = [
-            'id', 'name_ar', 'name_en', 'latitude', 'longitude',
+        $baseColumns = [
+            'id', 'name_ar', 'name_en', 'latitude', 'longitude', 'website_url',
             'source_url', 'external_id', 'verification_status', 'is_active', 'collector_name',
         ];
 
+        // TouristSite ما فيه عمود phone أصلاً (بعكس TouristService) - نضيفه
+        // بس لاستعلام الخدمات، ونطبّع اسم الحقل لـ website/phone بالرد
+        // (بدل website_url) عشان يطابق شكل حقول map_candidates بجهة البوت.
         $sites = $type !== 'service'
-            ? TouristSite::where('wilayat_id', $wilayat->id)->get($columns)->values()
+            ? TouristSite::where('wilayat_id', $wilayat->id)->get($baseColumns)->values()
+                ->map(fn ($s) => $this->normalizeItemFields($s, null))
             : collect();
 
         $services = $type !== 'site'
-            ? TouristService::where('wilayat_id', $wilayat->id)->get($columns)->values()
+            ? TouristService::where('wilayat_id', $wilayat->id)->get([...$baseColumns, 'phone'])->values()
+                ->map(fn ($s) => $this->normalizeItemFields($s, $s->phone))
             : collect();
 
         return response()->json([
@@ -419,6 +424,29 @@ class BadyahBotItemController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * يحوّل صف TouristSite/TouristService لمصفوفة بأسماء حقول موحّدة
+     * (website بدل website_url، phone صريح) عشان تطابق شكل map_candidates
+     * بجانب البوت لفحص التكرار (رقم هاتف/موقع إلكتروني).
+     */
+    private function normalizeItemFields($model, ?string $phone): array
+    {
+        return [
+            'id' => $model->id,
+            'name_ar' => $model->name_ar,
+            'name_en' => $model->name_en,
+            'latitude' => $model->latitude,
+            'longitude' => $model->longitude,
+            'website' => $model->website_url,
+            'phone' => $phone,
+            'source_url' => $model->source_url,
+            'external_id' => $model->external_id,
+            'verification_status' => $model->verification_status,
+            'is_active' => (bool) $model->is_active,
+            'collector_name' => $model->collector_name,
+        ];
     }
 
     private function haversineMeters(float $lat1, float $lon1, float $lat2, float $lon2): float
