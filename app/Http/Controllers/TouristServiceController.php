@@ -12,6 +12,62 @@ use Illuminate\Support\Facades\DB;
 class TouristServiceController extends Controller
 {
     /**
+     * مرجع مؤقت لجميع الخدمات السياحية لكشف التكرار.
+     */
+    public function reference(Request $request)
+    {
+        $query = TouristService::with([
+            'serviceType',
+            'governorate',
+            'wilayat',
+        ]);
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name_ar', 'like', "%{$search}%")
+                  ->orWhere('name_en', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('governorate_id')) {
+            $query->where('governorate_id', $request->governorate_id);
+        }
+
+        if ($request->filled('wilayat_id')) {
+            $query->where('wilayat_id', $request->wilayat_id);
+        }
+
+        if ($request->filled('service_type_id')) {
+            $query->where('service_type_id', $request->service_type_id);
+        }
+
+        $touristServices = $query
+            ->orderBy('name_ar')
+            ->paginate(50)
+            ->withQueryString();
+
+        $governorates = Governorate::orderBy('name_ar')->get();
+
+        $wilayats = Wilayat::with('governorate')
+            ->orderBy('name_ar')
+            ->get();
+
+        $serviceTypes = ServiceType::orderBy('name_ar')->get();
+
+        $totalServices = TouristService::count();
+
+        return view('reference.services', compact(
+            'touristServices',
+            'governorates',
+            'wilayats',
+            'serviceTypes',
+            'totalServices'
+        ));
+    }
+
+    /**
      * عرض قائمة الخدمات السياحية
      */
     public function index(Request $request)

@@ -18,6 +18,48 @@ class TouristSiteController extends Controller
         $this->middleware('web');
     }
     /**
+     * مرجع مؤقت لجميع المواقع السياحية لكشف التكرار.
+     */
+    public function reference(Request $request)
+    {
+        $query = TouristSite::with(['governorate', 'wilayat', 'category']);
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name_ar', 'like', "%{$search}%")
+                  ->orWhere('name_en', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('governorate_id')) {
+            $query->where('governorate_id', $request->governorate_id);
+        }
+
+        if ($request->filled('wilayat_id')) {
+            $query->where('wilayat_id', $request->wilayat_id);
+        }
+
+        $touristSites = $query
+            ->orderBy('name_ar')
+            ->paginate(50)
+            ->withQueryString();
+
+        $governorates = Governorate::orderBy('name_ar')->get();
+        $wilayats = Wilayat::with('governorate')->orderBy('name_ar')->get();
+
+        $totalSites = TouristSite::count();
+
+        return view('reference.sites', compact(
+            'touristSites',
+            'governorates',
+            'wilayats',
+            'totalSites'
+        ));
+    }
+
+    /**
      * عرض قائمة المواقع السياحية
      */
     public function index(Request $request)

@@ -36,6 +36,13 @@ Route::prefix('tourism')->name('tourism.')->group(function () {
 });
 
 
+// صفحات مرجعية مؤقتة لمراجعة التكرار
+Route::get('/reference/sites', [TouristSiteController::class, 'reference'])
+    ->name('reference.sites');
+
+Route::get('/reference/services', [TouristServiceController::class, 'reference'])
+    ->name('reference.services');
+
 // روابط تسجيل دخول الإدمن
 Route::get('/admin/login', [AdminController::class, 'showLogin'])->name('admin.login');
 Route::post('/admin/login', [AdminController::class, 'login']);
