@@ -9,6 +9,7 @@ use App\Http\Controllers\TouristServiceController;
 use App\Http\Controllers\TourismWebsiteController;
 use App\Http\Controllers\VisitController;
 use App\Http\Controllers\VisitStatsController;
+use App\Http\Controllers\MapCandidateReviewController;
 
 // الصفحة الرئيسية للموقع السياحي
 Route::get('/', [TourismWebsiteController::class, 'index'])->name('tourism.index');
@@ -59,6 +60,16 @@ Route::group([
         Route::resource('wilayats', WilayatController::class);
         Route::resource('tourist-sitesController', TouristSiteController::class);
         Route::resource('tourist-services', TouristServiceController::class);
+
+        // مراجعة بيانات بوت البادية وتحويلها يدويًا إلى جداول الموقع النهائية
+        Route::get('map-candidates', [MapCandidateReviewController::class, 'index'])
+            ->name('map-candidates.index');
+        Route::get('map-candidates/{candidateId}/edit', [MapCandidateReviewController::class, 'edit'])
+            ->name('map-candidates.edit');
+        Route::post('map-candidates/{candidateId}/process', [MapCandidateReviewController::class, 'process'])
+            ->name('map-candidates.process');
+        Route::post('map-candidates/{candidateId}/reject', [MapCandidateReviewController::class, 'reject'])
+            ->name('map-candidates.reject');
         
         // روابط إضافية للخدمات السياحية
         Route::get('tourist-services/create/location', [TouristServiceController::class, 'createLocation'])->name('tourist-services.create-location');

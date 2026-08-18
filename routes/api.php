@@ -106,7 +106,8 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum'])->group(function () {
 |--------------------------------------------------------------------------
 |
 | توثيق مستقل عبر BADYAH_BOT_API_TOKEN فقط (لا Sanctum ولا admin.auth).
-| كل عنصر يُحفظ pending + is_active=false دائمًا — لا نشر مباشر من هنا.
+| المرشح يُحفظ أولًا في map_candidates. النقل للجداول النهائية لا يحدث إلا
+| بقرار صريح من المشرف عبر زر الحفظ أو النشر في تلجرام.
 |
 */
 // throttle:120,1 بدل 20,1 - v2 يرسل مسودة map_candidates واحدة لكل مرشّح
@@ -120,8 +121,9 @@ Route::prefix('badyah-bot')->middleware(['badyah-bot.auth', 'throttle:120,1'])->
     Route::get('/wilayats/{wilayat}/stats', [BadyahBotItemController::class, 'wilayatStats']);
     Route::get('/wilayats/{wilayat}/items', [BadyahBotItemController::class, 'wilayatItems']);
 
-    // طابور مسودات (map_candidates) - منفصل تمامًا عن /items، بدون نشر مباشر
+    // طابور المسودات + نقل صريح وآمن للجداول النهائية بقرار المشرف
     Route::post('/candidates', [MapCandidateController::class, 'store']);
     Route::patch('/candidates/{candidateId}', [MapCandidateController::class, 'update']);
+    Route::post('/candidates/{candidateId}/publish', [MapCandidateController::class, 'publish']);
     Route::get('/candidates', [MapCandidateController::class, 'index']);
 });

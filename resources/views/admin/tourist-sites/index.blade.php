@@ -16,6 +16,10 @@
                     <p class="text-muted mb-0">إدارة وعرض جميع المواقع السياحية في النظام</p>
                 </div>
                 <div>
+                    <a href="{{ route('map-candidates.index') }}" class="btn btn-outline-primary btn-lg mr-2">
+                        <i class="fas fa-robot mr-2"></i>
+                        بيانات بوت البادية
+                    </a>
                     <a href="{{ route('tourist-sites.create') }}" class="btn btn-primary btn-lg">
                         <i class="fas fa-plus mr-2"></i>
                         إضافة موقع سياحي جديد

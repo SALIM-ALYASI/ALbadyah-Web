@@ -4,14 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\MapCandidate;
+use App\Services\MapCandidatePublisher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 /**
  * طابور مسودات بوت البادية (map_candidates) - منفصل تمامًا عن
  * BadyahBotItemController/tourist_sites/tourist_services. لا يوجد هنا أي
- * مسار ينشر شي بالموقع العام - مجرد تخزين مرشّحين بمصادرهم ودرجة ثقتهم
- * بانتظار قرار الأدمن، والنشر الفعلي لاحقًا خطوة يدوية منفصلة تمامًا.
+ * التخزين الأولي لا ينشر شيئًا. النقل للجداول النهائية يتم فقط عبر publish()
+ * بعد ضغط المشرف زر الحفظ أو النشر في تلجرام.
  */
 class MapCandidateController extends Controller
 {
@@ -35,6 +36,7 @@ class MapCandidateController extends Controller
             'phone' => ['nullable', 'string', 'max:60'],
             'website' => ['nullable', 'string', 'max:255'],
             'opening_hours' => ['nullable', 'string', 'max:255'],
+            'address_ar' => ['nullable', 'string', 'max:500'],
             'wilayat_id' => ['nullable', 'integer', 'exists:wilayats,id'],
             'governorate_id' => ['nullable', 'integer', 'exists:governorates,id'],
             'description_ar' => ['nullable', 'string', 'max:2000'],
@@ -124,6 +126,8 @@ class MapCandidateController extends Controller
             'description_en' => ['sometimes', 'string', 'max:2000'],
             'phone' => ['sometimes', 'nullable', 'string', 'max:60'],
             'website' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'opening_hours' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'address_ar' => ['sometimes', 'nullable', 'string', 'max:500'],
         ]);
 
         if ($validator->fails()) {
@@ -138,6 +142,44 @@ class MapCandidateController extends Controller
         $candidate->save();
 
         return response()->json(['success' => true, 'data' => $candidate]);
+    }
+
+    /**
+     * نقل مباشر من تلجرام إلى جدول الموقع النهائي.
+     * mode=review يحفظه غير ظاهر للعامة، وmode=public ينشر المكتمل فقط.
+     */
+    public function publish(Request $request, int $candidateId, MapCandidatePublisher $publisher)
+    {
+        $validator = Validator::make($request->all(), [
+            'mode' => ['required', 'in:review,public'],
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'وضع الحفظ غير صالح.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $candidate = MapCandidate::find($candidateId);
+        if (!$candidate) {
+            return response()->json(['success' => false, 'message' => 'مرشّح غير موجود.'], 404);
+        }
+
+        $record = $publisher->publish($candidate->id, $request->input('mode') === 'public');
+
+        return response()->json([
+            'success' => true,
+            'message' => $request->input('mode') === 'public'
+                ? 'تم الحفظ والنشر في الموقع.'
+                : 'تم الحفظ في بيانات الموقع للمراجعة.',
+            'data' => [
+                'candidate_id' => $candidate->id,
+                'table' => $candidate->category === 'service' ? 'tourist_services' : 'tourist_sites',
+                'id' => $record->id,
+                'public' => $request->input('mode') === 'public',
+            ],
+        ], 201);
     }
 
     /**
