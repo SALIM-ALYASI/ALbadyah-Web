@@ -105,6 +105,43 @@ class MapCandidatePublisher
                 $table = 'tourist_sites';
             }
 
+            // حفظ جميع صور الاستيراد في معرض الصور.
+            $imageUrls = array_values(array_unique(array_filter(
+                $candidate->image_urls ?: (
+                    (!$candidate->image_is_placeholder && $candidate->image_url)
+                        ? [$candidate->image_url]
+                        : []
+                )
+            )));
+
+            foreach ($imageUrls as $index => $imageUrl) {
+                if ($candidate->category === 'service') {
+                    DB::table('tourist_service_images')->insert([
+                        'tourist_service_id' => $finalRecord->id,
+                        'image_url' => $imageUrl,
+                        'image_path' => null,
+                        'alt_text_ar' => $candidate->name_ar,
+                        'alt_text_en' => $candidate->name_en ?: $candidate->name_ar,
+                        'sort_order' => $index,
+                        'is_featured' => $index === 0,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                } else {
+                    DB::table('tourist_images')->insert([
+                        'tourist_site_id' => $finalRecord->id,
+                        'image_url' => $imageUrl,
+                        'image_path' => null,
+                        'alt_text_ar' => $candidate->name_ar,
+                        'alt_text_en' => $candidate->name_en ?: $candidate->name_ar,
+                        'sort_order' => $index,
+                        'is_featured' => $index === 0,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+
             $candidate->update([
                 'status' => 'published',
                 'published_table' => $table,
