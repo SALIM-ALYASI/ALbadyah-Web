@@ -222,9 +222,13 @@ class TouristSite extends Model
     public function getFeaturedImageAttribute($value)
     {
         if ($value) {
-            return \App\Helpers\ImageHelper::getImageUrl($value, null);
+            // $value هنا رابط خارجي كامل (Wikimedia وغيره) في كل السجلات الفعلية،
+            // وليس مسارًا محليًا - لازم يمر كـ$imageUrl (الوسيط الثاني) لا $imagePath
+            // (الأول)، وإلا يحاول ImageHelper يتحقق منه كملف محلي فيفشل دائمًا
+            // ويرجع الصورة الافتراضية المفقودة أصلًا من القرص.
+            return \App\Helpers\ImageHelper::getImageUrl(null, $value);
         }
-        
+
         // إذا لم تكن هناك صورة مميزة، احصل على أول صورة
         $firstImage = $this->images()->featured()->first() ?: $this->images()->first();
         return $firstImage ? $firstImage->image_url : asset('images/default-tourist-site.jpg');
