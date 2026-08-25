@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('verification_logs')) {
+            return;
+        }
+
         Schema::create('verification_logs', function (Blueprint $table) {
             $table->id();
             $table->morphs('recordable'); // recordable_type, recordable_id
