@@ -1,284 +1,110 @@
 @extends('layouts.app')
 
 @section('title', 'إحصائيات الزيارات')
+@section('page-title', 'إحصائيات الزيارات')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="page-header">
-                <h1>إحصائيات الزيارات</h1>
-                <p class="text-muted">تتبع زيارات الموقع والإحصائيات التفصيلية</p>
-            </div>
-        </div>
+
+    <div class="mb-6">
+        <h1 class="m-0 text-2xl font-bold text-ab-navy">إحصائيات الزيارات</h1>
+        <p class="m-0 mt-1 text-sm text-ab-body">تتبع زيارات الموقع والإحصائيات التفصيلية.</p>
     </div>
 
-    <!-- إحصائيات سريعة -->
-    <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stats-card">
-                <div class="stats-icon">
-                    <i class="fas fa-eye"></i>
-                </div>
-                <div class="stats-content">
-                    <h3>{{ number_format($totalVisits) }}</h3>
-                    <p>إجمالي الزيارات</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stats-card">
-                <div class="stats-icon">
-                    <i class="fas fa-calendar-day"></i>
-                </div>
-                <div class="stats-content">
-                    <h3>{{ number_format($visitsToday) }}</h3>
-                    <p>زيارات اليوم</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stats-card">
-                <div class="stats-icon">
-                    <i class="fas fa-calendar-week"></i>
-                </div>
-                <div class="stats-content">
-                    <h3>{{ number_format($visitsThisWeek) }}</h3>
-                    <p>زيارات هذا الأسبوع</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="stats-card">
-                <div class="stats-icon">
-                    <i class="fas fa-calendar-alt"></i>
-                </div>
-                <div class="stats-content">
-                    <h3>{{ number_format($visitsThisMonth) }}</h3>
-                    <p>زيارات هذا الشهر</p>
-                </div>
-            </div>
-        </div>
+    <div class="grid gap-4 mb-6" style="grid-template-columns:repeat(auto-fit, minmax(180px,1fr))">
+        <x-admin.stat-card label="إجمالي الزيارات" :value="number_format($totalVisits)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        </x-admin.stat-card>
+        <x-admin.stat-card label="زيارات اليوم" :value="number_format($visitsToday)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+        </x-admin.stat-card>
+        <x-admin.stat-card label="زيارات هذا الأسبوع" :value="number_format($visitsThisWeek)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"></rect><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01"></path></svg>
+        </x-admin.stat-card>
+        <x-admin.stat-card label="زيارات هذا الشهر" :value="number_format($visitsThisMonth)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"></rect><path d="M16 2v4M8 2v4M3 10h18"></path><path d="M8 14h8v4H8z"></path></svg>
+        </x-admin.stat-card>
     </div>
 
-    <div class="row">
-        <!-- الزيارات حسب الدولة -->
-        <div class="col-lg-6 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-globe me-2"></i>الزيارات حسب الدولة</h5>
-                </div>
-                <div class="card-body">
-                    @if($visitsByCountry->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>الدولة</th>
-                                        <th>عدد الزيارات</th>
-                                        <th>النسبة</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($visitsByCountry as $visit)
-                                        <tr>
-                                            <td>{{ $visit->country }}</td>
-                                            <td>{{ number_format($visit->count) }}</td>
-                                            <td>
-                                                <div class="progress" style="height: 20px;">
-                                                    <div class="progress-bar" role="progressbar" 
-                                                         style="width: {{ ($visit->count / $totalVisits) * 100 }}%"
-                                                         aria-valuenow="{{ $visit->count }}" 
-                                                         aria-valuemin="0" 
-                                                         aria-valuemax="{{ $totalVisits }}">
-                                                        {{ round(($visit->count / $totalVisits) * 100, 1) }}%
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+    <div class="grid gap-6 mb-6" style="grid-template-columns:repeat(auto-fit, minmax(320px,1fr))">
+        <div class="bg-white border border-ab-border rounded-[22px] p-6">
+            <h2 class="m-0 text-sm font-bold text-ab-navy mb-4">الزيارات حسب الدولة</h2>
+            @if ($visitsByCountry->count())
+                <div class="flex flex-col gap-3">
+                    @foreach ($visitsByCountry as $visit)
+                        @php($pct = $totalVisits > 0 ? round(($visit->count / $totalVisits) * 100, 1) : 0)
+                        <div>
+                            <div class="flex items-center justify-between text-sm mb-1">
+                                <span class="text-ab-navy font-medium">{{ $visit->country }}</span>
+                                <span class="text-ab-muted">{{ number_format($visit->count) }} · {{ $pct }}%</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-ab-cool overflow-hidden">
+                                <div class="h-full rounded-full bg-ab-teal" style="width: {{ $pct }}%"></div>
+                            </div>
                         </div>
-                    @else
-                        <p class="text-muted">لا توجد بيانات زيارات متاحة</p>
-                    @endif
+                    @endforeach
                 </div>
-            </div>
+            @else
+                <p class="m-0 text-sm text-ab-muted">لا توجد بيانات زيارات متاحة</p>
+            @endif
         </div>
 
-        <!-- الزيارات حسب المدينة -->
-        <div class="col-lg-6 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-map-marker-alt me-2"></i>الزيارات حسب المدينة</h5>
-                </div>
-                <div class="card-body">
-                    @if($visitsByCity->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>المدينة</th>
-                                        <th>عدد الزيارات</th>
-                                        <th>النسبة</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($visitsByCity as $visit)
-                                        <tr>
-                                            <td>{{ $visit->city }}</td>
-                                            <td>{{ number_format($visit->count) }}</td>
-                                            <td>
-                                                <div class="progress" style="height: 20px;">
-                                                    <div class="progress-bar bg-success" role="progressbar" 
-                                                         style="width: {{ ($visit->count / $totalVisits) * 100 }}%"
-                                                         aria-valuenow="{{ $visit->count }}" 
-                                                         aria-valuemin="0" 
-                                                         aria-valuemax="{{ $totalVisits }}">
-                                                        {{ round(($visit->count / $totalVisits) * 100, 1) }}%
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+        <div class="bg-white border border-ab-border rounded-[22px] p-6">
+            <h2 class="m-0 text-sm font-bold text-ab-navy mb-4">الزيارات حسب المدينة</h2>
+            @if ($visitsByCity->count())
+                <div class="flex flex-col gap-3">
+                    @foreach ($visitsByCity as $visit)
+                        @php($pct = $totalVisits > 0 ? round(($visit->count / $totalVisits) * 100, 1) : 0)
+                        <div>
+                            <div class="flex items-center justify-between text-sm mb-1">
+                                <span class="text-ab-navy font-medium">{{ $visit->city }}</span>
+                                <span class="text-ab-muted">{{ number_format($visit->count) }} · {{ $pct }}%</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-ab-cool overflow-hidden">
+                                <div class="h-full rounded-full bg-emerald-500" style="width: {{ $pct }}%"></div>
+                            </div>
                         </div>
-                    @else
-                        <p class="text-muted">لا توجد بيانات زيارات متاحة</p>
-                    @endif
+                    @endforeach
                 </div>
-            </div>
+            @else
+                <p class="m-0 text-sm text-ab-muted">لا توجد بيانات زيارات متاحة</p>
+            @endif
         </div>
     </div>
 
-    <!-- الزيارات الأخيرة -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-history me-2"></i>الزيارات الأخيرة</h5>
-                </div>
-                <div class="card-body">
-                    @if($recentVisits->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>الدولة</th>
-                                        <th>المدينة</th>
-                                        <th>تاريخ الزيارة</th>
-                                        <th>وقت الزيارة</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($recentVisits as $index => $visit)
-                                        <tr>
-                                            <td>{{ $index + 1 }}</td>
-                                            <td>{{ $visit->country }}</td>
-                                            <td>{{ $visit->city }}</td>
-                                            <td>{{ $visit->created_at->format('Y-m-d') }}</td>
-                                            <td>{{ $visit->created_at->format('H:i:s') }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <p class="text-muted">لا توجد زيارات مسجلة بعد</p>
-                    @endif
-                </div>
-            </div>
+    <div class="bg-white border border-ab-border rounded-[22px] overflow-hidden">
+        <div class="p-6 pb-0">
+            <h2 class="m-0 text-sm font-bold text-ab-navy">الزيارات الأخيرة</h2>
         </div>
+        @if ($recentVisits->count())
+            <div class="overflow-x-auto p-6">
+                <table class="w-full text-sm min-w-[500px]">
+                    <thead>
+                        <tr class="bg-ab-navy text-white">
+                            <th class="px-3 py-3 text-center font-semibold rounded-r-xl">#</th>
+                            <th class="px-3 py-3 text-center font-semibold">الدولة</th>
+                            <th class="px-3 py-3 text-center font-semibold">المدينة</th>
+                            <th class="px-3 py-3 text-center font-semibold">تاريخ الزيارة</th>
+                            <th class="px-3 py-3 text-center font-semibold rounded-l-xl">وقت الزيارة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($recentVisits as $index => $visit)
+                            <tr class="border-b border-ab-border last:border-0 hover:bg-ab-warm/60">
+                                <td class="px-3 py-3 text-center text-ab-muted">{{ $index + 1 }}</td>
+                                <td class="px-3 py-3 text-center text-ab-navy font-medium">{{ $visit->country }}</td>
+                                <td class="px-3 py-3 text-center text-ab-body">{{ $visit->city }}</td>
+                                <td class="px-3 py-3 text-center text-ab-body">{{ $visit->created_at->format('Y-m-d') }}</td>
+                                <td class="px-3 py-3 text-center text-ab-muted" dir="ltr">{{ $visit->created_at->format('H:i:s') }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="p-10">
+                <x-admin.empty-state title="لا توجد زيارات مسجلة بعد" body="ستظهر بيانات الزوار هنا فور بدء تتبع الزيارات." />
+            </div>
+        @endif
     </div>
-</div>
 
-<style>
-.stats-card {
-    background: white;
-    border-radius: 15px;
-    padding: 1.5rem;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    transition: transform 0.3s ease;
-}
-
-.stats-card:hover {
-    transform: translateY(-5px);
-}
-
-.stats-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 1rem;
-}
-
-.stats-icon i {
-    color: white;
-    font-size: 1.5rem;
-}
-
-.stats-content h3 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin: 0;
-}
-
-.stats-content p {
-    color: #6c757d;
-    margin: 0;
-    font-size: 0.9rem;
-}
-
-.card {
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 15px 15px 0 0 !important;
-    border: none;
-}
-
-.card-header h5 {
-    margin: 0;
-    font-weight: 600;
-}
-
-.progress {
-    border-radius: 10px;
-    background-color: #e9ecef;
-}
-
-.progress-bar {
-    border-radius: 10px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.table th {
-    border-top: none;
-    font-weight: 600;
-    color: #495057;
-}
-
-.table td {
-    vertical-align: middle;
-}
-</style>
 @endsection

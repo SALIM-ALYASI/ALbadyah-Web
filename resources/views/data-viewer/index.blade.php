@@ -3,473 +3,321 @@
 @section('title', 'عرض جميع البيانات')
 @section('page-title', 'عرض جميع البيانات')
 
+@php
+    $tabs = [
+        ['key' => 'governorates', 'label' => 'المحافظات', 'count' => $governorates->count()],
+        ['key' => 'wilayats', 'label' => 'الولايات', 'count' => $wilayats->count()],
+        ['key' => 'tourist-sites', 'label' => 'المواقع السياحية', 'count' => $touristSites->count()],
+        ['key' => 'tourist-services', 'label' => 'الخدمات السياحية', 'count' => $touristServices->count()],
+        ['key' => 'service-types', 'label' => 'أنواع الخدمات', 'count' => $serviceTypes->count()],
+        ['key' => 'images', 'label' => 'الصور', 'count' => $touristImages->count()],
+    ];
+@endphp
+
 @section('content')
-<div class="container-fluid">
-    <!-- إحصائيات عامة -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>الإحصائيات العامة</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-2">
-                            <div class="stats-card text-center">
-                                <h3 class="text-primary">{{ $stats['total_governorates'] }}</h3>
-                                <p>المحافظات</p>
+
+    <div class="mb-6">
+        <h1 class="m-0 text-2xl font-bold text-ab-navy">عرض جميع البيانات</h1>
+        <p class="m-0 mt-1 text-sm text-ab-body">نظرة شاملة على كل جداول الموقع للمراجعة السريعة.</p>
+    </div>
+
+    <div class="grid gap-4 mb-6" style="grid-template-columns:repeat(auto-fit, minmax(150px,1fr))">
+        <x-admin.stat-card label="المحافظات" :value="$stats['total_governorates']">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"></path></svg>
+        </x-admin.stat-card>
+        <x-admin.stat-card label="الولايات" :value="$stats['total_wilayats']">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"></path><circle cx="12" cy="10" r="2.6"></circle></svg>
+        </x-admin.stat-card>
+        <x-admin.stat-card label="المواقع السياحية" :value="$stats['total_tourist_sites']">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg>
+        </x-admin.stat-card>
+        <x-admin.stat-card label="الخدمات السياحية" :value="$stats['total_tourist_services']">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+        </x-admin.stat-card>
+        <x-admin.stat-card label="أنواع الخدمات" :value="$stats['total_service_types']">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m20.6 12.3-8.3 8.3a2 2 0 0 1-2.8 0L3 14.1V3h11.1l6.5 6.5a2 2 0 0 1 0 2.8Z"></path><circle cx="7.5" cy="7.5" r="1.2"></circle></svg>
+        </x-admin.stat-card>
+        <x-admin.stat-card label="الصور" :value="$stats['total_images']">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg>
+        </x-admin.stat-card>
+    </div>
+
+    <div id="data-tabs" class="bg-white border border-ab-border rounded-[22px] overflow-hidden">
+        <div class="flex flex-wrap gap-2 p-4 border-b border-ab-border overflow-x-auto">
+            @foreach ($tabs as $index => $tab)
+                <button type="button" data-tab-btn="{{ $tab['key'] }}" onclick="AdminUI.showTab('data-tabs', '{{ $tab['key'] }}')"
+                    class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition {{ $index === 0 ? 'bg-ab-navy text-white' : 'text-ab-body hover:bg-ab-warm' }}">
+                    {{ $tab['label'] }} ({{ $tab['count'] }})
+                </button>
+            @endforeach
+        </div>
+
+        <div class="p-5">
+            {{-- المحافظات --}}
+            <div data-tab-panel="governorates" class="overflow-x-auto">
+                <table class="w-full text-sm min-w-[900px]">
+                    <thead>
+                        <tr class="bg-ab-navy text-white">
+                            <th class="px-3 py-3 text-center font-semibold">#</th>
+                            <th class="px-3 py-3 text-right font-semibold">الاسم بالعربية</th>
+                            <th class="px-3 py-3 text-right font-semibold" dir="ltr">الاسم بالإنجليزية</th>
+                            <th class="px-3 py-3 text-center font-semibold">موقع الويب</th>
+                            <th class="px-3 py-3 text-center font-semibold">الولايات</th>
+                            <th class="px-3 py-3 text-center font-semibold">المواقع</th>
+                            <th class="px-3 py-3 text-center font-semibold">الخدمات</th>
+                            <th class="px-3 py-3 text-center font-semibold">الصورة</th>
+                            <th class="px-3 py-3 text-center font-semibold">تاريخ الإنشاء</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($governorates as $governorate)
+                            <tr class="border-b border-ab-border last:border-0 hover:bg-ab-warm/60">
+                                <td class="px-3 py-3 text-center text-ab-muted">{{ $loop->iteration }}</td>
+                                <td class="px-3 py-3 font-semibold text-ab-navy">{{ $governorate->name_ar }}</td>
+                                <td class="px-3 py-3 text-ab-body" dir="ltr">{{ $governorate->name_en }}</td>
+                                <td class="px-3 py-3 text-center">
+                                    @if ($governorate->website_url)
+                                        <a href="{{ $governorate->website_url }}" target="_blank" rel="noopener" class="text-ab-teal text-xs font-semibold underline">زيارة الموقع</a>
+                                    @else
+                                        <span class="text-ab-muted text-xs">لا يوجد</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-center"><span class="px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-semibold">{{ $governorate->wilayats_count }}</span></td>
+                                <td class="px-3 py-3 text-center"><span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">{{ $governorate->tourist_sites_count }}</span></td>
+                                <td class="px-3 py-3 text-center"><span class="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-semibold">{{ $governorate->tourist_services_count }}</span></td>
+                                <td class="px-3 py-3 text-center">
+                                    @if ($governorate->image_url)
+                                        <img src="{{ $governorate->image_url }}" alt="{{ $governorate->name_ar }}" class="w-10 h-10 rounded-lg object-cover mx-auto border border-ab-border">
+                                    @else
+                                        <span class="text-ab-muted text-xs">لا توجد</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-center whitespace-nowrap text-xs text-ab-muted">{{ $governorate->created_at->format('Y-m-d H:i') }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="9" class="px-3 py-8 text-center text-ab-muted">لا توجد محافظات</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- الولايات --}}
+            <div data-tab-panel="wilayats" class="hidden overflow-x-auto">
+                <table class="w-full text-sm min-w-[800px]">
+                    <thead>
+                        <tr class="bg-ab-navy text-white">
+                            <th class="px-3 py-3 text-center font-semibold">#</th>
+                            <th class="px-3 py-3 text-right font-semibold">الاسم بالعربية</th>
+                            <th class="px-3 py-3 text-right font-semibold" dir="ltr">الاسم بالإنجليزية</th>
+                            <th class="px-3 py-3 text-center font-semibold">المحافظة</th>
+                            <th class="px-3 py-3 text-center font-semibold">موقع الويب</th>
+                            <th class="px-3 py-3 text-center font-semibold">الصورة</th>
+                            <th class="px-3 py-3 text-center font-semibold">تاريخ الإنشاء</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($wilayats as $wilayat)
+                            <tr class="border-b border-ab-border last:border-0 hover:bg-ab-warm/60">
+                                <td class="px-3 py-3 text-center text-ab-muted">{{ $loop->iteration }}</td>
+                                <td class="px-3 py-3 font-semibold text-ab-navy">{{ $wilayat->name_ar }}</td>
+                                <td class="px-3 py-3 text-ab-body" dir="ltr">{{ $wilayat->name_en }}</td>
+                                <td class="px-3 py-3 text-center">
+                                    @if ($wilayat->governorate)
+                                        <span class="px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-semibold">{{ $wilayat->governorate->name_ar }}</span>
+                                    @else
+                                        <span class="text-ab-muted text-xs">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-center">
+                                    @if ($wilayat->website_url)
+                                        <a href="{{ $wilayat->website_url }}" target="_blank" rel="noopener" class="text-ab-teal text-xs font-semibold underline">زيارة الموقع</a>
+                                    @else
+                                        <span class="text-ab-muted text-xs">لا يوجد</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-center">
+                                    @if ($wilayat->image_url)
+                                        <img src="{{ $wilayat->image_url }}" alt="{{ $wilayat->name_ar }}" class="w-10 h-10 rounded-lg object-cover mx-auto border border-ab-border">
+                                    @else
+                                        <span class="text-ab-muted text-xs">لا توجد</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-center whitespace-nowrap text-xs text-ab-muted">{{ $wilayat->created_at->format('Y-m-d H:i') }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="7" class="px-3 py-8 text-center text-ab-muted">لا توجد ولايات</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- المواقع السياحية --}}
+            <div data-tab-panel="tourist-sites" class="hidden overflow-x-auto">
+                <table class="w-full text-sm min-w-[900px]">
+                    <thead>
+                        <tr class="bg-ab-navy text-white">
+                            <th class="px-3 py-3 text-center font-semibold">#</th>
+                            <th class="px-3 py-3 text-right font-semibold">الاسم بالعربية</th>
+                            <th class="px-3 py-3 text-right font-semibold" dir="ltr">الاسم بالإنجليزية</th>
+                            <th class="px-3 py-3 text-center font-semibold">الموقع</th>
+                            <th class="px-3 py-3 text-center font-semibold">المحافظة</th>
+                            <th class="px-3 py-3 text-center font-semibold">الولاية</th>
+                            <th class="px-3 py-3 text-center font-semibold">عدد الصور</th>
+                            <th class="px-3 py-3 text-center font-semibold">موقع الويب</th>
+                            <th class="px-3 py-3 text-center font-semibold">تاريخ الإنشاء</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($touristSites as $site)
+                            <tr class="border-b border-ab-border last:border-0 hover:bg-ab-warm/60">
+                                <td class="px-3 py-3 text-center text-ab-muted">{{ $loop->iteration }}</td>
+                                <td class="px-3 py-3 font-semibold text-ab-navy">{{ $site->name_ar }}</td>
+                                <td class="px-3 py-3 text-ab-body" dir="ltr">{{ $site->name_en }}</td>
+                                <td class="px-3 py-3 text-center text-ab-body">{{ $site->location ?? 'غير محدد' }}</td>
+                                <td class="px-3 py-3 text-center">
+                                    @if ($site->governorate)
+                                        <span class="px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-semibold">{{ $site->governorate->name_ar }}</span>
+                                    @else
+                                        <span class="text-ab-muted text-xs">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-center">
+                                    @if ($site->wilayat)
+                                        <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">{{ $site->wilayat->name_ar }}</span>
+                                    @else
+                                        <span class="text-ab-muted text-xs">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-center"><span class="px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-semibold">{{ $site->images->count() }}</span></td>
+                                <td class="px-3 py-3 text-center">
+                                    @if ($site->website_url)
+                                        <a href="{{ $site->website_url }}" target="_blank" rel="noopener" class="text-ab-teal text-xs font-semibold underline">زيارة الموقع</a>
+                                    @else
+                                        <span class="text-ab-muted text-xs">لا يوجد</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-center whitespace-nowrap text-xs text-ab-muted">{{ $site->created_at->format('Y-m-d H:i') }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="9" class="px-3 py-8 text-center text-ab-muted">لا توجد مواقع سياحية</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- الخدمات السياحية --}}
+            <div data-tab-panel="tourist-services" class="hidden overflow-x-auto">
+                <table class="w-full text-sm min-w-[900px]">
+                    <thead>
+                        <tr class="bg-ab-navy text-white">
+                            <th class="px-3 py-3 text-center font-semibold">#</th>
+                            <th class="px-3 py-3 text-right font-semibold">الاسم بالعربية</th>
+                            <th class="px-3 py-3 text-right font-semibold" dir="ltr">الاسم بالإنجليزية</th>
+                            <th class="px-3 py-3 text-center font-semibold">نوع الخدمة</th>
+                            <th class="px-3 py-3 text-center font-semibold">المحافظة</th>
+                            <th class="px-3 py-3 text-center font-semibold">الولاية</th>
+                            <th class="px-3 py-3 text-center font-semibold">موقع الويب</th>
+                            <th class="px-3 py-3 text-center font-semibold">الصورة</th>
+                            <th class="px-3 py-3 text-center font-semibold">تاريخ الإنشاء</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($touristServices as $service)
+                            <tr class="border-b border-ab-border last:border-0 hover:bg-ab-warm/60">
+                                <td class="px-3 py-3 text-center text-ab-muted">{{ $loop->iteration }}</td>
+                                <td class="px-3 py-3 font-semibold text-ab-navy">{{ $service->name_ar }}</td>
+                                <td class="px-3 py-3 text-ab-body" dir="ltr">{{ $service->name_en }}</td>
+                                <td class="px-3 py-3 text-center">
+                                    @if ($service->serviceType)
+                                        <span class="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-semibold">{{ $service->serviceType->name_ar }}</span>
+                                    @else
+                                        <span class="text-ab-muted text-xs">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-center">
+                                    @if ($service->governorate)
+                                        <span class="px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-semibold">{{ $service->governorate->name_ar }}</span>
+                                    @else
+                                        <span class="text-ab-muted text-xs">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-center">
+                                    @if ($service->wilayat)
+                                        <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">{{ $service->wilayat->name_ar }}</span>
+                                    @else
+                                        <span class="text-ab-muted text-xs">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-center">
+                                    @if ($service->website_url)
+                                        <a href="{{ $service->website_url }}" target="_blank" rel="noopener" class="text-ab-teal text-xs font-semibold underline">زيارة الموقع</a>
+                                    @else
+                                        <span class="text-ab-muted text-xs">لا يوجد</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-center">
+                                    @if ($service->image_url)
+                                        <img src="{{ $service->image_url }}" alt="{{ $service->name_ar }}" class="w-10 h-10 rounded-lg object-cover mx-auto border border-ab-border">
+                                    @else
+                                        <span class="text-ab-muted text-xs">لا توجد</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-center whitespace-nowrap text-xs text-ab-muted">{{ $service->created_at->format('Y-m-d H:i') }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="9" class="px-3 py-8 text-center text-ab-muted">لا توجد خدمات سياحية</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- أنواع الخدمات --}}
+            <div data-tab-panel="service-types" class="hidden overflow-x-auto">
+                <table class="w-full text-sm min-w-[520px]">
+                    <thead>
+                        <tr class="bg-ab-navy text-white">
+                            <th class="px-3 py-3 text-center font-semibold">#</th>
+                            <th class="px-3 py-3 text-right font-semibold">الاسم بالعربية</th>
+                            <th class="px-3 py-3 text-right font-semibold" dir="ltr">الاسم بالإنجليزية</th>
+                            <th class="px-3 py-3 text-center font-semibold">عدد الخدمات</th>
+                            <th class="px-3 py-3 text-center font-semibold">تاريخ الإنشاء</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($serviceTypes as $type)
+                            <tr class="border-b border-ab-border last:border-0 hover:bg-ab-warm/60">
+                                <td class="px-3 py-3 text-center text-ab-muted">{{ $loop->iteration }}</td>
+                                <td class="px-3 py-3 font-semibold text-ab-navy">{{ $type->name_ar }}</td>
+                                <td class="px-3 py-3 text-ab-body" dir="ltr">{{ $type->name_en }}</td>
+                                <td class="px-3 py-3 text-center"><span class="px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-semibold">{{ $type->tourist_services_count }}</span></td>
+                                <td class="px-3 py-3 text-center whitespace-nowrap text-xs text-ab-muted">{{ $type->created_at->format('Y-m-d H:i') }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="5" class="px-3 py-8 text-center text-ab-muted">لا توجد أنواع خدمات</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- الصور --}}
+            <div data-tab-panel="images" class="hidden">
+                @if ($touristImages->count())
+                    <div class="grid gap-4" style="grid-template-columns:repeat(auto-fill, minmax(180px,1fr))">
+                        @foreach ($touristImages as $image)
+                            <div class="border border-ab-border rounded-2xl overflow-hidden">
+                                <img src="{{ $image->image_url }}" alt="صورة" class="w-full h-36 object-cover">
+                                <div class="p-3">
+                                    <p class="m-0 text-sm font-semibold text-ab-navy truncate">{{ $image->touristSite->name_ar ?? 'صورة غير مرتبطة' }}</p>
+                                    <p class="m-0 mt-1 text-xs text-ab-muted">{{ $image->created_at->format('Y-m-d H:i') }}</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="stats-card text-center">
-                                <h3 class="text-success">{{ $stats['total_wilayats'] }}</h3>
-                                <p>الولايات</p>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="stats-card text-center">
-                                <h3 class="text-info">{{ $stats['total_tourist_sites'] }}</h3>
-                                <p>المواقع السياحية</p>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="stats-card text-center">
-                                <h3 class="text-warning">{{ $stats['total_tourist_services'] }}</h3>
-                                <p>الخدمات السياحية</p>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="stats-card text-center">
-                                <h3 class="text-danger">{{ $stats['total_service_types'] }}</h3>
-                                <p>أنواع الخدمات</p>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="stats-card text-center">
-                                <h3 class="text-secondary">{{ $stats['total_images'] }}</h3>
-                                <p>الصور</p>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
-                </div>
+                @else
+                    <x-admin.empty-state title="لا توجد صور" body="لم تتم إضافة أي صور بعد." />
+                @endif
             </div>
         </div>
     </div>
 
-    <!-- تبويبات للجداول -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <ul class="nav nav-tabs card-header-tabs" id="dataTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="governorates-tab" data-bs-toggle="tab" data-bs-target="#governorates" type="button" role="tab">
-                                <i class="fas fa-building me-1"></i>المحافظات ({{ $governorates->count() }})
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="wilayats-tab" data-bs-toggle="tab" data-bs-target="#wilayats" type="button" role="tab">
-                                <i class="fas fa-map-marked-alt me-1"></i>الولايات ({{ $wilayats->count() }})
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="tourist-sites-tab" data-bs-toggle="tab" data-bs-target="#tourist-sites" type="button" role="tab">
-                                <i class="fas fa-camera me-1"></i>المواقع السياحية ({{ $touristSites->count() }})
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="tourist-services-tab" data-bs-toggle="tab" data-bs-target="#tourist-services" type="button" role="tab">
-                                <i class="fas fa-concierge-bell me-1"></i>الخدمات السياحية ({{ $touristServices->count() }})
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="service-types-tab" data-bs-toggle="tab" data-bs-target="#service-types" type="button" role="tab">
-                                <i class="fas fa-tags me-1"></i>أنواع الخدمات ({{ $serviceTypes->count() }})
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="images-tab" data-bs-toggle="tab" data-bs-target="#images" type="button" role="tab">
-                                <i class="fas fa-images me-1"></i>الصور ({{ $touristImages->count() }})
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-                <div class="card-body">
-                    <div class="tab-content" id="dataTabsContent">
-                        <!-- المحافظات -->
-                        <div class="tab-pane fade show active" id="governorates" role="tabpanel">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>الاسم بالعربية</th>
-                                            <th>الاسم بالإنجليزية</th>
-                                            <th>موقع الويب</th>
-                                            <th>الولايات</th>
-                                            <th>المواقع السياحية</th>
-                                            <th>الخدمات السياحية</th>
-                                            <th>الصورة</th>
-                                            <th>تاريخ الإنشاء</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($governorates as $governorate)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $governorate->name_ar }}</td>
-                                            <td>{{ $governorate->name_en }}</td>
-                                            <td>
-                                                @if($governorate->website_url)
-                                                    <a href="{{ $governorate->website_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                                        <i class="fas fa-external-link-alt"></i> زيارة الموقع
-                                                    </a>
-                                                @else
-                                                    <span class="text-muted">لا يوجد</span>
-                                                @endif
-                                            </td>
-                                            <td><span class="badge bg-info">{{ $governorate->wilayats_count }}</span></td>
-                                            <td><span class="badge bg-success">{{ $governorate->tourist_sites_count }}</span></td>
-                                            <td><span class="badge bg-warning">{{ $governorate->tourist_services_count }}</span></td>
-                                            <td>
-                                                @if($governorate->image_url)
-                                                    <img src="{{ $governorate->image_url }}" alt="{{ $governorate->name_ar }}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
-                                                @else
-                                                    <span class="text-muted">لا توجد صورة</span>
-                                                @endif
-                                            </td>
-                                            <td>{{ $governorate->created_at->format('Y-m-d H:i') }}</td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="9" class="text-center text-muted">لا توجد محافظات</td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- الولايات -->
-                        <div class="tab-pane fade" id="wilayats" role="tabpanel">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>الاسم بالعربية</th>
-                                            <th>الاسم بالإنجليزية</th>
-                                            <th>المحافظة</th>
-                                            <th>موقع الويب</th>
-                                            <th>الصورة</th>
-                                            <th>تاريخ الإنشاء</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($wilayats as $wilayat)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $wilayat->name_ar }}</td>
-                                            <td>{{ $wilayat->name_en }}</td>
-                                            <td>
-                                                @if($wilayat->governorate)
-                                                    <span class="badge bg-primary">{{ $wilayat->governorate->name_ar }}</span>
-                                                @else
-                                                    <span class="text-muted">غير محدد</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($wilayat->website_url)
-                                                    <a href="{{ $wilayat->website_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                                        <i class="fas fa-external-link-alt"></i> زيارة الموقع
-                                                    </a>
-                                                @else
-                                                    <span class="text-muted">لا يوجد</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($wilayat->image_url)
-                                                    <img src="{{ $wilayat->image_url }}" alt="{{ $wilayat->name_ar }}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
-                                                @else
-                                                    <span class="text-muted">لا توجد صورة</span>
-                                                @endif
-                                            </td>
-                                            <td>{{ $wilayat->created_at->format('Y-m-d H:i') }}</td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="7" class="text-center text-muted">لا توجد ولايات</td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- المواقع السياحية -->
-                        <div class="tab-pane fade" id="tourist-sites" role="tabpanel">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>الاسم بالعربية</th>
-                                            <th>الاسم بالإنجليزية</th>
-                                            <th>الموقع</th>
-                                            <th>المحافظة</th>
-                                            <th>الولاية</th>
-                                            <th>عدد الصور</th>
-                                            <th>موقع الويب</th>
-                                            <th>تاريخ الإنشاء</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($touristSites as $site)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $site->name_ar }}</td>
-                                            <td>{{ $site->name_en }}</td>
-                                            <td>{{ $site->location ?? 'غير محدد' }}</td>
-                                            <td>
-                                                @if($site->governorate)
-                                                    <span class="badge bg-primary">{{ $site->governorate->name_ar }}</span>
-                                                @else
-                                                    <span class="text-muted">غير محدد</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($site->wilayat)
-                                                    <span class="badge bg-success">{{ $site->wilayat->name_ar }}</span>
-                                                @else
-                                                    <span class="text-muted">غير محدد</span>
-                                                @endif
-                                            </td>
-                                            <td><span class="badge bg-info">{{ $site->images->count() }}</span></td>
-                                            <td>
-                                                @if($site->website_url)
-                                                    <a href="{{ $site->website_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                                        <i class="fas fa-external-link-alt"></i> زيارة الموقع
-                                                    </a>
-                                                @else
-                                                    <span class="text-muted">لا يوجد</span>
-                                                @endif
-                                            </td>
-                                            <td>{{ $site->created_at->format('Y-m-d H:i') }}</td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="9" class="text-center text-muted">لا توجد مواقع سياحية</td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- الخدمات السياحية -->
-                        <div class="tab-pane fade" id="tourist-services" role="tabpanel">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>الاسم بالعربية</th>
-                                            <th>الاسم بالإنجليزية</th>
-                                            <th>نوع الخدمة</th>
-                                            <th>المحافظة</th>
-                                            <th>الولاية</th>
-                                            <th>موقع الويب</th>
-                                            <th>الصورة</th>
-                                            <th>تاريخ الإنشاء</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($touristServices as $service)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $service->name_ar }}</td>
-                                            <td>{{ $service->name_en }}</td>
-                                            <td>
-                                                @if($service->serviceType)
-                                                    <span class="badge bg-warning">{{ $service->serviceType->name_ar }}</span>
-                                                @else
-                                                    <span class="text-muted">غير محدد</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($service->governorate)
-                                                    <span class="badge bg-primary">{{ $service->governorate->name_ar }}</span>
-                                                @else
-                                                    <span class="text-muted">غير محدد</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($service->wilayat)
-                                                    <span class="badge bg-success">{{ $service->wilayat->name_ar }}</span>
-                                                @else
-                                                    <span class="text-muted">غير محدد</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($service->website_url)
-                                                    <a href="{{ $service->website_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                                        <i class="fas fa-external-link-alt"></i> زيارة الموقع
-                                                    </a>
-                                                @else
-                                                    <span class="text-muted">لا يوجد</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($service->image_url)
-                                                    <img src="{{ $service->image_url }}" alt="{{ $service->name_ar }}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
-                                                @else
-                                                    <span class="text-muted">لا توجد صورة</span>
-                                                @endif
-                                            </td>
-                                            <td>{{ $service->created_at->format('Y-m-d H:i') }}</td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="9" class="text-center text-muted">لا توجد خدمات سياحية</td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- أنواع الخدمات -->
-                        <div class="tab-pane fade" id="service-types" role="tabpanel">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>الاسم بالعربية</th>
-                                            <th>الاسم بالإنجليزية</th>
-                                            <th>عدد الخدمات</th>
-                                            <th>تاريخ الإنشاء</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($serviceTypes as $type)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $type->name_ar }}</td>
-                                            <td>{{ $type->name_en }}</td>
-                                            <td><span class="badge bg-info">{{ $type->tourist_services_count }}</span></td>
-                                            <td>{{ $type->created_at->format('Y-m-d H:i') }}</td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="5" class="text-center text-muted">لا توجد أنواع خدمات</td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- الصور -->
-                        <div class="tab-pane fade" id="images" role="tabpanel">
-                            <div class="row">
-                                @forelse($touristImages as $image)
-                                <div class="col-md-4 col-lg-3 mb-3">
-                                    <div class="card">
-                                        <img src="{{ $image->image_url }}" class="card-img-top" alt="صورة" style="height: 200px; object-fit: cover;">
-                                        <div class="card-body">
-                                            <h6 class="card-title">
-                                                @if($image->touristSite)
-                                                    {{ $image->touristSite->name_ar }}
-                                                @else
-                                                    صورة غير مرتبطة
-                                                @endif
-                                            </h6>
-                                            <p class="card-text">
-                                                <small class="text-muted">{{ $image->created_at->format('Y-m-d H:i') }}</small>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                @empty
-                                <div class="col-12">
-                                    <div class="text-center text-muted py-5">
-                                        <i class="fas fa-images fa-3x mb-3"></i>
-                                        <p>لا توجد صور</p>
-                                    </div>
-                                </div>
-                                @endforelse
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection
-
-@push('styles')
-<style>
-.stats-card {
-    background: #f8f9fa;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 1px solid #dee2e6;
-}
-
-.stats-card h3 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.stats-card p {
-    margin: 0;
-    font-size: 1.1rem;
-    color: #6c757d;
-}
-
-.nav-tabs .nav-link {
-    border: none;
-    border-radius: 0;
-    color: #6c757d;
-    font-weight: 500;
-}
-
-.nav-tabs .nav-link.active {
-    background-color: #614c39;
-    color: white;
-    border-bottom: 2px solid #614c39;
-}
-
-.nav-tabs .nav-link:hover {
-    border-color: transparent;
-    background-color: #f8f9fa;
-}
-
-.table th {
-    border-top: none;
-    font-weight: 600;
-}
-
-.img-thumbnail {
-    border: 2px solid #dee2e6;
-}
-
-.badge {
-    font-size: 0.8rem;
-}
-
-.card {
-    border: none;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-}
-
-.card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
-}
-</style>
-@endpush

@@ -3,442 +3,204 @@
 @section('title', 'تفاصيل الموقع السياحي - ' . $touristSite->name_ar)
 @section('page-title', 'تفاصيل الموقع السياحي')
 
+@php
+    $infoRows = [
+        ['label' => 'المحافظة', 'value' => $touristSite->governorate?->name_ar, 'link' => $touristSite->governorate ? route('governorates.show', $touristSite->governorate->id) : null],
+        ['label' => 'الولاية', 'value' => $touristSite->wilayat?->name_ar, 'link' => $touristSite->wilayat ? route('wilayats.show', $touristSite->wilayat->id) : null],
+    ];
+@endphp
+
 @section('content')
-<!-- Header Section -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h3 mb-2">تفاصيل الموقع السياحي</h1>
-        <p class="text-muted mb-0">عرض جميع معلومات الموقع السياحي</p>
-    </div>
-    <div class="d-flex gap-2">
-        <a href="{{ route('tourist-sitesController.edit', $touristSite->id) }}" class="btn btn-warning">
-            <i class="fas fa-edit"></i>
-            تعديل
-        </a>
-        <a href="{{ route('tourist-sitesController.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-right"></i>
-            العودة للقائمة
-        </a>
-    </div>
-</div>
 
-<div class="row">
-    <!-- Main Info Card -->
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-camera me-2"></i>
-                    {{ $touristSite->name_ar ?? 'غير محدد' }}
-                </h5>
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="m-0 text-2xl font-bold text-ab-navy">تفاصيل الموقع السياحي</h1>
+            <p class="m-0 mt-1 text-sm text-ab-body">عرض جميع معلومات الموقع السياحي</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('tourist-sitesController.edit', $touristSite->id) }}"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-ab-sand text-ab-navy text-sm font-semibold no-underline">تعديل</a>
+            <a href="{{ route('tourist-sitesController.index') }}"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-ab-border-2 text-ab-navy text-sm font-semibold no-underline">العودة للقائمة</a>
+        </div>
+    </div>
+
+    <div class="grid gap-6" style="grid-template-columns:minmax(0,2fr) minmax(240px,1fr)">
+        <div class="bg-white border border-ab-border rounded-[22px] p-6 sm:p-8 flex flex-col gap-4">
+            <h2 class="m-0 text-lg font-bold text-ab-navy">{{ $touristSite->name_ar ?? 'غير محدد' }}</h2>
+
+            <div class="grid gap-4" style="grid-template-columns:repeat(auto-fit, minmax(200px,1fr))">
+                <div class="bg-ab-warm border border-ab-border rounded-2xl p-4">
+                    <span class="block text-xs font-semibold text-ab-teal mb-1">الاسم بالعربية</span>
+                    <span class="block font-bold text-ab-navy">{{ $touristSite->name_ar ?? 'غير محدد' }}</span>
+                </div>
+                <div class="bg-ab-warm border border-ab-border rounded-2xl p-4">
+                    <span class="block text-xs font-semibold text-ab-teal mb-1">الاسم بالإنجليزية</span>
+                    <span class="block font-bold text-ab-navy" dir="ltr">{{ $touristSite->name_en ?? 'غير محدد' }}</span>
+                </div>
+                @foreach ($infoRows as $row)
+                    <div class="bg-ab-warm border border-ab-border rounded-2xl p-4">
+                        <span class="block text-xs font-semibold text-ab-teal mb-1">{{ $row['label'] }}</span>
+                        @if ($row['value'])
+                            <a href="{{ $row['link'] }}" class="text-sm font-semibold text-ab-navy underline">{{ $row['value'] }}</a>
+                        @else
+                            <span class="text-sm text-ab-muted">غير محدد</span>
+                        @endif
+                    </div>
+                @endforeach
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="info-item mb-4">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="info-icon me-3">
-                                    <i class="fas fa-language text-primary"></i>
-                                </div>
-                                <h6 class="mb-0 text-primary">الاسم بالعربية</h6>
-                            </div>
-                            <p class="fs-5 fw-bold mb-0">{{ $touristSite->name_ar ?? 'غير محدد' }}</p>
-                        </div>
-                        
-                        <div class="info-item mb-4">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="info-icon me-3">
-                                    <i class="fas fa-language text-primary"></i>
-                                </div>
-                                <h6 class="mb-0 text-primary">الاسم بالإنجليزية</h6>
-                            </div>
-                            <p class="fs-5 mb-0">{{ $touristSite->name_en ?? 'غير محدد' }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <div class="info-item mb-4">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="info-icon me-3">
-                                    <i class="fas fa-building text-primary"></i>
-                                </div>
-                                <h6 class="mb-0 text-primary">المحافظة</h6>
-                            </div>
-                            @if($touristSite->governorate)
-                                <div class="d-flex align-items-center">
-                                    <span class="badge bg-info fs-6 me-2">{{ $touristSite->governorate->name_ar }}</span>
-                                    <a href="{{ route('governorates.show', $touristSite->governorate->id) }}" class="btn btn-sm btn-outline-info">
-                                        <i class="fas fa-external-link-alt"></i>
-                                        عرض المحافظة
-                                    </a>
-                                </div>
-                            @else
-                                <span class="badge bg-secondary">غير محدد</span>
-                            @endif
-                        </div>
-                        
-                        <div class="info-item mb-4">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="info-icon me-3">
-                                    <i class="fas fa-map-marked-alt text-primary"></i>
-                                </div>
-                                <h6 class="mb-0 text-primary">الولاية</h6>
-                            </div>
-                            @if($touristSite->wilayat)
-                                <div class="d-flex align-items-center">
-                                    <span class="badge bg-secondary fs-6 me-2">{{ $touristSite->wilayat->name_ar }}</span>
-                                    <a href="{{ route('wilayats.show', $touristSite->wilayat->id) }}" class="btn btn-sm btn-outline-secondary">
-                                        <i class="fas fa-external-link-alt"></i>
-                                        عرض الولاية
-                                    </a>
-                                </div>
-                            @else
-                                <span class="badge bg-secondary">غير محدد</span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
 
-                @if($touristSite->location)
-                <div class="info-item mb-4">
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="info-icon me-3">
-                            <i class="fas fa-map-marker-alt text-primary"></i>
-                        </div>
-                        <h6 class="mb-0 text-primary">الموقع الجغرافي</h6>
-                    </div>
-                    <p class="fs-6 mb-0">{{ $touristSite->location }}</p>
+            @if ($touristSite->location)
+                <div class="bg-ab-warm border border-ab-border rounded-2xl p-4">
+                    <span class="block text-xs font-semibold text-ab-teal mb-1">الموقع الجغرافي</span>
+                    <span class="text-sm text-ab-navy">{{ $touristSite->location }}</span>
                 </div>
-                @endif
+            @endif
 
-                @if($touristSite->website_url)
-                <div class="info-item mb-4">
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="info-icon me-3">
-                            <i class="fas fa-globe text-primary"></i>
-                        </div>
-                        <h6 class="mb-0 text-primary">الموقع الرسمي</h6>
-                    </div>
-                    <a href="{{ $touristSite->website_url }}" 
-                       target="_blank" 
-                       class="btn btn-outline-primary">
-                        <i class="fas fa-external-link-alt me-2"></i>
-                        زيارة الموقع
-                    </a>
+            @if ($touristSite->website_url)
+                <div class="bg-ab-warm border border-ab-border rounded-2xl p-4">
+                    <span class="block text-xs font-semibold text-ab-teal mb-1">الموقع الرسمي</span>
+                    <a href="{{ $touristSite->website_url }}" target="_blank" rel="noopener" class="text-sm font-semibold text-ab-navy underline">زيارة الموقع</a>
                 </div>
-                @endif
+            @endif
 
-                <div class="info-item mb-4">
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="info-icon me-3">
-                            <i class="fas fa-align-right text-primary"></i>
-                        </div>
-                        <h6 class="mb-0 text-primary">الوصف بالعربية</h6>
-                    </div>
-                    <p class="mb-0">{{ $touristSite->description_ar ?? 'غير محدد' }}</p>
-                </div>
+            <div class="bg-ab-warm border border-ab-border rounded-2xl p-4">
+                <span class="block text-xs font-semibold text-ab-teal mb-1">الوصف بالعربية</span>
+                <p class="m-0 text-sm text-ab-navy leading-relaxed">{{ $touristSite->description_ar ?? 'غير محدد' }}</p>
+            </div>
+            <div class="bg-ab-warm border border-ab-border rounded-2xl p-4">
+                <span class="block text-xs font-semibold text-ab-teal mb-1">الوصف بالإنجليزية</span>
+                <p class="m-0 text-sm text-ab-navy leading-relaxed" dir="ltr">{{ $touristSite->description_en ?? 'غير محدد' }}</p>
+            </div>
 
-                <div class="info-item mb-4">
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="info-icon me-3">
-                            <i class="fas fa-align-left text-primary"></i>
-                        </div>
-                        <h6 class="mb-0 text-primary">الوصف بالإنجليزية</h6>
-                    </div>
-                    <p class="mb-0">{{ $touristSite->description_en ?? 'غير محدد' }}</p>
-                </div>
-                
-                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                    <div>
-                        <small class="text-muted">
-                            <i class="fas fa-clock me-1"></i>
-                            آخر تحديث: {{ $touristSite->updated_at->format('Y-m-d H:i:s') }}
-                        </small>
-                    </div>
-                    <form action="{{ route('tourist-sitesController.destroy', $touristSite->id) }}" 
-                          method="POST" 
-                          style="display: inline;" 
-                          onsubmit="return confirmDelete()">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash me-2"></i>
-                            حذف الموقع السياحي
-                        </button>
-                    </form>
+            <div class="flex items-center justify-between pt-4 border-t border-ab-border">
+                <span class="text-xs text-ab-muted">آخر تحديث: {{ $touristSite->updated_at->format('Y-m-d H:i:s') }}</span>
+                <form action="{{ route('tourist-sitesController.destroy', $touristSite->id) }}" method="POST"
+                    onsubmit="return confirm('هل أنت متأكد من حذف هذا الموقع السياحي؟ سيتم حذف جميع الصور المرتبطة به أيضاً.')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-50 text-red-600 text-sm font-semibold">حذف الموقع السياحي</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="bg-white border border-ab-border rounded-[22px] p-6 flex flex-col gap-4 h-fit">
+            <h3 class="m-0 text-sm font-bold text-ab-navy">معلومات إضافية</h3>
+            <div class="flex flex-col gap-3 text-sm">
+                <div class="flex items-center justify-between"><span class="text-ab-body">معرّف الموقع</span><span class="font-bold text-ab-navy">#{{ $touristSite->id }}</span></div>
+                <div class="flex items-center justify-between"><span class="text-ab-body">تاريخ الإنشاء</span><span class="font-semibold text-ab-navy">{{ $touristSite->created_at->diffForHumans() }}</span></div>
+                <div class="flex items-center justify-between"><span class="text-ab-body">آخر تحديث</span><span class="font-semibold text-ab-navy">{{ $touristSite->updated_at->diffForHumans() }}</span></div>
+                <div class="flex items-center justify-between"><span class="text-ab-body">عدد الصور</span><span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">{{ $touristSite->images->count() }} صورة</span></div>
+                <div class="flex items-center justify-between"><span class="text-ab-body">الموقع الإلكتروني</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold {{ $touristSite->website_url ? 'bg-emerald-50 text-emerald-700' : 'bg-ab-cool text-ab-muted' }}">{{ $touristSite->website_url ? 'متوفر' : 'غير متوفر' }}</span>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Side Info Card -->
-    <div class="col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-info-circle me-2"></i>
-                    معلومات إضافية
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="info-item mb-3">
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-hashtag text-primary me-2"></i>
-                        <small class="text-muted">معرف الموقع</small>
-                    </div>
-                    <span class="badge bg-primary fs-6">#{{ $touristSite->id }}</span>
-                </div>
-                
-                <div class="info-item mb-3">
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-clock text-primary me-2"></i>
-                        <small class="text-muted">تاريخ الإنشاء</small>
-                    </div>
-                    <span class="fw-medium">{{ $touristSite->created_at->diffForHumans() }}</span>
-                </div>
-                
-                <div class="info-item mb-3">
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-edit text-primary me-2"></i>
-                        <small class="text-muted">آخر تحديث</small>
-                    </div>
-                    <span class="fw-medium">{{ $touristSite->updated_at->diffForHumans() }}</span>
-                </div>
-                
-                <div class="info-item mb-3">
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-images text-primary me-2"></i>
-                        <small class="text-muted">عدد الصور</small>
-                    </div>
-                    <span class="badge bg-success">{{ $touristSite->images->count() }} صورة</span>
-                </div>
-                
-                <div class="info-item mb-3">
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-globe text-primary me-2"></i>
-                        <small class="text-muted">الموقع الإلكتروني</small>
-                    </div>
-                    @if($touristSite->website_url)
-                        <span class="badge bg-success">متوفر</span>
-                    @else
-                        <span class="badge bg-secondary">غير متوفر</span>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Images Management Section -->
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fas fa-images me-2"></i>
-                        إدارة الصور ({{ $touristSite->images->count() }} صورة)
-                    </h5>
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addImagesModal">
-                        <i class="fas fa-plus"></i>
-                        إضافة صور
-                    </button>
+    <div class="mt-6 bg-white border border-ab-border rounded-[22px] p-6 sm:p-8">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+            <h2 class="m-0 text-lg font-bold text-ab-navy">إدارة الصور ({{ $touristSite->images->count() }} صورة)</h2>
+            <button type="button" onclick="AdminUI.openModal('addImagesModal')"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-ab-navy text-white text-sm font-semibold">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+                إضافة صور
+            </button>
+        </div>
+
+        @if ($touristSite->images->count() > 0)
+            <div class="grid gap-4" style="grid-template-columns:repeat(auto-fill, minmax(160px,1fr))">
+                @foreach ($touristSite->images as $image)
+                    <div class="relative">
+                        <img src="{{ $image->image_url }}" alt="{{ $touristSite->name_ar }}" loading="lazy"
+                            onclick="showSiteImage('{{ $image->image_url }}', '{{ $touristSite->name_ar }}')"
+                            class="w-full h-40 object-cover rounded-2xl cursor-pointer">
+                        <form action="{{ route('tourist-sites.images.destroy', [$touristSite->id, $image->id]) }}" method="POST"
+                            onsubmit="return confirm('هل أنت متأكد من حذف هذه الصورة؟')" class="absolute top-2 left-2">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" title="حذف الصورة" class="w-8 h-8 grid place-items-center rounded-full bg-white/90 text-red-600 shadow">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+                            </button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <x-admin.empty-state title="لا توجد صور للموقع السياحي" body="يمكنك إضافة صور للموقع السياحي باستخدام الزر أعلاه." />
+        @endif
+    </div>
+
+    {{-- نافذة إضافة صور --}}
+    <x-admin.modal id="addImagesModal">
+        <form action="{{ route('tourist-sites.images.store', $touristSite->id) }}" method="POST" enctype="multipart/form-data" class="flex flex-col">
+            @csrf
+            <div class="p-6 flex flex-col gap-4">
+                <h3 class="m-0 text-lg font-bold text-ab-navy">إضافة صور للموقع السياحي</h3>
+
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-sm font-semibold text-ab-navy">رفع ملفات الصور</span>
+                    <input type="file" name="image_files[]" multiple accept="image/*" id="image_files" onchange="previewSiteFiles(this)"
+                        class="text-sm text-ab-body file:me-3 file:px-4 file:py-2 file:rounded-full file:border-0 file:bg-ab-cool file:text-ab-navy file:font-semibold w-full border border-ab-border-2 rounded-2xl p-1.5">
+                    @error('image_files') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                    <span class="text-xs text-ab-muted">يمكنك اختيار عدة ملفات صور (JPG, PNG, GIF) - الحد الأقصى 2MB لكل صورة</span>
+                </label>
+
+                <div id="file_preview" class="hidden">
+                    <span class="block text-xs font-semibold text-ab-teal mb-2">معاينة الملفات المرفوعة</span>
+                    <div id="preview_container" class="grid grid-cols-3 gap-2"></div>
+                </div>
+
+                <div class="flex items-start gap-2 bg-sky-50 border border-sky-200 rounded-2xl p-3 text-sky-800 text-xs">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg>
+                    <span><strong>ملاحظة:</strong> يمكن رفع ملفات الصور المحلية فقط. الصيغ المدعومة: JPG, PNG, GIF</span>
                 </div>
             </div>
-            <div class="card-body">
-                @if($touristSite->images->count() > 0)
-                    <div class="row">
-                        @foreach($touristSite->images as $image)
-                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                            <div class="position-relative">
-                                <img src="{{ $image->image_url }}" 
-                                     alt="{{ $touristSite->name_ar }}" 
-                                     class="img-fluid rounded shadow" 
-                                     style="width: 100%; height: 200px; object-fit: cover; cursor: pointer;"
-                                     onclick="openImageModal('{{ $image->image_url }}', '{{ $touristSite->name_ar }}')">
-                                <div class="position-absolute top-0 end-0 m-2">
-                                    <form action="{{ route('tourist-sites.images.destroy', [$touristSite->id, $image->id]) }}" 
-                                          method="POST" 
-                                          style="display: inline;"
-                                          onsubmit="return confirm('هل أنت متأكد من حذف هذه الصورة؟')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger rounded-circle" 
-                                                title="حذف الصورة">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-center py-5">
-                        <i class="fas fa-image fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">لا توجد صور للموقع السياحي</h5>
-                        <p class="text-muted">يمكنك إضافة صور للموقع السياحي باستخدام الزر أعلاه</p>
-                    </div>
-                @endif
+            <div class="flex items-center justify-end gap-3 p-6 border-t border-ab-border">
+                <button type="button" onclick="AdminUI.closeModal('addImagesModal')" class="px-5 py-2.5 rounded-full border border-ab-border-2 text-ab-navy text-sm font-semibold">إلغاء</button>
+                <button type="submit" class="px-6 py-2.5 rounded-full bg-ab-navy text-white text-sm font-semibold">حفظ الصور</button>
             </div>
-        </div>
-    </div>
-</div>
+        </form>
+    </x-admin.modal>
 
-<!-- Add Images Modal -->
-<div class="modal fade" id="addImagesModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-plus me-2"></i>
-                    إضافة صور للموقع السياحي
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form action="{{ route('tourist-sites.images.store', $touristSite->id) }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-body">
-                    <!-- File Upload Section -->
-                    <div class="mb-4">
-                        <label for="image_files" class="form-label">
-                            <i class="fas fa-upload me-1 text-primary"></i>
-                            رفع ملفات الصور
-                        </label>
-                        <input type="file" 
-                               class="form-control @error('image_files') is-invalid @enderror" 
-                               id="image_files" 
-                               name="image_files[]" 
-                               multiple 
-                               accept="image/*"
-                               onchange="previewFiles(this)">
-                        @error('image_files')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                        @enderror
-                        <div class="form-text">
-                            <i class="fas fa-info-circle me-1"></i>
-                            يمكنك اختيار عدة ملفات صور (JPG, PNG, GIF) - الحد الأقصى 2MB لكل صورة
-                        </div>
-                    </div>
-                    
-                    <!-- File Preview Section -->
-                    <div id="file_preview" class="mb-4" style="display: none;">
-                        <h6 class="text-muted mb-2">معاينة الملفات المرفوعة:</h6>
-                        <div id="preview_container" class="row"></div>
-                    </div>
-                    
-                    <!-- Note about local files only -->
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>ملاحظة:</strong> يمكن رفع ملفات الصور المحلية فقط. الصيغ المدعومة: JPG, PNG, GIF
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i>
-                        حفظ الصور
-                    </button>
-                </div>
-            </form>
+    {{-- نافذة عرض الصورة --}}
+    <x-admin.modal id="imageModal" max-width="max-w-3xl">
+        <div class="p-4">
+            <img id="siteImageModalImg" src="" alt="" class="w-full max-h-[75vh] object-contain rounded-xl">
         </div>
-    </div>
-</div>
+    </x-admin.modal>
 
-<!-- Image View Modal -->
-<div class="modal fade" id="imageModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="imageModalTitle"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="modalImage" src="" alt="" class="img-fluid rounded">
-            </div>
-        </div>
-    </div>
-</div>
-
-@push('styles')
-<style>
-    .info-item {
-        padding: 1rem;
-        border-radius: 12px;
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
-    }
-    
-    .info-icon {
-        width: 40px;
-        height: 40px;
-        background: rgba(97, 76, 57, 0.1);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .info-icon i {
-        font-size: 1.2rem;
-    }
-</style>
-@endpush
+@endsection
 
 @push('scripts')
 <script>
-    let imageCount = 0;
-    
-    function openImageModal(imageUrl, siteName) {
-        document.getElementById('modalImage').src = imageUrl;
-        document.getElementById('modalImage').alt = siteName;
-        document.getElementById('imageModalTitle').textContent = siteName;
-        new bootstrap.Modal(document.getElementById('imageModal')).show();
+    function showSiteImage(url, title) {
+        const img = document.getElementById('siteImageModalImg');
+        img.src = url;
+        img.alt = title;
+        AdminUI.openModal('imageModal');
     }
-    
-    // File preview function
-    function previewFiles(input) {
-        const previewContainer = document.getElementById('preview_container');
-        const filePreview = document.getElementById('file_preview');
-        
-        if (input.files && input.files.length > 0) {
-            filePreview.style.display = 'block';
-            previewContainer.innerHTML = '';
-            
-            Array.from(input.files).forEach((file, index) => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const col = document.createElement('div');
-                        col.className = 'col-6 mb-2';
-                        col.innerHTML = `
-                            <div class="position-relative">
-                                <img src="${e.target.result}" 
-                                     alt="معاينة ${index + 1}" 
-                                     class="img-fluid rounded shadow" 
-                                     style="width: 100%; height: 80px; object-fit: cover;">
-                                <div class="position-absolute top-0 end-0 m-1">
-                                    <span class="badge bg-primary">${index + 1}</span>
-                                </div>
-                            </div>
-                        `;
-                        previewContainer.appendChild(col);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        } else {
-            filePreview.style.display = 'none';
+
+    function previewSiteFiles(input) {
+        const previewBox = document.getElementById('file_preview');
+        const container = document.getElementById('preview_container');
+        container.innerHTML = '';
+        if (!input.files || !input.files.length) {
+            previewBox.classList.add('hidden');
+            return;
         }
-    }
-    
-    // تم إزالة دوال إضافة الروابط الخارجية - النظام يدعم الملفات المحلية فقط
-    
-    function confirmDelete() {
-        return confirm('هل أنت متأكد من حذف هذا الموقع السياحي؟ سيتم حذف جميع الصور المرتبطة به أيضاً.');
+        previewBox.classList.remove('hidden');
+        Array.from(input.files).forEach(function (file) {
+            if (!file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'w-full h-20 object-cover rounded-xl';
+                container.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
     }
 </script>
 @endpush
-@endsection

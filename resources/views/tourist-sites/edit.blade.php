@@ -4,312 +4,146 @@
 @section('page-title', 'تعديل الموقع السياحي')
 
 @section('content')
-<!-- Header Section -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h3 mb-2">تعديل الموقع السياحي</h1>
-        <p class="text-muted mb-0">تعديل بيانات الموقع السياحي: {{ $touristSite->name_ar }}</p>
-    </div>
-    <div class="d-flex gap-2">
-        <a href="{{ route('tourist-sitesController.show', $touristSite->id) }}" class="btn btn-success">
-            <i class="fas fa-eye"></i>
-            عرض التفاصيل
-        </a>
-        <a href="{{ route('tourist-sitesController.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-right"></i>
-            العودة للقائمة
-        </a>
-    </div>
-</div>
 
-<div class="row">
-    <!-- Edit Form -->
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-edit me-2"></i>
-                    تعديل بيانات الموقع السياحي
-                </h5>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('tourist-sites.update', $touristSite->id) }}" method="POST" id="editForm">
-                    @csrf
-                    @method('PUT')
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <label for="name_ar" class="form-label">
-                                <i class="fas fa-language me-1 text-primary"></i>
-                                الاسم بالعربية *
-                            </label>
-                            <input type="text" 
-                                   class="form-control @error('name_ar') is-invalid @enderror" 
-                                   id="name_ar" 
-                                   name="name_ar" 
-                                   value="{{ old('name_ar', $touristSite->name_ar) }}" 
-                                   placeholder="أدخل اسم الموقع السياحي بالعربية"
-                                   required>
-                            @error('name_ar')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        
-                        <div class="col-md-6 mb-4">
-                            <label for="name_en" class="form-label">
-                                <i class="fas fa-language me-1 text-primary"></i>
-                                الاسم بالإنجليزية *
-                            </label>
-                            <input type="text" 
-                                   class="form-control @error('name_en') is-invalid @enderror" 
-                                   id="name_en" 
-                                   name="name_en" 
-                                   value="{{ old('name_en', $touristSite->name_en) }}" 
-                                   placeholder="Enter tourist site name in English"
-                                   required>
-                            @error('name_en')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <label for="governorate_id" class="form-label">
-                                <i class="fas fa-building me-1 text-primary"></i>
-                                المحافظة
-                            </label>
-                            <select class="form-control @error('governorate_id') is-invalid @enderror" 
-                                    id="governorate_id" 
-                                    name="governorate_id">
-                                <option value="">اختر المحافظة</option>
-                                @foreach($governorates as $governorate)
-                                    <option value="{{ $governorate->id }}" 
-                                            {{ (old('governorate_id', $touristSite->governorate_id) == $governorate->id) ? 'selected' : '' }}>
-                                        {{ $governorate->name_ar }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('governorate_id')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        
-                        <div class="col-md-6 mb-4">
-                            <label for="wilayat_id" class="form-label">
-                                <i class="fas fa-map-marked-alt me-1 text-primary"></i>
-                                الولاية
-                            </label>
-                            <select class="form-control @error('wilayat_id') is-invalid @enderror" 
-                                    id="wilayat_id" 
-                                    name="wilayat_id">
-                                <option value="">اختر الولاية</option>
-                                @foreach($wilayats as $wilayat)
-                                    <option value="{{ $wilayat->id }}" 
-                                            {{ (old('wilayat_id', $touristSite->wilayat_id) == $wilayat->id) ? 'selected' : '' }}>
-                                        {{ $wilayat->name_ar }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('wilayat_id')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="location" class="form-label">
-                            <i class="fas fa-map-marker-alt me-1 text-primary"></i>
-                            الموقع الجغرافي
-                        </label>
-                        <input type="text" 
-                               class="form-control @error('location') is-invalid @enderror" 
-                               id="location" 
-                               name="location" 
-                               value="{{ old('location', $touristSite->location) }}" 
-                               placeholder="أدخل الموقع الجغرافي">
-                        @error('location')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="website_url" class="form-label">
-                            <i class="fas fa-globe me-1 text-primary"></i>
-                            رابط الموقع الرسمي
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text">
-                                <i class="fas fa-link"></i>
-                            </span>
-                            <input type="url" 
-                                   class="form-control @error('website_url') is-invalid @enderror" 
-                                   id="website_url" 
-                                   name="website_url" 
-                                   value="{{ old('website_url', $touristSite->website_url) }}" 
-                                   placeholder="https://example.com">
-                        </div>
-                        @error('website_url')
-                            <div class="invalid-feedback d-block">
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="description_ar" class="form-label">
-                            <i class="fas fa-align-right me-1 text-primary"></i>
-                            الوصف بالعربية *
-                        </label>
-                        <textarea class="form-control @error('description_ar') is-invalid @enderror" 
-                                  id="description_ar" 
-                                  name="description_ar" 
-                                  rows="4" 
-                                  placeholder="أدخل وصف الموقع السياحي بالعربية"
-                                  required>{{ old('description_ar', $touristSite->description_ar) }}</textarea>
-                        @error('description_ar')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="description_en" class="form-label">
-                            <i class="fas fa-align-left me-1 text-primary"></i>
-                            الوصف بالإنجليزية *
-                        </label>
-                        <textarea class="form-control @error('description_en') is-invalid @enderror" 
-                                  id="description_en" 
-                                  name="description_en" 
-                                  rows="4" 
-                                  placeholder="Enter tourist site description in English"
-                                  required>{{ old('description_en', $touristSite->description_en) }}</textarea>
-                        @error('description_en')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
-                    
-                    <div class="mb-4 p-3 border rounded {{ $touristSite->is_active ? 'border-success bg-success bg-opacity-10' : 'border-warning bg-warning bg-opacity-10' }}">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox"
-                                   id="is_active" name="is_active" value="1"
-                                   {{ old('is_active', $touristSite->is_active) ? 'checked' : '' }}>
-                            <label class="form-check-label fw-bold" for="is_active">
-                                <i class="fas fa-globe me-1"></i>
-                                نشر الموقع (يظهر بالموقع العام)
-                            </label>
-                        </div>
-                        <small class="text-muted d-block mt-1">
-                            الحالة الحالية:
-                            {{ $touristSite->is_active ? 'منشور' : 'غير منشور' }} —
-                            {{ $touristSite->verification_status === 'approved' ? 'معتمد' : 'قيد المراجعة (' . $touristSite->verification_status . ')' }}.
-                            تفعيل هذا الخيار يعتمد الموقع تلقائيًا وينشره فورًا.
-                        </small>
-                    </div>
-
-                    <!-- Form Actions -->
-                    <div class="d-flex gap-3 justify-content-end pt-3 border-top">
-                        <a href="{{ route('tourist-sitesController.show', $touristSite->id) }}" class="btn btn-secondary">
-                            <i class="fas fa-times"></i>
-                            إلغاء
-                        </a>
-                        <button type="submit" class="btn btn-warning" id="submitBtn">
-                            <i class="fas fa-save"></i>
-                            حفظ التعديلات
-                        </button>
-                    </div>
-                </form>
-            </div>
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="m-0 text-2xl font-bold text-ab-navy">تعديل الموقع السياحي</h1>
+            <p class="m-0 mt-1 text-sm text-ab-body">تعديل بيانات الموقع السياحي: {{ $touristSite->name_ar }}</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('tourist-sitesController.show', $touristSite->id) }}"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-ab-border-2 text-ab-navy text-sm font-semibold no-underline">عرض التفاصيل</a>
+            <a href="{{ route('tourist-sitesController.index') }}"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-ab-border-2 text-ab-navy text-sm font-semibold no-underline">العودة للقائمة</a>
         </div>
     </div>
-    
-    <!-- Images Management -->
-    <div class="col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-images me-2"></i>
-                    إدارة الصور
-                </h6>
-            </div>
-            <div class="card-body">
-                @if($touristSite->images->count() > 0)
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-muted">الصور الحالية ({{ $touristSite->images->count() }})</span>
-                            <a href="{{ route('tourist-sitesController.show', $touristSite->id) }}" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-cog"></i>
-                                إدارة الصور
-                            </a>
-                        </div>
-                        <div class="row">
-                            @foreach($touristSite->images->take(4) as $image)
-                            <div class="col-6 mb-2">
-                                <img src="{{ $image->image_url }}" 
-                                     alt="{{ $touristSite->name_ar }}" 
-                                     class="img-fluid rounded shadow" 
-                                     style="width: 100%; height: 60px; object-fit: cover;">
-                            </div>
-                            @endforeach
-                        </div>
-                        @if($touristSite->images->count() > 4)
-                            <small class="text-muted">و {{ $touristSite->images->count() - 4 }} صورة أخرى...</small>
-                        @endif
-                    </div>
-                @else
-                
-                    <div class="text-center py-3">
-                        <i class="fas fa-image fa-2x text-muted mb-2"></i>
-                        <p class="text-muted mb-3">لا توجد صور للموقع السياحي</p>
-                        <a href="{{ route('tourist-sitesController.show', $touristSite->id) }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-plus"></i>
-                            إضافة صور
-                        </a>
-                    </div>
-                @endif
-                
-                <div class="alert alert-info mt-3">
-                    <i class="fas fa-info-circle me-2"></i>
-                    <small>يمكنك إدارة الصور من صفحة عرض الموقع السياحي</small>
+
+    <div class="grid gap-6" style="grid-template-columns:minmax(0,2fr) minmax(240px,1fr)">
+        <div class="bg-white border border-ab-border rounded-[22px] p-6 sm:p-8">
+            {{-- ملاحظة: الرابط الصحيح لمسار التحديث هو tourist-sitesController.update
+                 (اسم المورد المسجّل بـroutes/web.php) --}}
+            <form action="{{ route('tourist-sitesController.update', $touristSite->id) }}" method="POST" id="editForm" class="flex flex-col gap-5">
+                @csrf
+                @method('PUT')
+
+                <div class="grid gap-5" style="grid-template-columns:repeat(auto-fit, minmax(220px,1fr))">
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-sm font-semibold text-ab-navy">الاسم بالعربية *</span>
+                        <input type="text" id="name_ar" name="name_ar" value="{{ old('name_ar', $touristSite->name_ar) }}" required
+                            class="w-full border {{ $errors->has('name_ar') ? 'border-red-400' : 'border-ab-border-2' }} rounded-2xl px-4 py-3 text-ab-navy focus:outline-none focus:border-ab-teal">
+                        @error('name_ar') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                    </label>
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-sm font-semibold text-ab-navy">الاسم بالإنجليزية *</span>
+                        <input type="text" id="name_en" name="name_en" value="{{ old('name_en', $touristSite->name_en) }}" required dir="ltr"
+                            class="w-full border {{ $errors->has('name_en') ? 'border-red-400' : 'border-ab-border-2' }} rounded-2xl px-4 py-3 text-ab-navy focus:outline-none focus:border-ab-teal">
+                        @error('name_en') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                    </label>
                 </div>
+
+                <div class="grid gap-5" style="grid-template-columns:repeat(auto-fit, minmax(220px,1fr))">
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-sm font-semibold text-ab-navy">المحافظة</span>
+                        <select name="governorate_id" class="w-full border border-ab-border-2 rounded-2xl px-4 py-3 text-ab-navy focus:outline-none focus:border-ab-teal">
+                            <option value="">اختر المحافظة</option>
+                            @foreach ($governorates as $governorate)
+                                <option value="{{ $governorate->id }}" @selected(old('governorate_id', $touristSite->governorate_id) == $governorate->id)>{{ $governorate->name_ar }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-sm font-semibold text-ab-navy">الولاية</span>
+                        <select name="wilayat_id" class="w-full border border-ab-border-2 rounded-2xl px-4 py-3 text-ab-navy focus:outline-none focus:border-ab-teal">
+                            <option value="">اختر الولاية</option>
+                            @foreach ($wilayats as $wilayat)
+                                <option value="{{ $wilayat->id }}" @selected(old('wilayat_id', $touristSite->wilayat_id) == $wilayat->id)>{{ $wilayat->name_ar }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                </div>
+
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-sm font-semibold text-ab-navy">الموقع الجغرافي</span>
+                    <input type="text" name="location" value="{{ old('location', $touristSite->location) }}"
+                        class="w-full border border-ab-border-2 rounded-2xl px-4 py-3 text-ab-navy focus:outline-none focus:border-ab-teal">
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-sm font-semibold text-ab-navy">رابط الموقع الرسمي</span>
+                    <input type="url" name="website_url" value="{{ old('website_url', $touristSite->website_url) }}" dir="ltr"
+                        class="w-full border border-ab-border-2 rounded-2xl px-4 py-3 text-ab-navy focus:outline-none focus:border-ab-teal">
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-sm font-semibold text-ab-navy">الوصف بالعربية *</span>
+                    <textarea id="description_ar" name="description_ar" rows="4" required
+                        class="w-full border {{ $errors->has('description_ar') ? 'border-red-400' : 'border-ab-border-2' }} rounded-2xl px-4 py-3 text-ab-navy focus:outline-none focus:border-ab-teal">{{ old('description_ar', $touristSite->description_ar) }}</textarea>
+                    @error('description_ar') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-sm font-semibold text-ab-navy">الوصف بالإنجليزية *</span>
+                    <textarea id="description_en" name="description_en" rows="4" required dir="ltr"
+                        class="w-full border {{ $errors->has('description_en') ? 'border-red-400' : 'border-ab-border-2' }} rounded-2xl px-4 py-3 text-ab-navy focus:outline-none focus:border-ab-teal">{{ old('description_en', $touristSite->description_en) }}</textarea>
+                    @error('description_en') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                </label>
+
+                <div class="p-4 rounded-2xl border {{ $touristSite->is_active ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200' }}">
+                    <label class="flex items-center gap-3">
+                        <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $touristSite->is_active)) class="w-5 h-5 rounded border-ab-border-2">
+                        <span class="text-sm font-bold text-ab-navy">نشر الموقع (يظهر بالموقع العام)</span>
+                    </label>
+                    <p class="m-0 mt-2 text-xs text-ab-body">
+                        الحالة الحالية: {{ $touristSite->is_active ? 'منشور' : 'غير منشور' }} —
+                        {{ $touristSite->verification_status === 'approved' ? 'معتمد' : 'قيد المراجعة (' . $touristSite->verification_status . ')' }}.
+                        تفعيل هذا الخيار يعتمد الموقع تلقائيًا وينشره فورًا.
+                    </p>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-ab-border">
+                    <a href="{{ route('tourist-sitesController.show', $touristSite->id) }}" class="px-5 py-2.5 rounded-full border border-ab-border-2 text-ab-navy text-sm font-semibold no-underline">إلغاء</a>
+                    <button type="submit" id="submitBtn" class="px-6 py-2.5 rounded-full bg-ab-navy text-white text-sm font-semibold">حفظ التعديلات</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white border border-ab-border rounded-[22px] p-6 h-fit flex flex-col gap-4">
+            <h3 class="m-0 text-sm font-bold text-ab-navy">إدارة الصور</h3>
+            @if ($touristSite->images->count() > 0)
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-ab-muted">الصور الحالية ({{ $touristSite->images->count() }})</span>
+                    <a href="{{ route('tourist-sitesController.show', $touristSite->id) }}" class="text-xs font-semibold text-ab-navy underline">إدارة الصور</a>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    @foreach ($touristSite->images->take(4) as $image)
+                        <img src="{{ $image->image_url }}" alt="{{ $touristSite->name_ar }}" class="w-full h-16 object-cover rounded-xl">
+                    @endforeach
+                </div>
+                @if ($touristSite->images->count() > 4)
+                    <span class="text-xs text-ab-muted">و {{ $touristSite->images->count() - 4 }} صورة أخرى...</span>
+                @endif
+            @else
+                <div class="text-center py-4">
+                    <p class="m-0 text-sm text-ab-muted mb-3">لا توجد صور للموقع السياحي</p>
+                    <a href="{{ route('tourist-sitesController.show', $touristSite->id) }}" class="inline-flex px-4 py-2 rounded-full bg-ab-navy text-white text-xs font-semibold no-underline">إضافة صور</a>
+                </div>
+            @endif
+            <div class="flex items-start gap-2 bg-sky-50 border border-sky-200 rounded-2xl p-3 text-sky-800 text-xs">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg>
+                <span>يمكنك إدارة الصور من صفحة عرض الموقع السياحي</span>
             </div>
         </div>
     </div>
-</div>
+
+@endsection
 
 @push('scripts')
 <script>
-    // Form validation
-    document.getElementById('editForm').addEventListener('submit', function(e) {
-        const submitBtn = document.getElementById('submitBtn');
-        const originalText = submitBtn.innerHTML;
-        
-        // Show loading state
-        submitBtn.innerHTML = '<span class="loading"></span> جاري الحفظ...';
-        submitBtn.disabled = true;
-        
-        // Reset button after 3 seconds (in case of validation errors)
-        setTimeout(() => {
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }, 3000);
+    document.getElementById('editForm').addEventListener('submit', function () {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.textContent = 'جاري الحفظ...';
+        setTimeout(() => { btn.disabled = false; btn.textContent = 'حفظ التعديلات'; }, 3000);
     });
-    
-    // Auto-focus on first input
-    document.getElementById('name_ar').focus();
 </script>
 @endpush
-@endsection

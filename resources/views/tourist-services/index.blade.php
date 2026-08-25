@@ -4,252 +4,137 @@
 @section('page-title', 'إدارة الخدمات السياحية')
 
 @section('content')
-<!-- Header Section -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h3 mb-2">الخدمات السياحية</h1>
-        <p class="text-muted mb-0">إدارة وعرض جميع الخدمات السياحية في النظام</p>
-    </div>
-    <div class="d-flex gap-2">
-        <a href="{{ route('tourist-services.create-location') }}" class="btn btn-primary">
-            <i class="fas fa-map-marker-alt"></i>
-            إضافة موقع خدمة جديد
-        </a>
-        <a href="{{ route('tourist-services.create') }}" class="btn btn-outline-primary">
-            <i class="fas fa-plus"></i>
-            إضافة خدمة سريعة
-        </a>
-    </div>
-</div>
 
-@if($touristServices->count() > 0)
-    <!-- Stats Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="stats-card">
-                <h3>{{ $touristServices->count() }}</h3>
-                <p>إجمالي الخدمات السياحية</p>
-            </div>
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="m-0 text-2xl font-bold text-ab-navy">الخدمات السياحية</h1>
+            <p class="m-0 mt-1 text-sm text-ab-body">إدارة وعرض جميع الخدمات السياحية في النظام</p>
         </div>
-        <div class="col-md-3">
-            <div class="stats-card">
-                <h3>{{ $touristServices->where('website_url', '!=', null)->count() }}</h3>
-                <p>خدمات لها موقع إلكتروني</p>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stats-card">
-                <h3>{{ $touristServices->where('image_url', '!=', null)->count() }}</h3>
-                <p>خدمات لها صور</p>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stats-card">
-                <h3>{{ $touristServices->filter(function($item) { return $item->created_at && $item->created_at->isToday(); })->count() }}</h3>
-                <p>خدمات أضيفت اليوم</p>
-            </div>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('tourist-services.create-location') }}"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-ab-navy text-white text-sm font-semibold no-underline">إضافة موقع خدمة جديد</a>
+            <a href="{{ route('tourist-services.create') }}"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-ab-border-2 text-ab-navy text-sm font-semibold no-underline">إضافة خدمة سريعة</a>
         </div>
     </div>
 
-    <!-- Filter Section -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h6 class="mb-0">
-                <i class="fas fa-filter me-2"></i>
-                البحث والفلترة
-            </h6>
+    @if ($touristServices->count() > 0)
+        <div class="grid gap-4 mb-6" style="grid-template-columns:repeat(auto-fit, minmax(180px,1fr))">
+            <x-admin.stat-card label="إجمالي الخدمات السياحية" :value="$touristServices->count()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+            </x-admin.stat-card>
+            <x-admin.stat-card label="خدمات لها موقع إلكتروني" :value="$touristServices->where('website_url', '!=', null)->count()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20 15.3 15.3 0 0 1 0-20Z"></path></svg>
+            </x-admin.stat-card>
+            <x-admin.stat-card label="خدمات لها صور" :value="$touristServices->where('image_url', '!=', null)->count()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg>
+            </x-admin.stat-card>
+            <x-admin.stat-card label="خدمات أضيفت اليوم" :value="$touristServices->filter(fn($s) => $s->created_at && $s->created_at->isToday())->count()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+            </x-admin.stat-card>
         </div>
-        <div class="card-body">
-            <form method="GET" action="{{ route('tourist-services.index') }}">
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <label for="q" class="form-label">البحث</label>
-                        <input type="text" 
-                               class="form-control" 
-                               id="q" 
-                               name="q" 
-                               value="{{ request('q') }}" 
-                               placeholder="ابحث في اسم الخدمة">
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="governorate_id" class="form-label">المحافظة</label>
-                        <select class="form-control" id="governorate_id" name="governorate_id">
-                            <option value="">جميع المحافظات</option>
-                            @foreach($governorates as $governorate)
-                                <option value="{{ $governorate->id }}" 
-                                        {{ request('governorate_id') == $governorate->id ? 'selected' : '' }}>
-                                    {{ $governorate->name_ar }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="wilayat_id" class="form-label">الولاية</label>
-                        <select class="form-control" id="wilayat_id" name="wilayat_id">
-                            <option value="">جميع الولايات</option>
-                            @foreach($wilayats as $wilayat)
-                                <option value="{{ $wilayat->id }}" 
-                                        {{ request('wilayat_id') == $wilayat->id ? 'selected' : '' }}>
-                                    {{ $wilayat->name_ar }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="service_type_id" class="form-label">نوع الخدمة</label>
-                        <select class="form-control" id="service_type_id" name="service_type_id">
-                            <option value="">جميع الأنواع</option>
-                            @foreach($serviceTypes as $serviceType)
-                                <option value="{{ $serviceType->id }}" 
-                                        {{ request('service_type_id') == $serviceType->id ? 'selected' : '' }}>
-                                    {{ $serviceType->name_ar }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search"></i>
-                        بحث
-                    </button>
-                    <a href="{{ route('tourist-services.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-times"></i>
-                        مسح الفلاتر
-                    </a>
-                </div>
-            </form>
-        </div>
-    </div>
 
-    <!-- Services Grid -->
-    <div class="row">
-        @foreach($touristServices as $service)
-        <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card h-100">
-                <!-- Service Image -->
-                @if($service->has_image)
-                    <div class="position-relative" style="height: 200px; overflow: hidden;">
-                        <img src="{{ $service->image_url }}" 
-                             alt="{{ $service->name_ar }}" 
-                             class="card-img-top" 
-                             style="height: 100%; object-fit: cover;">
-                    </div>
-                @else
-                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                        <i class="fas fa-concierge-bell text-muted" style="font-size: 3rem;"></i>
-                    </div>
-                @endif
+        <form method="GET" action="{{ route('tourist-services.index') }}" class="bg-white border border-ab-border rounded-[22px] p-5 mb-6 flex flex-col gap-4">
+            <div class="grid gap-4" style="grid-template-columns:repeat(auto-fit, minmax(180px,1fr))">
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-ab-body">البحث</span>
+                    <input type="text" name="q" value="{{ request('q') }}" placeholder="ابحث في اسم الخدمة"
+                        class="w-full border border-ab-border-2 rounded-full px-4 py-2.5 text-sm text-ab-navy focus:outline-none focus:border-ab-teal">
+                </label>
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-ab-body">المحافظة</span>
+                    <select name="governorate_id" class="w-full border border-ab-border-2 rounded-full px-4 py-2.5 text-sm text-ab-navy">
+                        <option value="">جميع المحافظات</option>
+                        @foreach ($governorates as $governorate)
+                            <option value="{{ $governorate->id }}" @selected(request('governorate_id') == $governorate->id)>{{ $governorate->name_ar }}</option>
+                        @endforeach
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-ab-body">الولاية</span>
+                    <select name="wilayat_id" class="w-full border border-ab-border-2 rounded-full px-4 py-2.5 text-sm text-ab-navy">
+                        <option value="">جميع الولايات</option>
+                        @foreach ($wilayats as $wilayat)
+                            <option value="{{ $wilayat->id }}" @selected(request('wilayat_id') == $wilayat->id)>{{ $wilayat->name_ar }}</option>
+                        @endforeach
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-ab-body">نوع الخدمة</span>
+                    <select name="service_type_id" class="w-full border border-ab-border-2 rounded-full px-4 py-2.5 text-sm text-ab-navy">
+                        <option value="">جميع الأنواع</option>
+                        @foreach ($serviceTypes as $serviceType)
+                            <option value="{{ $serviceType->id }}" @selected(request('service_type_id') == $serviceType->id)>{{ $serviceType->name_ar }}</option>
+                        @endforeach
+                    </select>
+                </label>
+            </div>
+            <div class="flex items-center gap-3">
+                <button type="submit" class="px-5 py-2.5 rounded-full bg-ab-navy text-white text-sm font-semibold">بحث</button>
+                <a href="{{ route('tourist-services.index') }}" class="px-5 py-2.5 rounded-full border border-ab-border-2 text-ab-navy text-sm font-semibold no-underline">مسح الفلاتر</a>
+            </div>
+        </form>
 
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ $service->name_ar }}</h5>
-                    <p class="card-text text-muted">{{ $service->name_en }}</p>
-                    
-                    <div class="mb-3">
-                        @if($service->serviceType)
-                            <span class="badge bg-primary me-1">{{ $service->serviceType->name_ar }}</span>
-                        @endif
-                        @if($service->governorate)
-                            <span class="badge bg-info me-1">{{ $service->governorate->name_ar }}</span>
-                        @endif
-                        @if($service->wilayat)
-                            <span class="badge bg-secondary">{{ $service->wilayat->name_ar }}</span>
+        <div class="grid gap-5" style="grid-template-columns:repeat(auto-fill, minmax(280px,1fr))">
+            @foreach ($touristServices as $service)
+                <div class="bg-white border border-ab-border rounded-[22px] overflow-hidden flex flex-col">
+                    <div class="h-44 bg-ab-cool">
+                        @if ($service->has_image)
+                            <img src="{{ $service->image_url }}" alt="{{ $service->name_ar }}" class="w-full h-full object-cover">
+                        @else
+                            <div class="w-full h-full grid place-items-center">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#B7C6C4" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+                            </div>
                         @endif
                     </div>
 
-                    <div class="mt-auto">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-muted">
-                                <i class="fas fa-calendar me-1"></i>
-                                {{ $service->created_at->format('Y-m-d') }}
-                            </small>
-                            <div class="btn-group btn-group-sm">
-                                <a href="{{ route('tourist-services.show', $service->id) }}" 
-                                   class="btn btn-success" title="عرض التفاصيل">
-                                    <i class="fas fa-eye"></i>
+                    <div class="p-5 flex flex-col gap-2.5 flex-1">
+                        <h3 class="m-0 font-bold text-ab-navy">{{ $service->name_ar }}</h3>
+                        <p class="m-0 text-sm text-ab-muted" dir="ltr">{{ $service->name_en }}</p>
+
+                        <div class="flex flex-wrap gap-1.5">
+                            @if ($service->serviceType)
+                                <span class="px-2.5 py-1 rounded-full bg-ab-chip-bg text-ab-chip-text text-xs font-semibold">{{ $service->serviceType->name_ar }}</span>
+                            @endif
+                            @if ($service->governorate)
+                                <span class="px-2.5 py-1 rounded-full bg-ab-cool text-ab-navy text-xs font-semibold">{{ $service->governorate->name_ar }}</span>
+                            @endif
+                            @if ($service->wilayat)
+                                <span class="px-2.5 py-1 rounded-full bg-ab-cool text-ab-navy text-xs font-semibold">{{ $service->wilayat->name_ar }}</span>
+                            @endif
+                        </div>
+
+                        <div class="mt-auto flex items-center justify-between pt-3 border-t border-ab-border">
+                            <span class="text-xs text-ab-muted">{{ $service->created_at->format('Y-m-d') }}</span>
+                            <div class="flex items-center gap-1.5">
+                                <a href="{{ route('tourist-services.show', $service->id) }}" title="عرض التفاصيل"
+                                    class="w-9 h-9 grid place-items-center rounded-full bg-ab-cool text-ab-navy no-underline">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                 </a>
-                                <a href="{{ route('tourist-services.edit', $service->id) }}" 
-                                   class="btn btn-warning" title="تعديل">
-                                    <i class="fas fa-edit"></i>
+                                <a href="{{ route('tourist-services.edit', $service->id) }}" title="تعديل"
+                                    class="w-9 h-9 grid place-items-center rounded-full bg-amber-50 text-amber-600 no-underline">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
                                 </a>
-                                <form action="{{ route('tourist-services.destroy', $service->id) }}" 
-                                      method="POST" style="display: inline;" 
-                                      onsubmit="return confirmDelete()">
+                                <form action="{{ route('tourist-services.destroy', $service->id) }}" method="POST"
+                                    onsubmit="return confirm('هل أنت متأكد من حذف هذه الخدمة السياحية؟')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger" title="حذف">
-                                        <i class="fas fa-trash"></i>
+                                    <button type="submit" title="حذف" class="w-9 h-9 grid place-items-center rounded-full bg-red-50 text-red-600">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"></path></svg>
                                     </button>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endforeach
         </div>
-        @endforeach
-    </div>
-@else
-    <!-- Empty State -->
-    <div class="card">
-        <div class="card-body">
-            <div class="empty-state">
-                <i class="fas fa-concierge-bell"></i>
-                <h4>لا توجد خدمات سياحية</h4>
-                <p class="mb-4">لم يتم إضافة أي خدمات سياحية بعد. ابدأ بإضافة أول خدمة سياحية في النظام.</p>
-                <a href="{{ route('tourist-services.create') }}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-plus"></i>
-                    إضافة أول خدمة سياحية
-                </a>
-            </div>
-        </div>
-    </div>
-@endif
+    @else
+        <x-admin.empty-state title="لا توجد خدمات سياحية" body="لم يتم إضافة أي خدمات سياحية بعد. ابدأ بإضافة أول خدمة سياحية في النظام.">
+            <x-slot:actions>
+                <a href="{{ route('tourist-services.create') }}" class="px-5 py-2.5 rounded-full bg-ab-navy text-white text-sm font-semibold no-underline">إضافة أول خدمة سياحية</a>
+            </x-slot:actions>
+        </x-admin.empty-state>
+    @endif
 
-@push('styles')
-<style>
-    .card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    }
-    
-    .card-img-top {
-        transition: transform 0.3s ease;
-    }
-    
-    .card:hover .card-img-top {
-        transform: scale(1.05);
-    }
-    
-    .stats-card {
-        background: linear-gradient(135deg, #614c39 0%, #4a3a2a 100%);
-        color: #fff;
-        border-radius: 16px;
-        padding: 2rem;
-        text-align: center;
-        box-shadow: 0 8px 25px rgba(97, 76, 57, 0.3);
-        transition: transform 0.3s ease;
-    }
-    
-    .stats-card:hover {
-        transform: translateY(-3px);
-    }
-    
-    .stats-card h3 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-    
-    .stats-card p {
-        opacity: 0.9;
-        margin: 0;
-        font-size: 0.9rem;
-    }
-</style>
-@endpush
 @endsection

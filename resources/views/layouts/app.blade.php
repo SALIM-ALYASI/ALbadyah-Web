@@ -4,652 +4,194 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'لوحة التحكم') - البادية</title>
-    
-    <!-- Favicon -->
+
     <link rel="icon" href="{{ asset('images/loogo.png') }}" type="image/x-icon">
     <link rel="shortcut icon" href="{{ asset('images/loogo.png') }}" type="image/x-icon">
     <link rel="apple-touch-icon" href="{{ asset('images/loogo.png') }}">
-    <meta name="msapplication-TileImage" content="{{ asset('images/loogo.png') }}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        body {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            min-height: 100vh;
-            color: #333;
-        }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-        /* Sidebar */
-        .sidebar {
-            background: linear-gradient(180deg, #614c39 0%, #4a3a2a 100%);
-            min-height: 100vh;
-            width: 280px;
-            position: fixed;
-            right: 0;
-            top: 0;
-            z-index: 1000;
-            box-shadow: -5px 0 20px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        .sidebar-header {
-            padding: 2rem 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            text-align: center;
-        }
-
-        .sidebar-header h3 {
-            color: #fff;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            font-size: 1.5rem;
-        }
-
-        .sidebar-header p {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
-            margin: 0;
-        }
-
-        .sidebar-nav {
-            padding: 1rem 0;
-        }
-
-        .nav-item {
-            margin: 0.25rem 1rem;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 1rem 1.5rem;
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            position: relative;
-        }
-
-        .nav-link:hover {
-            color: #fff;
-            background: rgba(255,255,255,0.1);
-            transform: translateX(-5px);
-        }
-
-        .nav-link.active {
-            color: #fff;
-            background: rgba(255,255,255,0.15);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .nav-link.active::before {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 60%;
-            background: #fff;
-            border-radius: 2px;
-        }
-
-        .nav-link i {
-            margin-left: 1rem;
-            width: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-        }
-
-        /* Main Content */
-        .main-wrapper {
-            margin-right: 280px;
-            min-height: 100vh;
-            transition: all 0.3s ease;
-        }
-
-        .top-header {
-            background: #fff;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-menu-btn {
-            display: none;
-            background: #614c39;
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            width: 45px;
-            height: 45px;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 15px rgba(97, 76, 57, 0.3);
-            transition: all 0.3s ease;
-            margin-left: 1rem;
-        }
-
-        .header-menu-btn:hover {
-            background: #4a3a2a;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(97, 76, 57, 0.4);
-        }
-
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #333;
-            display: flex;
-            align-items: center;
-        }
-
-        .page-title i {
-            margin-left: 0.75rem;
-            color: #614c39;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .content-area {
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Cards */
-        .card {
-            background: #fff;
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-        }
-
-        .card-header {
-            background: linear-gradient(135deg, #614c39 0%, #4a3a2a 100%);
-            color: #fff;
-            border: none;
-            padding: 1.5rem;
-            font-weight: 600;
-        }
-
-        .card-body {
-            padding: 2rem;
-        }
-
-        /* Buttons */
-        .btn {
-            border-radius: 10px;
-            font-weight: 500;
-            padding: 0.75rem 1.5rem;
-            transition: all 0.3s ease;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #614c39 0%, #4a3a2a 100%);
-            color: #fff;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #4a3a2a 0%, #3d2f20 100%);
-            transform: translateY(-1px);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: #fff;
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-            color: #212529;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
-            color: #fff;
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-            color: #fff;
-        }
-
-        .btn-outline-danger {
-            border: 2px solid #dc3545;
-            color: #dc3545;
-            background: transparent;
-        }
-
-        .btn-outline-danger:hover {
-            background: #dc3545;
-            color: #fff;
-        }
-
-        /* Tables */
-        .table-container {
-            background: #fff;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-
-        .table {
-            margin: 0;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .table thead th {
-            background: linear-gradient(135deg, #614c39 0%, #4a3a2a 100%);
-            color: #fff;
-            border: none;
-            padding: 1rem;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .table tbody td {
-            padding: 1rem;
-            border-bottom: 1px solid #f8f9fa;
-            vertical-align: middle;
-            text-align: center;
-        }
-
-        .table tbody tr:hover {
-            background: #f8f9fa;
-        }
-
-        /* Forms */
-        .form-control {
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 1rem;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: #fff;
-        }
-
-        .form-control:focus {
-            border-color: #614c39;
-            box-shadow: 0 0 0 0.2rem rgba(97, 76, 57, 0.15);
-            background: #fff;
-        }
-
-        .form-label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Alerts */
-        .alert {
-            border: none;
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .alert-success {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            color: #155724;
-        }
-
-        .alert-danger {
-            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-            color: #721c24;
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(100%);
-                width: 100%;
-                z-index: 1050;
-            }
-
-            .sidebar.show {
-                transform: translateX(0);
-            }
-
-            .main-wrapper {
-                margin-right: 0;
-            }
-
-            .content-area {
-                padding: 1rem;
-            }
-
-            .top-header {
-                padding: 1rem;
-            }
-
-            .header-menu-btn {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .mobile-menu-btn {
-                display: block;
-                position: fixed;
-                top: 1rem;
-                right: 1rem;
-                z-index: 1001;
-                background: #614c39;
-                color: #fff;
-                border: none;
-                border-radius: 12px;
-                width: 50px;
-                height: 50px;
-                font-size: 1.2rem;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            }
-
-            /* Overlay for mobile sidebar */
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 1040;
-            }
-
-            .sidebar-overlay.show {
-                display: block;
-            }
-        }
-
-        /* Tablet Responsive */
-        @media (max-width: 1024px) and (min-width: 769px) {
-            .header-menu-btn {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-        }
-
-        .mobile-menu-btn {
-            display: none;
-        }
-
-        /* Stats Cards */
-        .stats-card {
-            background: linear-gradient(135deg, #614c39 0%, #4a3a2a 100%);
-            color: #fff;
-            border-radius: 16px;
-            padding: 2rem;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(97, 76, 57, 0.3);
-        }
-
-        .stats-card h3 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .stats-card p {
-            opacity: 0.9;
-            margin: 0;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: #6c757d;
-        }
-
-        .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        .empty-state h4 {
-            margin-bottom: 1rem;
-            color: #495057;
-        }
-
-        /* Loading States */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Custom Scrollbar */
-        .sidebar::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .sidebar::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.1);
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.3);
-            border-radius: 3px;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.5);
-        }
-    </style>
     @stack('styles')
 </head>
-<body>
-    <!-- Mobile Menu Button -->
-    <button class="mobile-menu-btn" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-    </button>
+<body class="bg-ab-warm text-ab-navy antialiased">
 
-    <!-- Sidebar Overlay for Mobile -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    {{-- شريط تنقّل جانبي --}}
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden" onclick="AdminUI.closeSidebar()"></div>
 
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3>البادية</h3>
-            <p>لوحة التحكم</p>
+    <aside id="sidebar"
+        class="fixed inset-y-0 right-0 z-50 w-72 bg-ab-navy flex flex-col transition-transform duration-300 translate-x-full lg:translate-x-0">
+        <div class="flex items-center gap-3 px-6 py-6 border-b border-white/10">
+            <span class="w-11 h-11 rounded-2xl bg-ab-sand/15 grid place-items-center text-ab-sand text-lg font-bold shrink-0">ب</span>
+            <div class="flex flex-col leading-tight min-w-0">
+                <span class="text-lg font-bold text-white">البادية</span>
+                <span class="text-xs text-white/60">لوحة التحكم</span>
+            </div>
+            <button type="button" onclick="AdminUI.closeSidebar()" aria-label="إغلاق القائمة"
+                class="ms-auto lg:hidden w-9 h-9 rounded-xl grid place-items-center text-white/70 hover:bg-white/10 shrink-0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+            </button>
         </div>
-        
-        <div class="sidebar-nav">
-            <div class="nav-item">
-                <a class="nav-link {{ request()->routeIs('governorates.*') ? 'active' : '' }}" href="{{ route('governorates.index') }}">
-                    <i class="fas fa-building"></i>
-                    المحافظات
+
+        <nav class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-1">
+            @php
+                $navItems = [
+                    ['route' => 'governorates.index', 'match' => 'governorates.*', 'label' => 'المحافظات',
+                        'icon' => '<path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"></path>'],
+                    ['route' => 'wilayats.index', 'match' => 'wilayats.*', 'label' => 'الولايات',
+                        'icon' => '<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"></path><circle cx="12" cy="10" r="2.6"></circle>'],
+                    ['route' => 'tourist-sitesController.index', 'match' => 'tourist-sitesController.*', 'label' => 'المواقع السياحية',
+                        'icon' => '<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"></path><circle cx="12" cy="10" r="2.6"></circle>'],
+                    ['route' => 'tourist-services.index', 'match' => 'tourist-services.*', 'label' => 'الخدمات السياحية',
+                        'icon' => '<path d="M4 7h16M4 12h16M4 17h10"></path>'],
+                    ['route' => 'map-candidates.index', 'match' => 'map-candidates.*', 'label' => 'مراجعة مرشّحات البوت',
+                        'icon' => '<path d="m9 12 2 2 4-4"></path><circle cx="12" cy="12" r="9"></circle>'],
+                    ['route' => 'data-viewer.index', 'match' => 'data-viewer.*', 'label' => 'عرض جميع البيانات',
+                        'icon' => '<ellipse cx="12" cy="5" rx="8" ry="3"></ellipse><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"></path>'],
+                    ['route' => 'visit-stats.index', 'match' => 'visit-stats.*', 'label' => 'إحصائيات الزيارات',
+                        'icon' => '<path d="M3 3v18h18M7 16v-4m5 4V8m5 8v-7"></path>'],
+                ];
+            @endphp
+            @foreach ($navItems as $item)
+                @php $isActive = request()->routeIs($item['match']); @endphp
+                <a href="{{ route($item['route']) }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium no-underline transition {{ $isActive ? 'bg-white/12 text-white font-semibold' : 'text-white/70 hover:bg-white/8 hover:text-white' }}">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">{!! $item['icon'] !!}</svg>
+                    {{ $item['label'] }}
                 </a>
-            </div>
-            <div class="nav-item">
-                <a class="nav-link {{ request()->routeIs('wilayats.*') ? 'active' : '' }}" href="{{ route('wilayats.index') }}">
-                    <i class="fas fa-map-marked-alt"></i>
-                    الولايات
-                </a>
-            </div>
-           
-            <div class="nav-item">
-                <a class="nav-link {{ request()->routeIs('tourist-sites.*') ? 'active' : '' }}" href="{{ route('tourist-sitesController.index') }}">
-                    <i class="fas fa-map-marked-alt"></i>
-                    المواقع السياحية  
-                </a>
-            </div>
-        <div class="nav-item">
-            <a class="nav-link {{ request()->routeIs('tourist-services.*') ? 'active' : '' }}" href="{{ route('tourist-services.index') }}">
-                <i class="fas fa-concierge-bell"></i>
-                الخدمات السياحية
+            @endforeach
+        </nav>
+
+        <div class="px-4 py-4 border-t border-white/10">
+            <a href="{{ route('tourism.index') }}" target="_blank" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-white/60 hover:bg-white/8 hover:text-white no-underline">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6M10 14 21 3"></path></svg>
+                عرض الموقع العام
             </a>
         </div>
-        <div class="nav-item">
-            <a class="nav-link {{ request()->routeIs('data-viewer.*') ? 'active' : '' }}" href="{{ route('data-viewer.index') }}">
-                <i class="fas fa-database"></i>
-                عرض جميع البيانات
-            </a>
-        </div>
-        <div class="nav-item">
-            <a class="nav-link {{ request()->routeIs('visit-stats.*') ? 'active' : '' }}" href="{{ route('visit-stats.index') }}">
-                <i class="fas fa-chart-line"></i>
-                إحصائيات الزيارات
-            </a>
-        </div>
-    </div>
-    </div>
+    </aside>
 
-    <!-- Main Content -->
-    <div class="main-wrapper">
-        <!-- Top Header -->
-        <div class="top-header">
-            <div style="display: flex; align-items: center;">
-                <button class="header-menu-btn" onclick="toggleSidebar()" title="فتح القائمة">
-                    <i class="fas fa-bars"></i>
+    {{-- المحتوى الرئيسي --}}
+    <div class="lg:me-72 min-h-screen flex flex-col">
+        <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-ab-border">
+            <div class="flex items-center gap-4 px-4 sm:px-6 py-4">
+                <button type="button" onclick="AdminUI.openSidebar()" aria-label="فتح القائمة"
+                    class="lg:hidden w-11 h-11 shrink-0 rounded-2xl border border-ab-border grid place-items-center text-ab-navy">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
                 </button>
-                <h2 class="page-title">
-                    <i class="fas fa-tachometer-alt"></i>
-                    @yield('page-title', 'لوحة التحكم')
-                </h2>
-            </div>
-            
-            <div class="header-actions">
-                <form action="{{ route('admin.logout') }}" method="POST" style="display: inline;">
+                <h1 class="text-lg sm:text-xl font-bold text-ab-navy truncate">@yield('page-title', 'لوحة التحكم')</h1>
+
+                <form action="{{ route('admin.logout') }}" method="POST" class="ms-auto shrink-0">
                     @csrf
-                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('هل أنت متأكد من تسجيل الخروج؟')">
-                        <i class="fas fa-sign-out-alt"></i>
-                        تسجيل الخروج
+                    <button type="submit" onclick="return confirm('هل أنت متأكد من تسجيل الخروج؟')"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-ab-border-2 text-ab-body text-sm font-semibold hover:border-red-300 hover:text-red-600">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5M21 12H9"></path></svg>
+                        <span class="hidden sm:inline">تسجيل الخروج</span>
                     </button>
                 </form>
             </div>
-        </div>
+        </header>
 
-        <!-- Content Area -->
-        <div class="content-area">
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
+        <main class="flex-1 p-4 sm:p-6 max-w-[1400px] w-full mx-auto">
+            <div id="admin-alerts" class="flex flex-col gap-3 mb-6">
+                @if (session('success'))
+                    <div class="admin-alert flex items-start gap-3 px-5 py-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 mt-0.5"><path d="m9 12 2 2 4-4"></path><circle cx="12" cy="12" r="9"></circle></svg>
+                        <span class="text-sm font-medium">{{ session('success') }}</span>
+                    </div>
+                @endif
+                @if (session('error'))
+                    <div class="admin-alert flex items-start gap-3 px-5 py-4 rounded-2xl bg-red-50 border border-red-200 text-red-800">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg>
+                        <span class="text-sm font-medium">{{ session('error') }}</span>
+                    </div>
+                @endif
+            </div>
 
             @yield('content')
-        </div>
+        </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            
-            sidebar.classList.toggle('show');
-            if (window.innerWidth <= 768) {
-                overlay.classList.toggle('show');
+        window.AdminUI = (function () {
+            function openSidebar() {
+                document.getElementById('sidebar').classList.remove('translate-x-full');
+                document.getElementById('sidebar-overlay').classList.remove('hidden');
             }
-        }
-
-        function closeSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            
-            sidebar.classList.remove('show');
-            overlay.classList.remove('show');
-        }
-        
-        // Close sidebar when clicking outside
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById('sidebar');
-            const menuBtn = document.querySelector('.mobile-menu-btn');
-            const headerMenuBtn = document.querySelector('.header-menu-btn');
-            
-            if (window.innerWidth <= 768) {
-                if (!sidebar.contains(event.target) && 
-                    !menuBtn.contains(event.target) && 
-                    !headerMenuBtn.contains(event.target)) {
-                    closeSidebar();
-                }
+            function closeSidebar() {
+                document.getElementById('sidebar').classList.add('translate-x-full');
+                document.getElementById('sidebar-overlay').classList.add('hidden');
             }
-        });
-        
-        // Close sidebar on window resize
-        window.addEventListener('resize', function() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
-            }
-        });
-
-        // Close sidebar when clicking on nav links (mobile)
-        document.addEventListener('DOMContentLoaded', function() {
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(function(link) {
-                link.addEventListener('click', function() {
-                    if (window.innerWidth <= 768) {
-                        closeSidebar();
-                    }
-                });
+            window.addEventListener('resize', function () {
+                if (window.innerWidth >= 1024) closeSidebar();
             });
-        });
-        
-        // Confirm delete
-        function confirmDelete() {
-            return confirm('هل أنت متأكد من حذف هذه المحافظة؟');
-        }
 
-        // Auto-hide alerts after 5 seconds
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
+            function setPreview(previewId, src) {
+                const box = document.getElementById(previewId);
+                if (!box) return;
+                box.innerHTML = src
+                    ? '<img src="' + src + '" class="w-full h-full object-cover" alt="">'
+                    : box.dataset.placeholder || '';
+            }
+
+            function previewImageFile(input, previewId) {
+                const file = input.files && input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function (e) { setPreview(previewId, e.target.result); };
+                reader.readAsDataURL(file);
+            }
+
+            function previewImageUrl(input, previewId) {
+                const url = input.value.trim();
+                if (!url) { setPreview(previewId, null); return; }
+                const test = new Image();
+                test.onload = function () { setPreview(previewId, url); };
+                test.onerror = function () {};
+                test.src = url;
+            }
+
+            function openModal(id) {
+                // نتحكم بالظهور عبر style.display لا صنف hidden، لأن ترتيب توليد
+                // Tailwind لأصناف hidden مقابل grid/flex غير مضمون عند تواجدهما
+                // معًا بنفس العنصر (قد يفوز flex/grid على hidden حسب ترتيب البناء).
+                const modal = document.getElementById(id);
+                if (modal) modal.style.display = 'grid';
+            }
+            function closeModal(id) {
+                const modal = document.getElementById(id);
+                if (modal) modal.style.display = 'none';
+            }
+
+            function showTab(groupId, tabKey) {
+                const group = document.getElementById(groupId);
+                if (!group) return;
+                group.querySelectorAll('[data-tab-panel]').forEach(function (panel) {
+                    panel.classList.toggle('hidden', panel.dataset.tabPanel !== tabKey);
+                });
+                group.querySelectorAll('[data-tab-btn]').forEach(function (btn) {
+                    const active = btn.dataset.tabBtn === tabKey;
+                    btn.classList.toggle('bg-ab-navy', active);
+                    btn.classList.toggle('text-white', active);
+                    btn.classList.toggle('text-ab-body', !active);
+                });
+            }
+
+            return {
+                openSidebar, closeSidebar,
+                previewImageFile, previewImageUrl,
+                openModal, closeModal,
+                showTab,
+            };
+        })();
+
+        setTimeout(function () {
+            document.querySelectorAll('.admin-alert').forEach(function (el) {
+                el.style.transition = 'opacity .4s ease';
+                el.style.opacity = '0';
+                setTimeout(function () { el.remove(); }, 400);
             });
         }, 5000);
     </script>
