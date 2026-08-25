@@ -76,7 +76,7 @@ class ImageHelper
             return asset('storage/' . $imagePath);
         }
 
-        if ($imageUrl && filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+        if ($imageUrl && filter_var($imageUrl, FILTER_VALIDATE_URL) && self::looksLikeImageUrl($imageUrl)) {
             return self::correctImageUrl($imageUrl);
         }
 
@@ -117,6 +117,18 @@ class ImageHelper
     }
 
     /**
+     * تحقق سريع (بدون طلب شبكة) إن الرابط يشير فعليًا لملف صورة، لا صفحة ويب
+     * عادية (رابط موقع فندق، رابط بحث خرائط جوجل...). يعتمد على امتداد
+     * المسار فقط - كافٍ لمنع تخزين روابط غير صورة في حقول image_url.
+     */
+    public static function looksLikeImageUrl(string $url): bool
+    {
+        $path = parse_url($url, PHP_URL_PATH) ?? '';
+
+        return (bool) preg_match('/\.(jpe?g|png|gif|webp|avif|svg|bmp)$/i', $path);
+    }
+
+    /**
      * التحقق من وجود الصورة.
      */
     public static function hasImage($imagePath = null, $imageUrl = null)
@@ -135,7 +147,7 @@ class ImageHelper
             return true;
         }
 
-        if ($imageUrl && filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+        if ($imageUrl && filter_var($imageUrl, FILTER_VALIDATE_URL) && self::looksLikeImageUrl($imageUrl)) {
             return true;
         }
 
