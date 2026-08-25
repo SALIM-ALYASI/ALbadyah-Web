@@ -23,9 +23,12 @@
     ]" />
 
     <section class="max-w-[1240px] mx-auto px-5 pt-4">
-        <div class="rounded-[34px] overflow-hidden bg-ab-cool" style="aspect-ratio:21/9; min-height:240px">
+        <div class="relative rounded-[34px] overflow-hidden bg-ab-cool" style="aspect-ratio:21/9; min-height:240px">
             @if ($touristService->has_image)
                 <img src="{{ $touristService->image_url }}" alt="{{ $touristService->name_ar }}" class="w-full h-full object-cover">
+            @elseif ($touristService->serviceType?->placeholder_image)
+                <img src="{{ $touristService->image_url }}" alt="{{ $touristService->name_ar }}" class="w-full h-full object-contain p-6">
+                <span class="absolute bottom-4 right-4 bg-white/90 text-ab-body text-xs font-semibold px-2.5 py-1 rounded-full">رسم توضيحي</span>
             @else
                 <div class="w-full h-full grid place-items-center">
                     <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#B7C6C4" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>

@@ -171,13 +171,14 @@ class TouristService extends Model
     }
 
     /**
-     * الحصول على رابط صورة الخدمة
+     * الحصول على رابط صورة الخدمة (يسقط تلقائيًا لصورة تصنيف عامة عند غياب صورة حقيقية)
      */
     public function getImageUrlAttribute()
     {
         return \App\Helpers\ImageHelper::getImageUrl(
             $this->attributes['image_path'] ?? null,
-            $this->attributes['image_url'] ?? null
+            $this->attributes['image_url'] ?? null,
+            $this->placeholderImagePath()
         );
     }
 
@@ -190,6 +191,21 @@ class TouristService extends Model
             $this->attributes['image_path'] ?? null,
             $this->attributes['image_url'] ?? null
         );
+    }
+
+    /**
+     * هل الصورة المعروضة حاليًا رسم توضيحي عام للتصنيف (لا صورة حقيقية للخدمة بعد)
+     */
+    public function getIsPlaceholderImageAttribute()
+    {
+        return !$this->has_image;
+    }
+
+    private function placeholderImagePath(): string
+    {
+        $file = $this->serviceType?->placeholder_image;
+
+        return $file ? "images/service-placeholders/{$file}" : 'images/default-placeholder.jpg';
     }
 
     /**

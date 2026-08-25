@@ -86,7 +86,7 @@
                     @foreach ($touristServices as $service)
                         <a href="{{ $service->maps_url }}" target="_blank" rel="noopener" class="flex items-center gap-3 p-3 rounded-2xl no-underline hover:bg-ab-cool">
                             <span class="w-[46px] h-[46px] shrink-0 rounded-2xl overflow-hidden bg-ab-cool grid place-items-center">
-                                @if ($service->has_image)
+                                @if ($service->has_image || $service->serviceType?->placeholder_image)
                                     <img src="{{ $service->image_url }}" class="w-full h-full object-cover" alt="">
                                 @else
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B7C6C4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>

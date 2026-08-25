@@ -12,6 +12,7 @@ class ServiceType extends Model
     protected $fillable = [
         'name_ar',
         'name_en',
+        'placeholder_image',
     ];
 
     // كل نوع خدمة يمتلك عدة خدمات سياحية

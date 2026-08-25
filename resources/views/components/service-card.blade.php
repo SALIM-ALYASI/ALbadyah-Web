@@ -10,9 +10,12 @@
 <div class="flex flex-col gap-3 bg-white border border-ab-border rounded-[22px] p-4 transition hover:border-ab-teal hover:shadow-[0_16px_34px_rgba(36,59,68,0.1)]">
     <div class="flex items-start gap-4">
         <div class="relative w-[104px] h-[104px] shrink-0 rounded-[18px] overflow-hidden bg-ab-cool">
-            @if ($service->has_image)
+            @if ($service->has_image || $service->serviceType?->placeholder_image)
                 <img src="{{ $service->image_url }}" alt="{{ $service->name_ar }}" loading="lazy"
                     class="w-full h-full object-cover" style="filter:saturate(.9) contrast(.97)">
+                @if ($service->is_placeholder_image)
+                    <span class="absolute bottom-1 right-1 bg-white/90 text-ab-body text-[9px] font-semibold px-1.5 py-0.5 rounded-full leading-none">رسم توضيحي</span>
+                @endif
             @else
                 <div class="w-full h-full grid place-items-center">
                     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#B7C6C4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
