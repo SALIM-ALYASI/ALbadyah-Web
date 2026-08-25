@@ -6,6 +6,40 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'IBM Plex Sans Arabic', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-ab-navy: #243B44;
+    --color-ab-teal: #789A9A;
+    --color-ab-sand: #E6C58F;
+    --color-ab-warm: #F8F5EF;
+    --color-ab-cool: #F1F5F4;
+    --color-ab-border: #EDE7DC;
+    --color-ab-border-2: #DCE5E3;
+    --color-ab-body: #5E7378;
+    --color-ab-muted: #93A7A6;
+    --color-ab-muted-2: #8A9B9E;
+    --color-ab-chip-bg: #F3E7D0;
+    --color-ab-chip-text: #8A6A33;
+    --color-ab-icon-muted: #B7C6C4;
+}
+
+body {
+    font-family: var(--font-sans);
+}
+
+::selection {
+    background: var(--color-ab-sand);
+}
+
+.ab-desk-nav { display: flex; }
+.ab-burger { display: none; }
+.ab-dock { display: none; }
+.ab-pad-dock { padding-bottom: clamp(40px, 6vw, 72px); }
+
+@media (max-width: 900px) {
+    .ab-desk-nav { display: none !important; }
+    .ab-burger { display: grid !important; }
+    .ab-dock { display: grid !important; }
+    .ab-pad-dock { padding-bottom: 104px !important; }
 }

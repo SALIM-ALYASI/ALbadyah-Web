@@ -204,6 +204,18 @@ class TouristService extends Model
     }
 
     /**
+     * رابط الاتجاهات إلى الخدمة في خرائط جوجل
+     */
+    public function getMapsUrlAttribute()
+    {
+        if ($this->latitude && $this->longitude) {
+            return "https://www.google.com/maps/search/?api=1&query={$this->latitude},{$this->longitude}";
+        }
+
+        return 'https://www.google.com/maps/search/' . urlencode($this->name_en ?: $this->name_ar);
+    }
+
+    /**
      * إنشاء slug تلقائياً عند إنشاء أو تحديث الخدمة
      */
     protected static function boot()

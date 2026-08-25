@@ -231,6 +231,18 @@ class TouristSite extends Model
     }
 
     /**
+     * رابط الاتجاهات إلى الموقع في خرائط جوجل
+     */
+    public function getMapsUrlAttribute()
+    {
+        if ($this->latitude && $this->longitude) {
+            return "https://www.google.com/maps/search/?api=1&query={$this->latitude},{$this->longitude}";
+        }
+
+        return 'https://www.google.com/maps/search/' . urlencode($this->name_en ?: $this->name_ar);
+    }
+
+    /**
      * الحصول على اسم الموقع حسب اللغة
      */
     public function getName($lang = 'ar')

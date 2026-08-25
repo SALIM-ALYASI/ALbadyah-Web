@@ -86,6 +86,14 @@ class Wilayat extends Model
     }
 
     /**
+     * رابط البحث عن الولاية في خرائط جوجل
+     */
+    public function getMapsUrlAttribute()
+    {
+        return 'https://www.google.com/maps/search/' . urlencode($this->name_en ?: $this->name_ar);
+    }
+
+    /**
      * إنشاء slug تلقائياً عند الحفظ
      */
     protected static function boot()

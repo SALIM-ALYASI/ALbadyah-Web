@@ -23,11 +23,11 @@ Route::get('/total-visits', [VisitController::class, 'getTotalVisits'])->name('v
 Route::prefix('tourism')->name('tourism.')->group(function () {
     Route::get('/search', [TourismWebsiteController::class, 'search'])->name('search');
     Route::get('/search/results', [TourismWebsiteController::class, 'searchResults'])->name('search.results');
+    Route::get('/search/suggest', [TourismWebsiteController::class, 'searchSuggest'])->name('search.suggest');
     Route::get('/governorates', [TourismWebsiteController::class, 'governorates'])->name('governorates');
     Route::get('/governorates/{identifier}', [TourismWebsiteController::class, 'governorate'])->name('governorate');
     Route::get('/wilayats', [TourismWebsiteController::class, 'wilayats'])->name('wilayats');
     Route::get('/wilayats/{identifier}', [TourismWebsiteController::class, 'wilayat'])->name('wilayat');
-    Route::get('/wilayat-details/{governorate_id}', [TourismWebsiteController::class, 'wilayatDetails'])->name('wilayat-details');
     Route::get('/tourist-sites', [TourismWebsiteController::class, 'touristSites'])->name('tourist-sites');
     Route::get('/tourist-sites/{identifier}', [TourismWebsiteController::class, 'touristSite'])->name('tourist-site');
     Route::get('/tourist-services', [TourismWebsiteController::class, 'touristServices'])->name('tourist-services');

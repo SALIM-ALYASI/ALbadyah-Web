@@ -1,593 +1,235 @@
 @extends('layouts.tourism')
 
-@section('title', 'البادية - اكتشف جمال سلطنة عُمان')
-@section('description', 'اكتشف أجمل المواقع السياحية في سلطنة عُمان واستمتع بخدماتنا المتميزة')
+@section('title', 'البادية - السياحة في عُمان')
+@section('description', 'اكتشف جمال سلطنة عُمان - مواقع سياحية رائعة وخدمات متميزة عبر ١١ محافظة و٦٣ ولاية')
 
 @section('content')
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="hero-content fade-in-up">
-                    <div class="hero-logo mb-4">
-                        <div class="hero-logo-container mb-4">
-                            <img src="{{ asset('images/loogo.png') }}" alt="البادية" class="hero-logo-img">
-                        </div>
-                        <h1 style="font-size: 4rem; font-weight: 700; text-shadow: 3px 3px 6px rgba(0,0,0,0.5); margin-bottom: 0;">
-                            البادية
-                        </h1>
-                        <p style="font-size: 1.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin-top: 0.5rem;">
-                            اكتشف جمال سلطنة عُمان
-                        </p>
-                    </div>
-                    <p style="font-size: 1.3rem; margin-bottom: 2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
-                        من الجبال الشامخة إلى السواحل الذهبية، من الصحراء الذهبية إلى الواحات الخضراء<br>
-                        رحلة عبر تراث عُمان العريق وطبيعتها الساحرة
-                    </p>
 
-                    <!-- إحصائيات الزيارات -->
-                    <div class="hero-stats">
-                        <div class="stat-item">
-                            <div class="stat-number" id="hero-total-visits">-</div>
-                            <div class="stat-label">زيارة</div>
+    {{-- Hero --}}
+    <section class="max-w-[1240px] mx-auto px-5 pt-6">
+        <div class="relative rounded-[34px] overflow-hidden" style="min-height:min(620px,78vh)">
+            <img src="{{ asset('images/albadyah.jpg') }}" alt="عُمان" class="absolute inset-0 w-full h-full object-cover">
+            <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(36,59,68,.95) 8%, rgba(36,59,68,.72) 45%, rgba(36,59,68,.35) 100%)"></div>
+
+            <div class="relative z-10 flex flex-col items-center text-center gap-6 px-6 py-16 md:py-20">
+                <span class="inline-flex items-center gap-2 bg-white/12 border border-white/25 text-ab-sand text-[13px] font-semibold px-4 py-2 rounded-full">
+                    سلطنة عُمان · {{ $stats['total_governorates'] }} محافظة · {{ $stats['total_wilayats'] }} ولاية
+                </span>
+
+                <h1 class="m-0 text-white font-bold" style="font-size:clamp(40px,7vw,76px)">اكتشف عُمان</h1>
+                <p class="m-0 max-w-2xl text-white/85 text-lg leading-relaxed">من الجبال الشامخة إلى السواحل الذهبية، من الصحراء الذهبية إلى الواحات الخضراء — رحلة عبر تراث عُمان العريق وطبيعتها الساحرة.</p>
+
+                {{-- شريط البحث --}}
+                <div class="relative w-full max-w-xl" id="hero-search">
+                    <form class="ab-search flex items-center gap-2 bg-white rounded-full p-2 shadow-[0_18px_44px_rgba(20,35,41,.28)]" style="flex-wrap:wrap" onsubmit="event.preventDefault(); window.location.href='{{ route('tourism.search') }}?query=' + encodeURIComponent(document.getElementById('hero-search-input').value);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A9B9E" stroke-width="2.5" stroke-linecap="round" class="shrink-0 mr-2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg>
+                        <input id="hero-search-input" type="text" autocomplete="off" placeholder="ابحث عن مكان أو خدمة..." class="ab-search-field flex-1 min-w-0 border-0 outline-none bg-transparent text-sm text-ab-navy px-1 py-2.5">
+                        <button type="submit" class="ab-search-cta inline-flex items-center gap-2 px-5 py-3 rounded-full bg-ab-teal text-white text-sm font-semibold shrink-0">استكشف عُمان</button>
+                    </form>
+                    <div id="hero-search-results" class="hidden absolute z-20 mt-3 w-full text-right bg-white rounded-[26px] shadow-[0_24px_60px_rgba(20,35,41,.3)] p-3 overflow-y-auto" style="max-height:min(58vh,460px)"></div>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                    @foreach (['مطرح', 'قلعة', 'فندق في مسقط', 'المتحف الوطني'] as $chip)
+                        <button type="button" class="ab-search-chip px-4 py-2 rounded-full bg-white/12 border border-white/25 text-white text-[13px]" data-query="{{ $chip }}">{{ $chip }}</button>
+                    @endforeach
+                </div>
+
+                <div class="grid gap-1 pt-4 w-full max-w-xl border-t border-white/15" style="grid-template-columns:repeat(auto-fit, minmax(110px,1fr))">
+                    @foreach ([['value' => $stats['total_governorates'], 'label' => 'محافظة'], ['value' => $stats['total_wilayats'], 'label' => 'ولاية'], ['value' => $stats['total_tourist_sites'], 'label' => 'موقع سياحي'], ['value' => $stats['total_tourist_services'], 'label' => 'خدمة سياحية']] as $stat)
+                        <div class="flex flex-col items-center gap-1 pt-3">
+                            <span class="text-[28px] font-bold text-ab-sand">{{ $stat['value'] }}</span>
+                            <span class="text-[13px] text-white/70">{{ $stat['label'] }}</span>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-number" id="hero-total-cities">-</div>
-                            <div class="stat-label">مدينة</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">{{ $stats['total_tourist_sites'] }}</div>
-                            <div class="stat-label">موقع سياحي</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">{{ $stats['total_tourist_services'] }}</div>
-                            <div class="stat-label">خدمة سياحية</div>
-                        </div>
-                    </div>
-                    <div class="hero-buttons">
-                        <a href="{{ route('tourism.tourist-sites') }}" class="btn btn-primary btn-lg me-3">
-                            <i class="fas fa-mountain me-2"></i>استكشف المواقع السياحية
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- مسارَان --}}
+    <section class="max-w-[1240px] mx-auto px-5 pt-14 md:pt-20">
+        <div class="grid gap-5" style="grid-template-columns:repeat(auto-fit, minmax(320px,1fr))">
+            <a href="{{ route('tourism.governorates') }}" class="relative overflow-hidden rounded-[30px] bg-ab-navy p-8 no-underline">
+                <span class="absolute -top-[60px] -left-[110px] w-[300px] h-[300px] rounded-full bg-white/5"></span>
+                <div class="relative flex flex-col gap-4">
+                    <span class="w-[62px] h-[62px] rounded-2xl bg-ab-sand/20 grid place-items-center text-ab-sand">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"></path><circle cx="12" cy="10" r="2.6"></circle></svg>
+                    </span>
+                    <span class="text-ab-sand text-[13px] font-semibold">ابدأ من هنا</span>
+                    <h2 class="m-0 text-white font-bold" style="font-size:clamp(28px,4vw,40px)">أين تريد أن تذهب؟</h2>
+                    <p class="m-0 text-white/75 leading-relaxed">تصفّح محافظات عُمان الإحدى عشرة وولاياتها الثلاث والستين.</p>
+                    <span class="inline-flex items-center gap-2 self-start px-5 py-2.5 rounded-full bg-white/12 text-white text-sm font-semibold">
+                        تصفّح المحافظات
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+                    </span>
+                </div>
+            </a>
+
+            <a href="{{ route('tourism.tourist-services') }}" class="relative overflow-hidden rounded-[30px] p-8 no-underline" style="background:#F3E7D0">
+                <span class="absolute -top-[60px] -left-[110px] w-[300px] h-[300px] rounded-full bg-white/25"></span>
+                <div class="relative flex flex-col gap-4">
+                    <span class="w-[62px] h-[62px] rounded-2xl bg-white/60 grid place-items-center text-ab-chip-text">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+                    </span>
+                    <span class="text-ab-chip-text text-[13px] font-semibold">خدمات سياحية</span>
+                    <h2 class="m-0 text-ab-navy font-bold" style="font-size:clamp(28px,4vw,40px)">ماذا تحتاج؟</h2>
+                    <p class="m-0 text-ab-navy/70 leading-relaxed">فنادق وأسواق ومطاعم ومرافق قريبة من وجهتك.</p>
+                    <span class="inline-flex items-center gap-2 self-start px-5 py-2.5 rounded-full bg-ab-navy text-white text-sm font-semibold">
+                        تصفّح الخدمات
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+                    </span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    {{-- المحافظات --}}
+    <section id="governorates" class="max-w-[1240px] mx-auto px-5 pt-14 md:pt-20">
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+            <h2 class="m-0 text-2xl md:text-3xl font-bold text-ab-navy">محافظات عُمان</h2>
+            <a href="{{ route('tourism.governorates') }}" class="text-sm font-semibold text-ab-teal no-underline">عرض جميع المحافظات ←</a>
+        </div>
+
+        <div class="grid gap-5" style="grid-template-columns:repeat(auto-fill, minmax(268px,1fr))">
+            @foreach ($governorates as $governorate)
+                <x-governorate-card :governorate="$governorate" />
+            @endforeach
+        </div>
+    </section>
+
+    {{-- أنواع الخدمات --}}
+    @if ($serviceTypes->isNotEmpty())
+        <section id="needs" class="mt-14 md:mt-20 bg-ab-warm py-14 md:py-20">
+            <div class="max-w-[1240px] mx-auto px-5">
+                <h2 class="m-0 text-2xl md:text-3xl font-bold text-ab-navy mb-6">ماذا تحتاج في رحلتك؟</h2>
+                <div class="grid gap-4" style="grid-template-columns:repeat(auto-fit, minmax(240px,1fr))">
+                    @foreach ($serviceTypes as $type)
+                        <a href="{{ route('tourism.tourist-services', ['service_type_id' => $type->id]) }}"
+                            class="flex items-center gap-4 bg-white border border-ab-border rounded-[22px] p-4 no-underline transition hover:border-ab-teal">
+                            <span class="w-[54px] h-[54px] shrink-0 rounded-2xl bg-ab-cool grid place-items-center text-ab-teal text-lg font-bold">{{ mb_substr($type->name_ar, 0, 1) }}</span>
+                            <span class="flex flex-col">
+                                <span class="font-bold text-ab-navy">{{ $type->name_ar }}</span>
+                                <span class="text-[13px] text-ab-muted">{{ $type->tourist_services_count }} خدمة</span>
+                            </span>
                         </a>
-                        <a href="{{ route('tourism.tourist-services') }}" class="btn btn-outline-light btn-lg">
-                            <i class="fas fa-concierge-bell me-2"></i>خدماتنا السياحية
-                        </a>
-                    </div>
+                    @endforeach
                 </div>
             </div>
-        </div>
-    </div>
-</section>
+        </section>
+    @endif
 
-<!-- Stats Section -->
-<section class="stats-section section">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                <div class="stat-item">
-                    <span class="stat-number">{{ $stats['total_governorates'] }}</span>
-                    <div class="stat-label">محافظة</div>
-                </div>
+    {{-- المواقع السياحية --}}
+    @if ($featuredSites->isNotEmpty())
+        <section id="sites" class="max-w-[1240px] mx-auto px-5 pt-14 md:pt-20">
+            <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+                <h2 class="m-0 text-2xl md:text-3xl font-bold text-ab-navy">مواقع سياحية مميزة</h2>
+                <a href="{{ route('tourism.tourist-sites') }}" class="text-sm font-semibold text-ab-teal no-underline">عرض كل المواقع ←</a>
             </div>
-            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                <div class="stat-item">
-                    <span class="stat-number">{{ $stats['total_wilayats'] }}</span>
-                    <div class="stat-label">ولاية</div>
-                </div>
+            <div class="grid gap-5" style="grid-template-columns:repeat(auto-fill, minmax(300px,1fr))">
+                @foreach ($featuredSites as $site)
+                    <x-site-card :site="$site" />
+                @endforeach
             </div>
-            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                <div class="stat-item">
-                    <span class="stat-number">{{ $stats['total_tourist_sites'] }}</span>
-                    <div class="stat-label">موقع سياحي</div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                <div class="stat-item">
-                    <span class="stat-number">{{ $stats['total_tourist_services'] }}</span>
-                    <div class="stat-label">خدمة سياحية</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+        </section>
+    @endif
 
-<!-- Featured Tourist Sites -->
-<section class="section">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <h2 class="section-title">أبرز المواقع السياحية</h2>
-                <p class="section-subtitle">اكتشف أجمل الأماكن في سلطنة عُمان</p>
+    {{-- الخدمات السياحية --}}
+    @if ($featuredServices->isNotEmpty())
+        <section id="services" class="max-w-[1240px] mx-auto px-5 pt-14 md:pt-20">
+            <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+                <h2 class="m-0 text-2xl md:text-3xl font-bold text-ab-navy">خدمات سياحية مقترحة</h2>
+                <a href="{{ route('tourism.tourist-services') }}" class="text-sm font-semibold text-ab-teal no-underline">عرض كل الخدمات ←</a>
             </div>
-        </div>
+            <div class="grid gap-5" style="grid-template-columns:repeat(auto-fill, minmax(320px,1fr))">
+                @foreach ($featuredServices as $service)
+                    <x-service-card :service="$service" />
+                @endforeach
+            </div>
+        </section>
+    @endif
 
-        <div class="row">
-            @forelse($featuredSites as $site)
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card h-100 mountain-shadow">
-                    @if($site->images->count() > 0)
-                    <img src="{{ $site->images->first()->image_url }}" class="card-img-top" alt="{{ $site->name_ar }}">
-                    @else
-                    @php
-                    $omaniImages = [
-                    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // صحراء
-                    'https://images.unsplash.com/photo-1544735716-392fe2489ffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // جبال
-                    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // سواحل
-                    'https://images.unsplash.com/photo-1583417319070-4a69db38a482?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // واحات
-                    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // قلعة
-                    'https://images.unsplash.com/photo-1544735716-392fe2489ffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' // تراث
-                    ];
-                    $randomImage = $omaniImages[array_rand($omaniImages)];
-                    @endphp
-                    <img src="{{ $randomImage }}" class="card-img-top" alt="{{ $site->name_ar }}">
-                    @endif
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">{{ $site->name_ar }}</h5>
-                        <p class="card-text">{{ $site->name_en }}</p>
-                        <p class="card-text text-muted small">
-                            <i class="fas fa-map-marker-alt me-1"></i>
-                            {{ $site->location ?? 'سلطنة عُمان' }}
-                        </p>
-                        <div class="mt-auto">
-                            <a href="{{ route('tourism.tourist-site', $site->slug) }}" class="btn btn-primary">
-                                <i class="fas fa-eye me-1"></i>عرض التفاصيل
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @empty
-            <div class="col-12">
-                <div class="text-center py-5">
-                    <i class="fas fa-camera fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">لا توجد مواقع سياحية متاحة حالياً</h4>
-                </div>
-            </div>
-            @endforelse
-        </div>
-
-        <div class="row mt-4">
-            <div class="col-12 text-center">
-                <a href="{{ route('tourism.tourist-sites') }}" class="btn btn-outline-primary btn-lg">
-                    <i class="fas fa-list me-2"></i>عرض جميع المواقع السياحية
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Governorates Section -->
-<section class="section bg-light">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <h2 class="section-title">استكشف المحافظات</h2>
-                <p class="section-subtitle">اكتشف التنوع الجغرافي والثقافي في سلطنة عُمان</p>
-            </div>
-        </div>
-
-        <div class="row">
-            @forelse($governorates->take(6) as $governorate)
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card h-100 mountain-shadow">
-                    <img src="{{ $governorate->image_url }}" class="card-img-top" alt="{{ $governorate->name_ar }}" style="height: 200px; object-fit: cover;">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">{{ $governorate->name_ar }}</h5>
-                        <p class="card-text">{{ $governorate->name_en }}</p>
-                        <div class="governorate-stats mb-3">
-                            <span class="badge custom-badge-1 me-2">
-                                <i class="fas fa-map-marked-alt me-1"></i>{{ $governorate->wilayats_count }} ولاية
-                            </span>
-                            <span class="badge custom-badge-2 me-2">
-                                <i class="fas fa-camera me-1"></i>{{ $governorate->tourist_sites_count }} موقع
-                            </span>
-                            <span class="badge custom-badge-3">
-                                <i class="fas fa-concierge-bell me-1"></i>{{ $governorate->tourist_services_count }} خدمة
-                            </span>
-                        </div>
-                        <div class="mt-auto">
-                            <a href="{{ route('tourism.governorate', $governorate->id) }}" class="btn btn-primary">
-                                <i class="fas fa-eye me-1"></i>استكشف المحافظة
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @empty
-            <div class="col-12">
-                <div class="text-center py-5">
-                    <i class="fas fa-building fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">لا توجد محافظات متاحة حالياً</h4>
-                </div>
-            </div>
-            @endforelse
-        </div>
-
-        <div class="row mt-4">
-            <div class="col-12 text-center">
-                <a href="{{ route('tourism.governorates') }}" class="btn btn-outline-primary btn-lg">
-                    <i class="fas fa-list me-2"></i>عرض جميع المحافظات
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Call to Action Section -->
-<section class="section" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%); color: white;">
-    <div class="container">
-        <div class="row justify-content-center text-center">
-            <div class="col-lg-8">
-                <h2 class="mb-4">ابدأ رحلتك في البادية</h2>
-                <p class="mb-4">من الجبال الشامخة إلى السواحل الذهبية، من الصحراء الذهبية إلى الواحات الخضراء<br>
-                    اكتشف خدماتنا السياحية المتميزة واحجز رحلتك المثالية عبر تراث عُمان العريق</p>
-                <div class="cta-buttons">
-                    <a href="{{ route('tourism.tourist-services') }}" class="btn btn-light btn-lg me-3">
-                        <i class="fas fa-concierge-bell me-2"></i>خدماتنا السياحية
-                    </a>
+    {{-- بانر من نحن --}}
+    <section class="max-w-[1240px] mx-auto px-5 py-14 md:py-20">
+        <div class="relative overflow-hidden rounded-[30px] bg-ab-navy p-10 md:p-14 text-center">
+            <span class="absolute -bottom-[80px] -right-[100px] w-[320px] h-[320px] rounded-full bg-white/5"></span>
+            <div class="relative flex flex-col items-center gap-4">
+                <h2 class="m-0 text-white font-bold" style="font-size:clamp(28px,4vw,42px)">جاهز لاستكشاف عُمان؟</h2>
+                <p class="m-0 max-w-xl text-white/75 leading-relaxed">ابدأ رحلتك من المواقع السياحية أو دع البادية يدلّك على الخدمات القريبة منك.</p>
+                <div class="flex flex-wrap items-center justify-center gap-3 mt-2">
+                    <a href="{{ route('tourism.tourist-sites') }}" class="px-6 py-3 rounded-full bg-ab-sand text-ab-navy text-sm font-semibold no-underline">المواقع السياحية</a>
+                    <a href="{{ route('tourism.tourist-services') }}" class="px-6 py-3 rounded-full border border-white/30 text-white text-sm font-semibold no-underline">الخدمات السياحية</a>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
 @endsection
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        loadHeroStats();
+(function () {
+    const input = document.getElementById('hero-search-input');
+    const results = document.getElementById('hero-search-results');
+    const suggestUrl = @json(route('tourism.search.suggest'));
+    let debounce;
+
+    function iconFor() {
+        return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#789A9A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"></path><circle cx="12" cy="10" r="2.6"></circle></svg>';
+    }
+
+    function render(groups) {
+        if (!groups.length) {
+            results.innerHTML = '<p class="text-center text-sm text-ab-muted py-6 m-0">لا توجد نتائج مطابقة</p>';
+            results.classList.remove('hidden');
+            return;
+        }
+        results.innerHTML = groups.map(function (group) {
+            const rows = group.items.map(function (item) {
+                const avatar = item.image
+                    ? '<img src="' + item.image + '" class="w-11 h-11 rounded-2xl object-cover" alt="">'
+                    : '<span class="w-11 h-11 rounded-2xl bg-ab-cool grid place-items-center">' + iconFor() + '</span>';
+                return '<a href="' + item.url + '" class="flex items-center gap-3 p-2 rounded-2xl no-underline hover:bg-ab-cool">' +
+                    avatar +
+                    '<span class="flex flex-col min-w-0">' +
+                        '<span class="text-sm font-semibold text-ab-navy truncate">' + item.name + '</span>' +
+                        (item.meta ? '<span class="text-xs text-ab-muted truncate">' + item.meta + '</span>' : '') +
+                    '</span>' +
+                '</a>';
+            }).join('');
+            return '<div class="mb-2"><p class="px-2 text-xs font-semibold text-ab-muted mb-1">' + group.title + ' · ' + group.items.length + '</p>' + rows + '</div>';
+        }).join('');
+        results.classList.remove('hidden');
+    }
+
+    input.addEventListener('input', function () {
+        clearTimeout(debounce);
+        const value = input.value.trim();
+        if (!value) {
+            results.classList.add('hidden');
+            return;
+        }
+        debounce = setTimeout(function () {
+            fetch(suggestUrl + '?query=' + encodeURIComponent(value))
+                .then(function (r) { return r.json(); })
+                .then(function (data) { render(data.groups || []); })
+                .catch(function () {});
+        }, 250);
     });
 
-    function loadHeroStats() {
-        // جلب إجمالي الزيارات
-        fetch('/total-visits')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('hero-total-visits').textContent = formatNumber(data.total_visits);
-                }
-            })
-            .catch(error => {
-                console.error('Error loading total visits:', error);
-            });
-
-        // جلب إحصائيات مفصلة لعدد المدن
-        fetch('/visit-stats')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.data.visits_by_city) {
-                    const uniqueCities = data.data.visits_by_city.length;
-                    document.getElementById('hero-total-cities').textContent = formatNumber(uniqueCities);
-                }
-            })
-            .catch(error => {
-                console.error('Error loading city stats:', error);
-            });
-    }
-
-    function formatNumber(num) {
-        if (num >= 1000000) {
-            return (num / 1000000).toFixed(1) + 'M';
-        } else if (num >= 1000) {
-            return (num / 1000).toFixed(1) + 'K';
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('#hero-search')) {
+            results.classList.add('hidden');
         }
-        return num.toString();
-    }
+    });
+
+    document.querySelectorAll('.ab-search-chip').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+            input.value = chip.dataset.query;
+            input.dispatchEvent(new Event('input'));
+            input.focus();
+        });
+    });
+})();
 </script>
-@endpush
-
-@push('styles')
-<style>
-    .hero-section {
-        background: linear-gradient(rgba(97, 76, 57, 0.7), rgba(161, 129, 90, 0.6), rgba(222, 180, 122, 0.5)),
-        url('{{ asset("images/albadyah.jpg") }}');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-    }
-
-    .hero-logo-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .hero-logo-img {
-        height: 140px;
-        width: auto;
-        object-fit: contain;
-        filter: brightness(1.1) contrast(1.1) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
-        transition: all 0.3s ease;
-        border-radius: 15px;
-        background: rgba(255, 255, 255, 0.1);
-        padding: 10px;
-        backdrop-filter: blur(5px);
-    }
-
-    .hero-logo-img:hover {
-        transform: scale(1.1);
-        filter: brightness(1.3) contrast(1.2) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
-        background: rgba(255, 255, 255, 0.2);
-    }
-
-    .hero-buttons {
-        margin-top: 2rem;
-    }
-
-    .governorate-stats .badge {
-        font-size: 0.8rem;
-    }
-
-    .cta-buttons {
-        margin-top: 2rem;
-    }
-
-    /* Custom Badge Colors */
-    .custom-badge-1 {
-        background: linear-gradient(135deg, #614c39 0%, #a1815a 100%) !important;
-        color: white !important;
-        border: none;
-        font-weight: 500;
-    }
-
-    .custom-badge-2 {
-        background: linear-gradient(135deg, #a1815a 0%, #deb47a 100%) !important;
-        color: white !important;
-        border: none;
-        font-weight: 500;
-    }
-
-    .custom-badge-3 {
-        background: linear-gradient(135deg, #deb47a 0%, #c19b6c 100%) !important;
-        color: white !important;
-        border: none;
-        font-weight: 500;
-    }
-
-    .custom-badge-1:hover {
-        background: linear-gradient(135deg, #4a3a2a 0%, #8a6f4a 100%) !important;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(97, 76, 57, 0.3);
-    }
-
-    .custom-badge-2:hover {
-        background: linear-gradient(135deg, #8a6f4a 0%, #c9a06a 100%) !important;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(161, 129, 90, 0.3);
-    }
-
-    .custom-badge-3:hover {
-        background: linear-gradient(135deg, #c9a06a 0%, #a8855c 100%) !important;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(222, 180, 122, 0.3);
-    }
-
-    @media (max-width: 768px) {
-        .hero-logo-img {
-            height: 100px;
-        }
-
-        .hero-buttons .btn {
-            display: block;
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        .cta-buttons .btn {
-            display: block;
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-    }
-
-    /* إحصائيات الصفحة الرئيسية */
-    .hero-stats {
-        display: flex;
-        justify-content: center;
-        gap: 3rem;
-        margin: 2rem 0;
-        padding: 1.5rem;
-        background: rgba(255, 255, 255, 0.15);
-        border-radius: 20px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    }
-
-    .hero-stats .stat-item {
-        text-align: center;
-        flex: 1;
-    }
-
-    .hero-stats .stat-number {
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: white;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        line-height: 1;
-        margin-bottom: 0.5rem;
-    }
-
-    .hero-stats .stat-label {
-        font-size: 1rem;
-        color: rgba(255, 255, 255, 0.9);
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        font-weight: 500;
-    }
-
-    @media (max-width: 768px) {
-        .hero-stats {
-            gap: 1.5rem;
-            padding: 1rem;
-        }
-
-        .hero-stats .stat-number {
-            font-size: 2rem;
-        }
-
-        .hero-stats .stat-label {
-            font-size: 0.9rem;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .hero-stats {
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .hero-stats .stat-item {
-            flex: 1 1 calc(50% - 0.5rem);
-        }
-
-        .hero-stats .stat-number {
-            font-size: 1.8rem;
-        }
-    }
-
-    /* Stats Section Styles */
-    .stats-section {
-        background: linear-gradient(135deg, rgba(97, 76, 57, 0.8) 0%, rgba(161, 129, 90, 0.6) 50%, rgba(222, 180, 122, 0.7) 100%);
-        padding: 4rem 0;
-        position: relative;
-    }
-
-    .stats-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(97, 76, 57, 0.3) 0%, rgba(161, 129, 90, 0.2) 50%, rgba(222, 180, 122, 0.3) 100%);
-        backdrop-filter: blur(10px);
-        z-index: 1;
-    }
-
-    .stats-section .container {
-        position: relative;
-        z-index: 2;
-    }
-
-    .stats-section .stat-item {
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(20px);
-        border-radius: 20px;
-        padding: 2rem 1.5rem;
-        text-align: center;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .stats-section .stat-item::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-        border-radius: 20px;
-        z-index: -1;
-    }
-
-    .stats-section .stat-item:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-        border-color: rgba(255, 255, 255, 0.3);
-        background: rgba(255, 255, 255, 0.2);
-    }
-
-    .stats-section .stat-number {
-        font-size: 3rem;
-        font-weight: 800;
-        color: white;
-        line-height: 1;
-        margin-bottom: 0.5rem;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
-
-    .stats-section .stat-label {
-        font-size: 1.1rem;
-        color: rgba(255, 255, 255, 0.9);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-    }
-
-    /* Responsive adjustments for stats section */
-    @media (max-width: 992px) {
-        .stats-section .stat-number {
-            font-size: 2.5rem;
-        }
-        
-        .stats-section .stat-label {
-            font-size: 1rem;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .stats-section {
-            padding: 3rem 0;
-        }
-        
-        .stats-section .stat-item {
-            padding: 1.5rem 1rem;
-        }
-        
-        .stats-section .stat-number {
-            font-size: 2.2rem;
-        }
-        
-        .stats-section .stat-label {
-            font-size: 0.9rem;
-        }
-        
-        .stats-section .row {
-            justify-content: center;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .stats-section {
-            padding: 2rem 0;
-        }
-        
-        .stats-section .stat-item {
-            padding: 1.25rem 0.75rem;
-        }
-        
-        .stats-section .stat-number {
-            font-size: 2rem;
-        }
-        
-        .stats-section .stat-label {
-            font-size: 0.85rem;
-        }
-    }
-
-    /* Ensure proper centering on all screen sizes */
-    .stats-section .row {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: stretch;
-    }
-
-    .stats-section .col-lg-3,
-    .stats-section .col-md-6,
-    .stats-section .col-sm-6 {
-        display: flex;
-        justify-content: center;
-    }
-</style>
 @endpush
